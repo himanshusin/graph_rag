@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import time
+import re
 from pathlib import Path
 from typing import Dict, Any, List, Tuple, Optional
 
@@ -112,9 +113,26 @@ class ChangeManagementAgent:
     # 3. Synchronize README.md
     # -------------------------------------------------------------------------
     def sync_readme(self) -> str:
-        """Update README.md with live architecture diagrams, sub-tree guide, and badges."""
+        """Update README.md with live version badges, sub-tree guide, and semantic versioning while preserving rich conceptual sections."""
         version = self.get_version()
-        readme_content = f"""# 🏛️ Enterprise Knowledge Intelligence Platform (GraphRAG)
+        if self.readme_file.exists():
+            content = self.readme_file.read_text(encoding="utf-8")
+            # Update Version badge: [![Version](https://img.shields.io/badge/Version-X.Y.Z-blue.svg...
+            content = re.sub(
+                r'img\.shields\.io/badge/Version-[\d\.]+-blue\.svg',
+                f'img.shields.io/badge/Version-{version}-blue.svg',
+                content
+            )
+            # Update VERSION line in ASCII tree: ├── VERSION    # Semantic Versioning (X.Y.Z)
+            content = re.sub(
+                r'├── VERSION\s+# Semantic Versioning \([\d\.]+\)',
+                f'├── VERSION                         # Semantic Versioning ({version})',
+                content
+            )
+            self.readme_file.write_text(content, encoding="utf-8")
+            return content
+        else:
+            readme_content = f"""# 🏛️ Enterprise Knowledge Intelligence Platform (GraphRAG)
 
 [![Version](https://img.shields.io/badge/Version-{version}-blue.svg?style=flat-square)](#)
 [![Compliance](https://img.shields.io/badge/Compliance-SOC2_Audit_Ready-emerald.svg?style=flat-square)](#)
@@ -149,54 +167,12 @@ GraphRAG-Breakdown/
 │   └── sync_and_push.py            # Pre-push orchestrator invoking Change Management Agent
 │
 ├── ragtest/output/                 # Parquet datasets (entities, relationships, nodes, reports)
-└── notebook/                       # Visualizations (interactive_graph.html) & ChromaDB store
-```
-
----
-
-## 🌟 Key Capabilities
-
-1. **📄 Enterprise Document Retention Vault (`core/vault.py`)**:
-   - Permanent document storage with SHA-256 integrity verification.
-   - Inline verified citations `[1]`, `[2]` linking answers to exact source passages and page numbers.
-2. **🤖 Multi-Strategy Executive AI Advisor**:
-   - **🌐 Strategic Synthesis**: Hierarchical summaries across all strategic knowledge domains.
-   - **🔍 Targeted Lookup**: Granular entity and relationship traversal with verified proof.
-   - **🌀 Deep-Dive Cross-Functional Analysis**: Multi-hop reasoning connecting macro strategy with operational details.
-   - **📚 Standard Document Search**: Dense vector similarity search across source passages.
-   - **⚖️ Comparative Audit**: Side-by-side evaluation of Graph Intelligence vs Standard Search.
-3. **🕸️ Interactive Concept Map**:
-   - Full physics-based PyVis visualization with node centrality and community color clusters.
-4. **🛡️ Change Management Agent (`core/change_manager.py`)**:
-   - Automated semantic versioning, changelog generation, QA validation, and pre-push maintenance.
-
----
-
-## 🚀 Quickstart
-
-```bash
-# 1. Install dependencies
-pip install -r requirements.txt
-
-# 2. Configure environment
-echo "OPENAI_API_KEY=your_key_here" > .env
-
-# 3. Launch Enterprise Web Platform
-streamlit run app.py
-```
-Open **[http://localhost:8501](http://localhost:8501)** in your browser.
-
----
-
-## 🛠️ Automated QA & Git Sync
-
-To run QA checks, update the changelog, and push changes:
-```bash
-python scripts/sync_and_push.py
+├── notebook/                       # Visualizations (interactive_graph.html) & ChromaDB store
+└── media/                          # Conceptual diagrams and architectural graphics
 ```
 """
-        self.readme_file.write_text(readme_content, encoding="utf-8")
-        return readme_content
+            self.readme_file.write_text(readme_content, encoding="utf-8")
+            return readme_content
 
     # -------------------------------------------------------------------------
     # 4. QA Validation Suite

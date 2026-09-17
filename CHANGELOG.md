@@ -4,7 +4,7 @@ All notable changes, release updates, and governance audits for **GraphRAG Enter
 
 ---
 
-## [v2.3.1] - 2026-09-17
+## [v2.3.2] - 2026-09-17
 
 ### 🚀 New Features & Capabilities
 - [`feb13fc`] feat: implement Sub-tree architecture, Change Management Agent, Document Vault with source attribution, and Glean-style UI
@@ -19,4 +19,5 @@ All notable changes, release updates, and governance audits for **GraphRAG Enter
 - [`104a206`] Main Files
 
 ### 📖 Documentation & Governance
+- [`2624691`] chore: remove all references to glean across codebase and documentation
 - [`bf302b6`] Create README.md
