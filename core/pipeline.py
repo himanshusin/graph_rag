@@ -443,10 +443,10 @@ class GraphRAGEngine:
         }
 
     def _generate_visualizations(self, nodes_df: pd.DataFrame, relationships_df: pd.DataFrame):
-        colors = ['#3B82F6', '#6366F1', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6', '#06B6D4', '#EF4444', '#14B8A6', '#84CC16']
-        
+        colors = ['#3056D3', '#1F8A5B', '#B7791F', '#8A8A83', '#B03A2E', '#5B4BC4', '#2F7F8F', '#9C5518', '#4B7A2F', '#7A4B6B']
+
         # Interactive PyVis Graph
-        net = Network(height='600px', width='100%', bgcolor='#0B0E14', font_color='white', notebook=True, cdn_resources='in_line')
+        net = Network(height='600px', width='100%', bgcolor='#FFFFFF', font_color='#111110', notebook=True, cdn_resources='in_line')
         
         for _, row in nodes_df.iterrows():
             comm = int(row['community'])
@@ -474,8 +474,8 @@ class GraphRAGEngine:
 
         # Matplotlib Static Graph
         if len(nodes_df) > 0:
-            fig, ax = plt.subplots(figsize=(14, 9), facecolor='#0B0E14')
-            ax.set_facecolor('#0B0E14')
+            fig, ax = plt.subplots(figsize=(14, 9), facecolor='#FFFFFF')
+            ax.set_facecolor('#FFFFFF')
 
             G = nx.Graph()
             for _, row in nodes_df.iterrows():
@@ -490,10 +490,10 @@ class GraphRAGEngine:
             node_sizes = [350 + G.nodes[n]['degree'] * 120 for n in G.nodes]
 
             nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=node_sizes, alpha=0.92, ax=ax)
-            nx.draw_networkx_edges(G, pos, edge_color='#232B3E', alpha=0.5, width=1.5, ax=ax)
-            nx.draw_networkx_labels(G, pos, font_size=8, font_color='white', font_weight='bold', ax=ax)
+            nx.draw_networkx_edges(G, pos, edge_color='#D6D6D0', alpha=0.9, width=1.2, ax=ax)
+            nx.draw_networkx_labels(G, pos, font_size=8, font_color='#111110', font_weight='bold', ax=ax)
 
-            plt.title('Enterprise Knowledge Concept Map (Thematic Domains)', color='white', fontsize=14, pad=15)
+            plt.title('Concept map · thematic domains', color='#111110', fontsize=14, pad=15)
             plt.axis('off')
             plt.tight_layout()
 

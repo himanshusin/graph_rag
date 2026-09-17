@@ -1,9 +1,8 @@
 import os
-import html
-import json
+import re
 import time
 from pathlib import Path
-from typing import Dict, Any, Tuple, List, Optional
+from typing import Dict, Any, Tuple, List
 
 import streamlit as st
 import pandas as pd
@@ -27,13 +26,15 @@ importlib.reload(core.change_manager)
 from core.vault import DocumentVault
 from core.pipeline import DocumentIngestor, GraphRAGEngine
 from core.change_manager import ChangeManagementAgent
+from core import design
+
+MODEL_NAME = "gpt-4o-mini"
 
 # -----------------------------------------------------------------------------
-# 1. Page Configuration & Enterprise Design System
+# 1. Page configuration & design system
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Enterprise Knowledge Platform",
-    page_icon="🏛️",
+    page_title="Knowledge · GraphRAG",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -41,196 +42,12 @@ st.set_page_config(
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY", "")
 
-# Initialize Core Services
 vault = DocumentVault(vault_dir="./vault")
 change_agent = ChangeManagementAgent()
 app_version = change_agent.get_version()
 
-# Enterprise Styling
-st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-    
-    html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    
-    .stApp {
-        background-color: #0A0D14;
-        color: #E2E8F0;
-    }
-    
-    /* Work Header */
-    .app-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.75rem 0 1.25rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        margin-bottom: 1.5rem;
-    }
-    
-    .app-brand {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    
-    .app-logo-badge {
-        background: linear-gradient(135deg, #2563EB, #4F46E5);
-        color: white;
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-weight: 800;
-        font-size: 1.1rem;
-        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
-    }
-    
-    .app-title {
-        font-size: 1.55rem;
-        font-weight: 800;
-        color: #F8FAFC;
-        letter-spacing: -0.02em;
-        margin: 0;
-    }
-    
-    .app-subtitle {
-        color: #94A3B8;
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin: 0;
-    }
-    
-    /* Verified Grounding Pill */
-    .verified-pill {
-        background: rgba(16, 185, 129, 0.12);
-        border: 1px solid rgba(16, 185, 129, 0.35);
-        color: #6EE7B7;
-        padding: 4px 10px;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    /* Search Filter Chips */
-    .source-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 12px;
-        border-radius: 9999px;
-        font-size: 0.78rem;
-        font-weight: 600;
-        background: #141824;
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        color: #CBD5E1;
-        margin-right: 8px;
-    }
-    
-    /* Metric HUD */
-    .kpi-row {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-        margin-bottom: 1.5rem;
-    }
-    
-    .app-stat-card {
-        background: #121622;
-        border: 1px solid rgba(255, 255, 255, 0.07);
-        border-radius: 10px;
-        padding: 14px 16px;
-        position: relative;
-    }
-    
-    .app-stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: linear-gradient(90deg, #2563EB, #4F46E5);
-    }
-    
-    .app-stat-num {
-        font-size: 1.65rem;
-        font-weight: 800;
-        color: #F8FAFC;
-        font-family: 'JetBrains Mono', monospace;
-    }
-    
-    .app-stat-text {
-        font-size: 0.76rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        color: #94A3B8;
-        letter-spacing: 0.05em;
-        margin-top: 3px;
-    }
-
-    /* Citation Cards */
-    .citation-card {
-        background: #0E121A;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        padding: 12px 14px;
-        margin-top: 8px;
-        margin-bottom: 8px;
-        transition: border-color 0.2s ease;
-    }
-    
-    .citation-card:hover {
-        border-color: rgba(37, 99, 235, 0.4);
-    }
-    
-    .citation-badge {
-        background: rgba(37, 99, 235, 0.15);
-        border: 1px solid rgba(37, 99, 235, 0.4);
-        color: #93C5FD;
-        padding: 2px 7px;
-        border-radius: 4px;
-        font-size: 0.72rem;
-        font-weight: 700;
-        font-family: 'JetBrains Mono', monospace;
-    }
-    
-    .citation-title {
-        font-size: 0.88rem;
-        font-weight: 700;
-        color: #F1F5F9;
-        margin-left: 6px;
-    }
-    
-    .citation-snippet {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.78rem;
-        color: #94A3B8;
-        background: #07090E;
-        border-radius: 6px;
-        padding: 8px 10px;
-        margin-top: 8px;
-        line-height: 1.45;
-        max-height: 140px;
-        overflow-y: auto;
-    }
-
-    /* Split Comparison Card */
-    .compare-container {
-        background: #121622;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        padding: 16px;
-        height: 100%;
-    }
-</style>
-""", unsafe_allow_html=True)
-
 # -----------------------------------------------------------------------------
-# 2. Data & Client Caching
+# 2. Data & client caching
 # -----------------------------------------------------------------------------
 @st.cache_data(show_spinner=False)
 def load_graph_data(root_path: str = "./ragtest") -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -254,38 +71,45 @@ def load_chroma_db(path: str = "./notebook/chromadb"):
     return client, collection
 
 @st.cache_resource(show_spinner=False)
-def get_llm(temperature: float = 0.2, model_name: str = "gpt-4o-mini"):
+def get_llm(temperature: float = 0.2, model_name: str = MODEL_NAME):
     return ChatOpenAI(model=model_name, temperature=temperature, api_key=api_key)
 
-# Load core datasets
 entities_df, relationships_df, nodes_df, community_df = load_graph_data()
 chroma_client, paper_collection = load_chroma_db()
 catalog_docs = vault.get_catalog()
+all_vault_tables = vault.get_tables() if hasattr(vault, "get_tables") else []
 
-# Helper for Tabular & Quantitative Context Injection
+
 def append_table_context(query: str, context_lines: List[str], citations: List[Dict[str, Any]], top_k: int = 2):
     """Retrieve matched structured tables and inject markdown tables & row facts into LLM context."""
     matched_tables = vault.find_relevant_tables(query, top_k=top_k)
     if matched_tables:
-        context_lines.append("\n### 📊 Verified Structured Tables & Quantitative Metric Data:")
+        context_lines.append("\n### Verified structured tables & quantitative metric data:")
         for t in matched_tables:
             context_lines.append(f"#### Table: {t.get('title', 'Extracted Table')} (Page {t.get('page', 1)})")
             context_lines.append(t.get("markdown", ""))
             if t.get("row_facts"):
                 context_lines.append("**Row Observations & Numerical Facts:**\n" + "\n".join(t["row_facts"][:8]))
-            
+
             citations.append({
                 "index": len(citations) + 1,
-                "document_title": f"Structured Table: {t.get('title', 'Table')}",
+                "kind": "Table",
+                "name": t.get("title", "Extracted table"),
+                "meta": f"p. {t.get('page', 1)}",
+                "source": "tables",
+                "document_title": f"Table: {t.get('title', 'Table')}",
                 "chunk_id": t.get("table_id", "tab_ref"),
-                "excerpt": f"Page {t.get('page', 1)} | {len(t.get('columns', []))} columns | {t.get('rows_count', 0)} rows: {', '.join(t.get('columns', [])[:4])}",
-                "relevance": "Verified Quantitative Table",
+                "excerpt": (
+                    f"{len(t.get('columns', []))} columns · {t.get('rows_count', 0)} rows: "
+                    f"{', '.join(t.get('columns', [])[:4])}"
+                ),
+                "relevance": "Verified quantitative table",
                 "is_table": True,
                 "table_markdown": t.get("markdown", "")
             })
 
 # -----------------------------------------------------------------------------
-# 3. Query Reasoning Engines with Source Citations & Numerical Grounding
+# 3. Query reasoning engines with source citations & numerical grounding
 # -----------------------------------------------------------------------------
 def query_graphrag_global(query: str, reports: pd.DataFrame, llm: ChatOpenAI) -> Tuple[str, str, List[Dict[str, Any]]]:
     context_lines = ["### Executive Thematic Domain Summaries:"]
@@ -294,13 +118,17 @@ def query_graphrag_global(query: str, reports: pd.DataFrame, llm: ChatOpenAI) ->
         context_lines.append(f"#### [{idx + 1}] {row['title']}\n{row['summary']}\n")
         citations.append({
             "index": idx + 1,
-            "document_title": f"Thematic Domain: {row['title']}",
+            "kind": "Domain",
+            "name": row["title"],
+            "meta": f"rank {row['rank']}",
+            "source": "graph",
+            "document_title": f"Domain: {row['title']}",
             "chunk_id": f"domain_{row['community']}",
-            "excerpt": row['summary'],
+            "excerpt": row["summary"],
             "relevance": f"Rank: {row['rank']}",
             "is_table": False
         })
-    
+
     append_table_context(query, context_lines, citations, top_k=2)
     context_text = "\n".join(context_lines)
     prompt = ChatPromptTemplate.from_template(
@@ -323,17 +151,21 @@ def query_graphrag_local(query: str, entities: pd.DataFrame, rels: pd.DataFrame,
         context_lines.append(f"- [{idx + 1}] **{row['title']}** ({row['type']}): {row['description']}")
         citations.append({
             "index": idx + 1,
+            "kind": "Concept",
+            "name": row["title"],
+            "meta": str(row["type"]),
+            "source": "graph",
             "document_title": f"Concept: {row['title']} ({row['type']})",
             "chunk_id": f"entity_{row['human_readable_id']}",
-            "excerpt": row['description'],
-            "relevance": "Direct Graph Node",
+            "excerpt": row["description"],
+            "relevance": "Direct graph node",
             "is_table": False
         })
-    
+
     context_lines.append("\n### Direct Relational Dependencies & Quantitative Measurements:")
     for _, row in rels.head(top_k).iterrows():
         context_lines.append(f"- **{row['source']}** ➔ **{row['target']}** (Strength: {row['weight']}/10): {row['description']}")
-    
+
     append_table_context(query, context_lines, citations, top_k=2)
     context_text = "\n".join(context_lines)
     prompt = ChatPromptTemplate.from_template(
@@ -356,17 +188,21 @@ def query_graphrag_drift(query: str, reports: pd.DataFrame, rels: pd.DataFrame, 
         context_lines.append(f"- [{idx + 1}] **{row['title']}**: {row['summary']}")
         citations.append({
             "index": idx + 1,
-            "document_title": row['title'],
+            "kind": "Domain",
+            "name": row["title"],
+            "meta": f"rank {row['rank']}" if "rank" in row else "",
+            "source": "graph",
+            "document_title": row["title"],
             "chunk_id": f"report_{row['community']}",
-            "excerpt": row['summary'],
-            "relevance": "Strategic Domain",
+            "excerpt": row["summary"],
+            "relevance": "Strategic domain",
             "is_table": False
         })
-    
+
     context_lines.append("\n### Granular Cross-Functional Dependencies & Metrics:")
     for _, row in rels.head(20).iterrows():
         context_lines.append(f"- **{row['source']}** <-> **{row['target']}**: {row['description']}")
-    
+
     append_table_context(query, context_lines, citations, top_k=2)
     context_text = "\n".join(context_lines)
     prompt = ChatPromptTemplate.from_template(
@@ -387,21 +223,26 @@ def query_chroma_rag(query: str, collection, llm: ChatOpenAI, num_results: int =
     docs = results.get("documents", [[]])[0]
     metas = results.get("metadatas", [[]])[0]
     ids = results.get("ids", [[]])[0]
-    
+
     context_lines = []
     citations = []
     for idx, (doc, meta, c_id) in enumerate(zip(docs, metas, ids), 1):
-        doc_name = meta.get("document_title", "Enterprise Knowledge Vault") if meta else "Enterprise Knowledge Vault"
+        doc_name = meta.get("document_title", "Knowledge vault") if meta else "Knowledge vault"
         context_lines.append(f"--- Citation [{idx}] from {doc_name} ({c_id}) ---\n{doc.strip()}\n")
         citations.append({
             "index": idx,
+            "kind": "Passage",
+            "name": doc_name,
+            "meta": str(c_id),
+            "source": "documents",
             "document_title": doc_name,
             "chunk_id": c_id,
             "excerpt": doc.strip(),
-            "relevance": "Direct Vector Match",
+            "quote": doc.strip(),
+            "relevance": "Direct vector match",
             "is_table": False
         })
-    
+
     append_table_context(query, context_lines, citations, top_k=2)
     context_text = "\n".join(context_lines)
     prompt = ChatPromptTemplate.from_template(
@@ -417,419 +258,912 @@ def query_chroma_rag(query: str, collection, llm: ChatOpenAI, num_results: int =
     answer = chain.invoke({"context": context_text, "query": query})
     return answer, context_text, citations
 
-def render_citations_drawer(citations: List[Dict[str, Any]]):
-    """Render interactive verified citation cards and structured tables in UI."""
-    if not citations:
-        return
-    with st.expander(f"📚 Verified Sources & Citations ({len(citations)} sources)"):
-        for c in citations:
-            if c.get("is_table") and c.get("table_markdown"):
-                st.markdown(f"""
-                <div class="citation-card" style="border-left: 3px solid #38BDF8;">
-                    <span class="citation-badge" style="background: rgba(56, 189, 248, 0.15); border-color: #38BDF8; color: #38BDF8;">📊 Table Citation {c['index']}</span>
-                    <span class="citation-title">{c['document_title']}</span>
-                    <div style="font-size: 0.76rem; color: #94A3B8; margin-top: 4px;">{c.get('excerpt', '')}</div>
-                </div>
-                """, unsafe_allow_html=True)
-                st.markdown(c["table_markdown"])
-            else:
-                st.markdown(f"""
-                <div class="citation-card">
-                    <span class="citation-badge">Citation {c['index']}</span>
-                    <span class="citation-title">📄 {c['document_title']}</span>
-                    <div class="citation-snippet">{html.escape(c['excerpt'])}</div>
-                </div>
-                """, unsafe_allow_html=True)
-
 # -----------------------------------------------------------------------------
-# 4. Enterprise Top Header & KPI Dashboard
+# 4. Governance helpers
 # -----------------------------------------------------------------------------
-st.markdown(f"""
-<div class="app-header">
-    <div class="app-brand">
-        <div class="app-logo-badge">🏛️</div>
-        <div>
-            <h1 class="app-title">Enterprise Knowledge Assistant</h1>
-            <p class="app-subtitle">Autonomous Graph Intelligence • Document Retention Vault • Verified Source Attribution</p>
-        </div>
-    </div>
-    <div style="display: flex; gap: 10px; align-items: center;">
-        <span class="verified-pill">● 98% VERIFIED GROUNDING</span>
-        <span class="source-chip" style="background: rgba(37, 99, 235, 0.15); color: #93C5FD; border-color: rgba(37, 99, 235, 0.4);">v{app_version} PROD</span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# Metric Row (5 Core Enterprise Metrics)
-all_vault_tables = vault.get_tables() if hasattr(vault, "get_tables") else []
-col1, col2, col3, col4, col5 = st.columns(5)
-with col1:
-    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(entities_df)}</div><div class="app-stat-text">Indexed Concepts</div></div>', unsafe_allow_html=True)
-with col2:
-    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(relationships_df)}</div><div class="app-stat-text">Verified Links</div></div>', unsafe_allow_html=True)
-with col3:
-    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(catalog_docs)}</div><div class="app-stat-text">Retained Docs</div></div>', unsafe_allow_html=True)
-with col4:
-    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(all_vault_tables)}</div><div class="app-stat-text">Structured Tables</div></div>', unsafe_allow_html=True)
-with col5:
-    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{paper_collection.count()}</div><div class="app-stat-text">Evidence Passages</div></div>', unsafe_allow_html=True)
-
-# -----------------------------------------------------------------------------
-# 5. Sidebar Controls & Settings
-# -----------------------------------------------------------------------------
-with st.sidebar:
-    st.markdown("### 🎯 Reasoning Strategy")
-    search_mode = st.selectbox(
-        "Select Intelligence Mode",
-        [
-            "🌐 Strategic Executive Synthesis",
-            "🔍 Targeted Concept & Dependency Lookup",
-            "🌀 Deep-Dive Cross-Functional Analysis",
-            "📚 Standard Document Passage Search",
-            "⚖️ Comparative Audit: Graph vs Document Search"
-        ],
-        index=0,
-        help="Select the reasoning depth: High-level synthesis, factual entity traversal, or side-by-side comparative audit."
-    )
-    
-    st.divider()
-    st.markdown("### 🎛️ Search Precision")
-    temp = st.slider("Response Precision (Temperature)", min_value=0.0, max_value=1.0, value=0.2, step=0.05)
-    top_k_passages = st.slider("Source Citations to Retrieve", min_value=2, max_value=8, value=4)
-    
-    st.divider()
-    if st.button("🗑️ Clear Chat History", use_container_width=True):
-        st.session_state.messages = []
-        st.rerun()
-    
-    st.markdown("### 🛡️ Enterprise Governance")
-    qa_status = change_agent.run_qa_checks()
-    if qa_status["passed"]:
-        st.markdown('<span class="verified-pill">● QA Validated (All Checks Passed)</span>', unsafe_allow_html=True)
-    else:
-        st.warning("⚠️ QA Warning: Check governance tab.")
-
-# Initialize chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = [
+def build_qa_checks(report: Dict[str, Any]) -> List[Dict[str, str]]:
+    """Flatten the change agent's QA report into display rows."""
+    parquet_ok = report.get("parquet_tables") == "PASSED"
+    checks = [
         {
+            "label": "Python syntax · app.py, core/*",
+            "ok": report.get("syntax_check") == "PASSED",
+            "meta": report.get("syntax_check", ""),
+        },
+        {
+            "label": "Parquet · create_final_entities",
+            "ok": parquet_ok and not entities_df.empty,
+            "meta": f"{len(entities_df)} rows",
+        },
+        {
+            "label": "Parquet · create_final_relationships",
+            "ok": parquet_ok and not relationships_df.empty,
+            "meta": f"{len(relationships_df)} rows",
+        },
+        {
+            "label": "Parquet · create_final_nodes",
+            "ok": parquet_ok and not nodes_df.empty,
+            "meta": f"{len(nodes_df)} rows",
+        },
+        {
+            "label": "Parquet · create_final_community_reports",
+            "ok": parquet_ok and not community_df.empty,
+            "meta": f"{len(community_df)} rows",
+        },
+        {
+            "label": "ChromaDB · paper_collection reachable",
+            "ok": report.get("chromadb_vault") == "PASSED",
+            "meta": f"{paper_collection.count()} docs",
+        },
+        {
+            "label": "Vault catalog integrity · SHA-256",
+            "ok": report.get("vault_catalog") == "PASSED",
+            "meta": f"{len(catalog_docs)} docs",
+        },
+        {
+            "label": "Structured tables extracted",
+            "ok": str(report.get("structured_tables", "")).startswith("PASSED"),
+            "meta": f"{len(all_vault_tables)} tables",
+        },
+        {
+            "label": "OPENAI_API_KEY present",
+            "ok": bool(api_key),
+            "meta": ".env",
+        },
+    ]
+    return checks
+
+
+def parse_changelog(path: Path, limit: int = 4) -> List[Dict[str, Any]]:
+    """Parse CHANGELOG.md into release entries with their commit lines."""
+    if not path.exists():
+        return []
+    releases: List[Dict[str, Any]] = []
+    current: Dict[str, Any] = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        header = re.match(r"^##\s*\[?v?([0-9][^\]\s]*)\]?\s*-\s*(.+?)\s*$", line)
+        if header:
+            if current:
+                releases.append(current)
+            current = {"version": header.group(1), "date": header.group(2), "commits": []}
+            continue
+        commit = re.match(r"^-\s*\[`([0-9a-f]{6,})`\]\s*(.+?)\s*$", line)
+        if commit and current:
+            message = re.sub(r"^(feat|fix|docs|chore|refactor|test|style)(\([^)]*\))?:\s*", "", commit.group(2))
+            current["commits"].append({"sha": commit.group(1)[:7], "message": message})
+    if current:
+        releases.append(current)
+    return releases[:limit]
+
+
+qa_report = change_agent.run_qa_checks()
+qa_checks = build_qa_checks(qa_report)
+qa_passed_count = sum(1 for c in qa_checks if c["ok"])
+
+# -----------------------------------------------------------------------------
+# 5. Sidebar — navigation, reasoning mode, precision controls
+# -----------------------------------------------------------------------------
+nav_counts = {"vault": len(catalog_docs)}
+st.markdown(design.stylesheet(nav_counts), unsafe_allow_html=True)
+
+MODE_LABELS = [label for _key, label in design.MODES]
+MODE_KEY_BY_LABEL = {label: key for key, label in design.MODES}
+
+with st.sidebar:
+    st.markdown(design.brand(app_version), unsafe_allow_html=True)
+
+    nav_keys = [key for key, _label in design.NAV]
+    requested_screen = st.query_params.get("screen", "search")
+    with st.container(key="nav"):
+        nav_label = st.radio(
+            "Navigation",
+            [label for _key, label in design.NAV],
+            index=nav_keys.index(requested_screen) if requested_screen in nav_keys else 0,
+            label_visibility="collapsed",
+        )
+    screen = {label: key for key, label in design.NAV}[nav_label]
+    # Keep the screen in the URL so in-page links (vault rows) survive a reload.
+    if screen != requested_screen:
+        st.query_params["screen"] = screen
+
+    if screen == "search":
+        with st.container(key="modes"):
+            mode_label = st.radio("Reasoning", MODE_LABELS)
+        mode_key = MODE_KEY_BY_LABEL[mode_label]
+
+        with st.container(key="controls"):
+            temp = st.slider("Temperature", min_value=0.0, max_value=1.0, value=0.2, step=0.05)
+            top_k_passages = st.slider("Citations", min_value=2, max_value=8, value=4)
+    else:
+        mode_label, mode_key = design.MODES[0][1], design.MODES[0][0]
+        temp, top_k_passages = 0.2, 4
+
+    if screen == "concepts" and not nodes_df.empty and "community" in nodes_df.columns:
+        community_sizes = nodes_df["community"].value_counts().head(5)
+        rows = ['<div class="k-side-label">Communities</div>']
+        for community, size in community_sizes.items():
+            title = community
+            if not community_df.empty and "community" in community_df.columns:
+                match = community_df[community_df["community"].astype(str) == str(community)]
+                if not match.empty:
+                    title = match.iloc[0]["title"]
+            rows.append(
+                '<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;font-size:12px">'
+                f'<span style="width:8px;height:8px;border-radius:2px;background:{design.community_color(community)}"></span>'
+                f'<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{design.esc(title)}</span>'
+                f'<span style="margin-left:auto;font:11px var(--k-mono);color:var(--k-faint)">{size}</span></div>'
+            )
+        st.markdown("".join(rows), unsafe_allow_html=True)
+
+    st.markdown(
+        design.sidebar_status(qa_passed_count == len(qa_checks), len(qa_checks)),
+        unsafe_allow_html=True,
+    )
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+if "pending_query" not in st.session_state:
+    st.session_state.pending_query = None
+
+# -----------------------------------------------------------------------------
+# 6. Screen: Search
+# -----------------------------------------------------------------------------
+CITATION_RE = re.compile(r"\[(\d+)\](?!\()")
+
+
+def render_answer(text: str, key: str):
+    """Render an answer body with citation markers styled as accent superscripts."""
+    marked = CITATION_RE.sub(r'<sup class="k-cite">[\1]</sup>', text)
+    with st.container(key=key):
+        st.markdown(marked, unsafe_allow_html=True)
+
+
+def render_compare(comparison: Dict[str, Any], key: str):
+    with st.container(key=f"cmprow_{key}"):
+        left, right = st.columns(2, gap="small")
+        with left:
+            with st.container(key=f"cmpcard_{key}_graph"):
+                st.markdown(
+                    '<div class="k-compare__head"><span class="k-swatch" '
+                    f'style="background:{design.ACCENT}"></span><span class="k-card__title">Graph · '
+                    f'{design.esc(comparison.get("graph_mode", "DRIFT"))}</span>'
+                    f'<span class="k-compare__meta">{comparison.get("graph_sources", 0)} sources</span></div>',
+                    unsafe_allow_html=True,
+                )
+                render_answer(comparison["graph_answer"], key=f"ans_cmp_{key}_graph")
+        with right:
+            with st.container(key=f"cmpcard_{key}_vector"):
+                st.markdown(
+                    '<div class="k-compare__head"><span class="k-swatch" '
+                    f'style="background:{design.FAINT}"></span><span class="k-card__title">Vector · top-'
+                    f'{comparison.get("vector_sources", 0)} passages</span>'
+                    '<span class="k-compare__meta">ChromaDB · paper_collection</span></div>',
+                    unsafe_allow_html=True,
+                )
+                render_answer(comparison["vector_answer"], key=f"ans_cmp_{key}_vector")
+
+
+def run_query(question: str, mode: str, temperature: float, citations_k: int) -> Dict[str, Any]:
+    """Execute one reasoning run and return the assistant message."""
+    llm = get_llm(temperature=temperature)
+    started = time.perf_counter()
+
+    if mode == "global":
+        answer, _ctx, citations = query_graphrag_global(question, community_df, llm)
+    elif mode == "local":
+        answer, _ctx, citations = query_graphrag_local(question, entities_df, relationships_df, llm)
+    elif mode == "drift":
+        answer, _ctx, citations = query_graphrag_drift(question, community_df, relationships_df, llm)
+    elif mode == "vector":
+        answer, _ctx, citations = query_chroma_rag(question, paper_collection, llm, num_results=citations_k)
+    else:
+        graph_answer, _gctx, graph_citations = query_graphrag_drift(question, community_df, relationships_df, llm)
+        vector_answer, _vctx, vector_citations = query_chroma_rag(
+            question, paper_collection, llm, num_results=citations_k
+        )
+        citations = graph_citations + vector_citations
+        for position, citation in enumerate(citations, 1):
+            citation["index"] = position
+        return {
             "role": "assistant",
-            "content": "👋 Welcome to the **Enterprise Knowledge Assistant**.\n\nI am connected to your organizational document vault and enterprise knowledge graph. Every response is grounded with **verified source citations [1], [2]** linking directly to underlying documents.\n\nAsk a strategic question below, browse the **Document Vault**, or inspect the **Concept Map**!",
-            "mode": "Executive Assistant",
-            "citations": []
+            "content": "",
+            "mode": dict(design.MODES)["compare"],
+            "mode_key": "compare",
+            "query": question,
+            "citations": citations,
+            "elapsed": time.perf_counter() - started,
+            "comparison": {
+                "graph_answer": graph_answer,
+                "vector_answer": vector_answer,
+                "graph_mode": "DRIFT",
+                "graph_sources": len(graph_citations),
+                "vector_sources": len(vector_citations),
+            },
         }
-    ]
 
-# -----------------------------------------------------------------------------
-# 6. Enterprise Work Navigation Tabs
-# -----------------------------------------------------------------------------
-tab_search_chat, tab_vault_ui, tab_concept_map, tab_catalog_ui, tab_governance = st.tabs([
-    "🔍 Enterprise Search & Assistant",
-    "📑 Enterprise Document Vault",
-    "🕸️ Knowledge Concept Map",
-    "📊 Enterprise Data Catalog",
-    "🛡️ System Governance & Changelog"
-])
+    return {
+        "role": "assistant",
+        "content": answer,
+        "mode": dict(design.MODES)[mode],
+        "mode_key": mode,
+        "query": question,
+        "citations": citations,
+        "elapsed": time.perf_counter() - started,
+    }
 
-# =============================================================================
-# TAB 1: Enterprise Search & Assistant
-# =============================================================================
-with tab_search_chat:
-    # Source Filter Chips
-    st.markdown("""
-    <div>
-        <span class="source-chip" style="background: rgba(37, 99, 235, 0.2); color: #93C5FD; border-color: #2563EB;">✨ All Sources</span>
-        <span class="source-chip">📄 PDF Documents</span>
-        <span class="source-chip">🕸️ Knowledge Graph</span>
-        <span class="source-chip">📑 Retained Vault</span>
-        <span class="source-chip">📊 Parquet Taxonomy</span>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Prompt Chips
-    p_cols = st.columns(4)
-    biz_prompts = [
-        "What are the cost, ROI, and resource trade-offs between RAG and Fine-Tuning?",
-        "Which techniques reduce operational compute overhead and deployment risks?",
-        "What are the strategic dependencies and recommendations outlined in this report?",
-        "Summarize the core thematic knowledge domains identified across the document."
-    ]
-    
-    clicked_chip = None
-    for i, col in enumerate(p_cols):
-        with col:
-            if st.button(biz_prompts[i], key=f"search_chip_{i}", use_container_width=True):
-                clicked_chip = biz_prompts[i]
-    
-    st.divider()
 
-    # Render Chat History
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            if "mode" in msg and msg["mode"] != "Executive Assistant":
-                st.markdown(f'<span class="source-chip">{msg["mode"]}</span>', unsafe_allow_html=True)
-            
-            st.markdown(msg["content"])
-            
-            # Render Citations if present
-            if msg.get("citations"):
-                render_citations_drawer(msg["citations"])
-            
-            # Comparative Audit View
-            if msg.get("comparison"):
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.markdown("""
-                    <div class="compare-container">
-                        <div style="font-weight: bold; margin-bottom: 8px; color: #93C5FD;">🌐 GRAPHRAG STRATEGIC DEEP-DIVE</div>
-                    """, unsafe_allow_html=True)
-                    st.markdown(msg["comparison"]["graph_answer"])
-                    st.markdown("</div>", unsafe_allow_html=True)
-                with col2:
-                    st.markdown("""
-                    <div class="compare-container">
-                        <div style="font-weight: bold; margin-bottom: 8px; color: #C4B5FD;">📚 STANDARD DOCUMENT PASSAGE SEARCH</div>
-                    """, unsafe_allow_html=True)
-                    st.markdown(msg["comparison"]["vector_answer"])
-                    st.markdown("</div>", unsafe_allow_html=True)
+def screen_search():
+    last_query = next(
+        (m["content"] for m in reversed(st.session_state.messages) if m["role"] == "user"),
+        "",
+    )
+    split = st.container(key="split")
+    thread_col, rail_col = split.columns([1, 0.42], gap=None)
 
-    # Chat Input
-    user_input = st.chat_input("Search enterprise knowledge or ask a strategic question...") or clicked_chip
+    with thread_col:
+        with st.container(key="topbar_search", horizontal=True, vertical_alignment="center"):
+            crumb = f"Thread · {last_query[:46]}" if last_query else "New thread"
+            st.markdown(
+                f'<div class="k-topbar__title">Search</div><div class="k-topbar__sep">/</div>'
+                f'<div class="k-topbar__crumb">{design.esc(crumb)}</div>',
+                unsafe_allow_html=True,
+            )
+            with st.container(key="pills_sources"):
+                evidence_filter = st.radio(
+                    "Evidence filter",
+                    ["All sources", "Documents", "Graph", "Tables"],
+                    horizontal=True,
+                    label_visibility="collapsed",
+                )
 
-    if user_input:
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        with st.chat_message("user"):
-            st.markdown(user_input)
-        
-        llm = get_llm(temperature=temp)
-        with st.chat_message("assistant"):
-            with st.spinner(f"Searching & synthesizing across knowledge sources..."):
-                try:
-                    if "Synthesis" in search_mode:
-                        ans, ctx, cits = query_graphrag_global(user_input, community_df, llm)
-                        st.markdown(ans)
-                        render_citations_drawer(cits)
-                        st.session_state.messages.append({"role": "assistant", "content": ans, "mode": "Strategic Synthesis", "citations": cits})
-                    
-                    elif "Targeted" in search_mode:
-                        ans, ctx, cits = query_graphrag_local(user_input, entities_df, relationships_df, llm)
-                        st.markdown(ans)
-                        render_citations_drawer(cits)
-                        st.session_state.messages.append({"role": "assistant", "content": ans, "mode": "Targeted Lookup", "citations": cits})
-                    
-                    elif "Deep-Dive" in search_mode:
-                        ans, ctx, cits = query_graphrag_drift(user_input, community_df, relationships_df, llm)
-                        st.markdown(ans)
-                        render_citations_drawer(cits)
-                        st.session_state.messages.append({"role": "assistant", "content": ans, "mode": "Deep-Dive Analysis", "citations": cits})
-                    
-                    elif "Standard" in search_mode:
-                        ans, ctx, cits = query_chroma_rag(user_input, paper_collection, llm, num_results=top_k_passages)
-                        st.markdown(ans)
-                        render_citations_drawer(cits)
-                        st.session_state.messages.append({"role": "assistant", "content": ans, "mode": "Standard Passage Search", "citations": cits})
-                    
-                    else: # Comparative Audit
-                        g_ans, g_ctx, g_cits = query_graphrag_drift(user_input, community_df, relationships_df, llm)
-                        v_ans, v_ctx, v_cits = query_chroma_rag(user_input, paper_collection, llm, num_results=top_k_passages)
-                        
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.markdown("""
-                            <div class="compare-container">
-                                <div style="font-weight: bold; margin-bottom: 8px; color: #93C5FD;">🌐 GRAPHRAG STRATEGIC DEEP-DIVE</div>
-                            """, unsafe_allow_html=True)
-                            st.markdown(g_ans)
-                            st.markdown("</div>", unsafe_allow_html=True)
-                        with col2:
-                            st.markdown("""
-                            <div class="compare-container">
-                                <div style="font-weight: bold; margin-bottom: 8px; color: #C4B5FD;">📚 STANDARD DOCUMENT PASSAGE SEARCH</div>
-                            """, unsafe_allow_html=True)
-                            st.markdown(v_ans)
-                            st.markdown("</div>", unsafe_allow_html=True)
-                        
-                        st.session_state.messages.append({
-                            "role": "assistant",
-                            "content": "⚖️ **Comparative Audit Completed**",
-                            "mode": "Comparative Audit",
-                            "comparison": {
-                                "graph_answer": g_ans,
-                                "vector_answer": v_ans
-                            }
-                        })
-                except Exception as e:
-                    st.error(f"Search Execution Error: {str(e)}")
+        with st.container(key="thread"):
+            if not st.session_state.messages:
+                st.markdown(
+                    '<div class="k-empty"><div class="k-empty__title">Ask the knowledge base.</div>'
+                    "<div class=\"k-empty__text\">Answers are grounded in vault documents, graph concepts "
+                    "and extracted tables. Pick a reasoning mode in the sidebar, then ask a question.</div></div>",
+                    unsafe_allow_html=True,
+                )
 
-# =============================================================================
-# TAB 2: Enterprise Document Vault
-# =============================================================================
-with tab_vault_ui:
-    st.markdown("### 📑 Enterprise Document Retention Vault")
-    st.markdown("All uploaded enterprise assets are retained permanently with SHA-256 integrity hashing and full provenance tracking.")
-    
-    # Upload Section
-    with st.expander("📥 Ingest New Document into Vault", expanded=False):
-        uploaded_vault_file = st.file_uploader("Choose PDF or TXT file to ingest into permanent vault", type=["pdf", "txt", "md"])
-        if uploaded_vault_file:
-            col_v1, col_v2 = st.columns(2)
-            with col_v1:
-                run_indexing_immediately = st.checkbox("Re-index Knowledge Graph immediately with this document", value=True)
-            with col_v2:
-                ingest_chunk_depth = st.slider("Chunk Limit for Graph Building", min_value=1, max_value=30, value=5)
-            
-            if st.button("🚀 Upload & Retain in Vault", type="primary"):
-                with st.spinner("Persisting document to enterprise vault..."):
-                    file_bytes = uploaded_vault_file.read()
-                    stored_meta = vault.store_document(
-                        filename=uploaded_vault_file.name,
-                        content_bytes=file_bytes,
-                        source_type="pdf" if uploaded_vault_file.name.endswith(".pdf") else "txt",
-                        metadata={"source": "User Upload"}
+            for position, message in enumerate(st.session_state.messages):
+                if message["role"] == "user":
+                    st.markdown(
+                        '<div class="k-msg"><div class="k-msg__av">HS</div>'
+                        f'<div class="k-msg__q">{design.esc(message["content"])}</div></div>',
+                        unsafe_allow_html=True,
                     )
-                    st.success(f"✅ Stored **{stored_meta['filename']}** in Vault (ID: `{stored_meta['id']}`)")
-                    
-                    if run_indexing_immediately:
-                        with st.status("Building GraphRAG on uploaded document...", expanded=True) as status_build:
-                            engine = GraphRAGEngine(model_name="gpt-4o-mini", temperature=0.0)
-                            res = engine.build_from_text(
-                                document_text=stored_meta["extracted_text"],
-                                document_title=stored_meta["filename"],
-                                max_chunks=ingest_chunk_depth
-                            )
-                            status_build.update(label="🎉 Indexing Complete!", state="complete")
-                            st.cache_data.clear()
-                            st.cache_resource.clear()
-                            st.rerun()
+                    continue
 
-    # Display Retained Documents Catalog
-    st.markdown("#### 📂 Vault Document Registry")
-    current_catalog = vault.get_catalog()
-    if current_catalog:
-        catalog_table_data = []
-        for d in current_catalog:
-            catalog_table_data.append({
-                "Document ID": d["id"],
-                "Document Name": d["title"],
-                "Format": d["source_type"],
-                "Size (KB)": d["file_size_kb"],
-                "Pages/Sections": d["page_count"],
-                "Structured Tables": d.get("table_count", 0),
-                "Uploaded At": d["uploaded_at"],
-                "Status": d["status"]
+                st.markdown(
+                    '<div class="k-msg k-msg--ai"><div class="k-msg__av k-msg__av--ai">G</div><div class="k-msg__meta">'
+                    f'<span class="k-msg__mode">{design.esc(message.get("mode", ""))}</span><span>·</span>'
+                    f'<span>{len(message.get("citations", []))} sources</span><span>·</span>'
+                    f'<span class="k-mono">{message.get("elapsed", 0):.1f}s</span></div></div>',
+                    unsafe_allow_html=True,
+                )
+                if message.get("comparison"):
+                    render_compare(message["comparison"], key=f"cmp_{position}")
+                else:
+                    render_answer(message["content"], key=f"ans_msg_{position}")
+
+                with st.container(key=f"link_actions_{position}", horizontal=True):
+                    if st.button("Compare with vector search", key=f"cmp_btn_{position}"):
+                        st.session_state.pending_query = (message["query"], "compare")
+                        st.rerun()
+                    if st.button("Rerun", key=f"rerun_btn_{position}"):
+                        st.session_state.pending_query = (message["query"], message["mode_key"])
+                        st.rerun()
+                    st.markdown(
+                        f'<span class="k-actions__model k-mono">{MODEL_NAME}</span>',
+                        unsafe_allow_html=True,
+                    )
+
+    last_citations = next(
+        (m.get("citations", []) for m in reversed(st.session_state.messages) if m["role"] == "assistant"),
+        [],
+    )
+    source_filter = {"Documents": "documents", "Graph": "graph", "Tables": "tables"}.get(evidence_filter)
+    shown = [c for c in last_citations if not source_filter or c.get("source") == source_filter]
+
+    if shown:
+        cards = [design.evidence_card(c, focus=c.get("is_table", False)) for c in shown[:6]]
+        if len(shown) > 6:
+            cards.append(f'<div class="k-ev__more">{len(shown) - 6} more</div>')
+        body = "".join(cards)
+    else:
+        body = '<div class="k-ev__more">Citations appear here once you run a query.</div>'
+
+    with rail_col:
+        st.markdown(
+            '<div class="k-rail"><div class="k-rail__head">Evidence'
+            f'<span class="k-rail__count">{len(shown)}</span></div>'
+            f'<div class="k-rail__body">{body}</div></div>',
+            unsafe_allow_html=True,
+        )
+
+    typed = st.chat_input("Ask the knowledge base…")
+
+    question, question_mode = (typed, mode_key) if typed else (st.session_state.pending_query or (None, None))
+    st.session_state.pending_query = None
+
+    if question:
+        st.session_state.messages.append({"role": "user", "content": question})
+        try:
+            with st.spinner("Searching the knowledge base…"):
+                st.session_state.messages.append(run_query(question, question_mode, temp, top_k_passages))
+        except Exception as exc:
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": f"The query could not be completed: {exc}",
+                "mode": dict(design.MODES)[question_mode],
+                "mode_key": question_mode,
+                "query": question,
+                "citations": [],
+                "elapsed": 0.0,
             })
-        st.dataframe(pd.DataFrame(catalog_table_data), use_container_width=True)
-        
-        # Document Inspector
-        selected_doc_id = st.selectbox("Inspect Document in Vault:", [d["id"] for d in current_catalog], format_func=lambda x: f"{x} - {next((d['title'] for d in current_catalog if d['id'] == x), '')}")
-        doc_details = vault.get_document(selected_doc_id)
-        if doc_details:
-            c1, c2, c3, c4 = st.columns(4)
-            with c1:
-                st.info(f"**SHA-256 Hash:** `{doc_details['sha256'][:14]}...`")
-            with c2:
-                st.info(f"**Storage Path:** `{Path(doc_details['storage_path']).name}`")
-            with c3:
-                st.info(f"**Character Count:** `{doc_details['char_count']:,}`")
-            with c4:
-                st.info(f"**Extracted Tables:** `{doc_details.get('table_count', 0)}`")
-            
-            # Show Extracted Structured Tables if present
-            doc_tables = vault.get_tables(selected_doc_id) if hasattr(vault, "get_tables") else []
-            if doc_tables:
-                with st.expander(f"📊 Extracted Structured Tables & Numerical Data ({len(doc_tables)} tables detected)", expanded=True):
-                    for tab_info in doc_tables:
-                        st.markdown(f"##### 📌 {tab_info.get('title', 'Table')}")
-                        st.markdown(tab_info.get("markdown", ""))
-                        if tab_info.get("row_facts"):
-                            with st.expander("Show Extracted Row Metrics & Facts"):
-                                for rf in tab_info["row_facts"]:
-                                    st.markdown(f"- `{rf}`")
-                        st.divider()
+        st.rerun()
 
-            if st.button("🗑️ Delete Document from Vault", key=f"del_{selected_doc_id}"):
-                vault.delete_document(selected_doc_id)
-                st.success("Deleted document from vault.")
-                st.rerun()
-    else:
-        st.info("No documents found in vault.")
 
-# =============================================================================
-# TAB 3: Knowledge Concept Map
-# =============================================================================
-with tab_concept_map:
-    st.markdown("### 🕸️ Enterprise Concept Map & Relational Network")
-    st.markdown("Interactive visual topography of core organizational concepts, frameworks, and tools grouped by strategic thematic domains.")
-    
-    html_file = Path("./notebook/interactive_graph.html")
-    if html_file.exists():
-        raw_html = html_file.read_text(encoding="utf-8")
-        st.components.v1.html(raw_html, height=650, scrolling=True)
-    else:
-        st.info("Concept map not found. Ingest your document in the **📑 Enterprise Document Vault** tab to generate the map.")
+# -----------------------------------------------------------------------------
+# 7. Screen: Vault
+# -----------------------------------------------------------------------------
+VAULT_COLUMNS = "2.2fr .7fr .7fr .8fr .8fr 1.2fr 1fr"
 
-# =============================================================================
-# TAB 4: Enterprise Data Catalog
-# =============================================================================
-with tab_catalog_ui:
-    st.markdown("### 📊 Enterprise Knowledge Catalog & Structured Taxonomy")
-    st.markdown("Audit and explore recognized business concepts, dependency links, and domain briefs.")
-    
-    sub_c1, sub_c2, sub_c3, sub_c4 = st.tabs([
-        "🏷️ Business Concepts",
-        "🔗 Dependency Links",
-        "🌐 Domain Network Map",
-        "📑 Strategic Domain Briefs"
-    ])
-    
-    with sub_c1:
-        st.markdown(f"**Total Indexed Concepts:** `{len(entities_df)}`")
-        f_term = st.text_input("Search concept by name or definition:", key="f_concept_term")
-        filt_df = entities_df[entities_df['title'].str.contains(f_term, case=False, na=False) | entities_df['description'].str.contains(f_term, case=False, na=False)] if f_term else entities_df
-        st.dataframe(filt_df[['title', 'type', 'description']], use_container_width=True)
-        
-    with sub_c2:
-        st.markdown(f"**Total Verified Dependency Links:** `{len(relationships_df)}`")
-        f_rel_term = st.text_input("Search relationships:", key="f_rel_term")
-        filt_r_df = relationships_df[relationships_df['source'].str.contains(f_rel_term, case=False, na=False) | relationships_df['target'].str.contains(f_rel_term, case=False, na=False) | relationships_df['description'].str.contains(f_rel_term, case=False, na=False)] if f_rel_term else relationships_df
-        st.dataframe(filt_r_df[['source', 'target', 'weight', 'description']], use_container_width=True)
-        
-    with sub_c3:
-        st.markdown(f"**Thematic Domain Node Assignments:** `{len(nodes_df)}`")
-        st.dataframe(nodes_df[['title', 'community', 'degree']], use_container_width=True)
-        
-    with sub_c4:
-        st.markdown(f"**Strategic Domain Briefs:** `{len(community_df)}`")
-        st.dataframe(community_df[['community', 'title', 'summary', 'rank']], use_container_width=True)
-        for _, r in community_df.iterrows():
-            with st.expander(f"📑 {r['title']} (Strategic Weight: {r['rank']})"):
-                st.markdown(r['full_content'])
 
-# =============================================================================
-# TAB 5: System Governance & Changelog
-# =============================================================================
-with tab_governance:
-    st.markdown("### 🛡️ System Governance, Quality & Change Management")
-    st.markdown("Automated QA test results, semantic versioning, and auditable release logs managed by the Change Management Agent.")
-    
-    col_gov1, col_gov2 = st.columns([1, 1])
-    with col_gov1:
-        st.markdown("#### 🧪 Automated QA Health Report")
-        qa_report = change_agent.run_qa_checks()
-        st.json(qa_report)
-        
-        if st.button("🔄 Re-Run QA & Synchronize Docs", use_container_width=True):
-            with st.spinner("Running full change management cycle..."):
-                sync_out = change_agent.run_full_sync()
-                st.success(f"Synchronized Version v{sync_out['version']} with changelog and README!")
-                st.rerun()
-                
-    with col_gov2:
-        st.markdown("#### 📜 Live Release Changelog")
-        changelog_path = Path("./CHANGELOG.md")
-        if changelog_path.exists():
-            st.markdown(changelog_path.read_text(encoding="utf-8"))
+def format_size(size_kb) -> str:
+    try:
+        size_kb = float(size_kb)
+    except (TypeError, ValueError):
+        return "—"
+    return f"{size_kb / 1024:.1f} MB" if size_kb >= 1024 else f"{size_kb:.0f} KB"
+
+
+def format_uploaded(value: str) -> str:
+    try:
+        return pd.to_datetime(value).strftime("%b %d, %H:%M")
+    except (ValueError, TypeError):
+        return str(value)[:16]
+
+
+def screen_vault():
+    with st.container(key="topbar_vault", horizontal=True, vertical_alignment="center"):
+        st.markdown(
+            '<div class="k-topbar__title">Vault</div>'
+            '<div class="k-topbar__note">Retained permanently · SHA-256 deduplicated</div>',
+            unsafe_allow_html=True,
+        )
+        if st.button("Add document", type="primary", key="vault_add"):
+            st.session_state.vault_add_open = not st.session_state.get("vault_add_open", False)
+
+    with st.container(key="pad_vault"):
+        if st.session_state.get("vault_add_open"):
+            render_vault_uploader()
+
+        catalog = vault.get_catalog()
+        if not catalog:
+            st.markdown(
+                '<div class="k-card"><div class="k-card__body k-faint">'
+                "No documents in the vault yet. Use Add document to ingest a PDF or text file.</div></div>",
+                unsafe_allow_html=True,
+            )
+            return
+
+        selected_id = st.query_params.get("doc") or catalog[0]["id"]
+        if selected_id not in {d["id"] for d in catalog}:
+            selected_id = catalog[0]["id"]
+
+        head = (
+            f'<div class="k-grid__head" style="grid-template-columns:{VAULT_COLUMNS}">'
+            "<span>Document</span><span>Format</span><span>Size</span><span>Pages</span>"
+            "<span>Tables</span><span>Uploaded</span><span>Status</span></div>"
+        )
+        rows = []
+        for document in catalog:
+            indexed = "index" in str(document.get("status", "")).lower()
+            status = (
+                f'<span style="display:flex;align-items:center;gap:6px;color:{design.SUCCESS}">'
+                f'<span class="k-dot" style="background:{design.SUCCESS}"></span>Indexed</span>'
+                if indexed
+                else f'<span class="k-muted">{design.esc(document.get("status", "Pending"))}</span>'
+            )
+            rows.append(
+                f'<a class="k-grid__row{" k-grid__row--on" if document["id"] == selected_id else ""}" '
+                f'href="?screen=vault&doc={design.esc(document["id"])}" target="_self" '
+                f'style="grid-template-columns:{VAULT_COLUMNS}">'
+                f'<span><span class="k-grid__name">{design.esc(document["title"])}</span><br>'
+                f'<span class="k-grid__id">{design.esc(document["id"])}</span></span>'
+                f'<span>{design.esc(document.get("source_type", "—"))}</span>'
+                f'<span class="k-num">{design.esc(format_size(document.get("file_size_kb")))}</span>'
+                f'<span class="k-num">{design.esc(document.get("page_count", "—"))}</span>'
+                f'<span class="k-num">{design.esc(document.get("table_count", 0) or "—")}</span>'
+                f'<span class="k-muted">{design.esc(format_uploaded(document.get("uploaded_at", "")))}</span>'
+                f"{status}</a>"
+            )
+        st.markdown(f'<div class="k-card">{head}{"".join(rows)}</div>', unsafe_allow_html=True)
+
+        document = vault.get_document(selected_id)
+        if not document:
+            return
+
+        tables = vault.get_tables(selected_id) if hasattr(vault, "get_tables") else []
+        left, right = st.columns(2, gap="medium")
+        with left:
+            st.markdown(
+                '<div class="k-card"><div class="k-card__body">'
+                f'<div style="display:flex;align-items:center;margin-bottom:12px">'
+                f'<span class="k-card__title">{design.esc(document["title"])}</span></div>'
+                '<div class="k-kv">'
+                f'<span>SHA-256</span><span class="k-mono" style="font-size:11.5px;word-break:break-all">'
+                f'{design.esc(document["sha256"][:32])}…</span>'
+                f'<span>Storage</span><span class="k-mono" style="font-size:11.5px;word-break:break-all">'
+                f'{design.esc(Path(document["storage_path"]).name)}</span>'
+                f'<span>Characters</span><span class="k-mono" style="font-size:11.5px">'
+                f'{document.get("char_count", 0):,}</span>'
+                f'<span>Extracted tables</span><span class="k-mono" style="font-size:11.5px">'
+                f'{document.get("table_count", 0)}</span>'
+                f'<span>Origin</span><span>{design.esc(document.get("metadata", {}).get("origin", "User upload"))}</span>'
+                "</div></div></div>",
+                unsafe_allow_html=True,
+            )
+            with st.container(key="link_delete", horizontal=True):
+                if st.button("Delete document", key=f"delete_{selected_id}"):
+                    vault.delete_document(selected_id)
+                    st.query_params.pop("doc", None)
+                    st.rerun()
+
+        with right:
+            table_rows = "".join(
+                '<div style="display:flex;gap:10px;align-items:center">'
+                f'<span class="k-mono k-faint" style="font-size:11px;width:34px">p. {design.esc(t.get("page", 1))}</span>'
+                f'<span>{design.esc(t.get("title", "Table"))}</span>'
+                f'<span class="k-mono k-faint" style="margin-left:auto;font-size:11px">'
+                f'{len(t.get("columns", []))} × {t.get("rows_count", 0)}</span></div>'
+                for t in tables[:5]
+            ) or '<div class="k-faint">No structured tables extracted from this document.</div>'
+            more = (
+                f'<div class="k-faint" style="font-size:11.5px;padding-top:4px">{len(tables) - 5} more</div>'
+                if len(tables) > 5
+                else ""
+            )
+            st.markdown(
+                '<div class="k-card"><div class="k-card__body">'
+                '<div style="display:flex;align-items:center;margin-bottom:12px">'
+                '<span class="k-card__title">Extracted tables</span>'
+                f'<span class="k-mono k-faint" style="margin-left:6px;font-size:11px">{len(tables)}</span>'
+                '<span class="k-faint" style="margin-left:auto;font-size:11.5px">Row facts</span></div>'
+                f'<div style="display:grid;gap:6px;color:var(--k-muted)">{table_rows}{more}</div>'
+                "</div></div>",
+                unsafe_allow_html=True,
+            )
+            for table in tables[:5]:
+                with st.expander(f"{table.get('title', 'Table')} · page {table.get('page', 1)}"):
+                    st.markdown(table.get("markdown", ""))
+                    for fact in table.get("row_facts", [])[:8]:
+                        st.markdown(f"- `{fact}`")
+
+
+def render_vault_uploader():
+    with st.container(key="card_upload"):
+        uploaded = st.file_uploader(
+            "Add a PDF, text or markdown document to the vault",
+            type=["pdf", "txt", "md"],
+        )
+        if not uploaded:
+            return
+        index_now = st.checkbox("Re-index the knowledge graph with this document", value=True)
+        chunk_depth = st.slider("Chunk limit for graph building", min_value=1, max_value=30, value=5)
+        if st.button("Upload & retain", type="primary", key="vault_upload_go"):
+            with st.spinner("Persisting document to the vault…"):
+                stored = vault.store_document(
+                    filename=uploaded.name,
+                    content_bytes=uploaded.read(),
+                    source_type="pdf" if uploaded.name.endswith(".pdf") else "txt",
+                    metadata={"origin": "User upload"},
+                )
+            st.success(f"Stored {stored['filename']} · {stored['id']}")
+            if index_now:
+                with st.status("Building the knowledge graph…", expanded=True) as status:
+                    engine = GraphRAGEngine(model_name=MODEL_NAME, temperature=0.0)
+                    engine.build_from_text(
+                        document_text=stored["extracted_text"],
+                        document_title=stored["filename"],
+                        max_chunks=chunk_depth,
+                    )
+                    status.update(label="Indexing complete", state="complete")
+            st.cache_data.clear()
+            st.cache_resource.clear()
+            st.session_state.vault_add_open = False
+            st.rerun()
+
+
+# -----------------------------------------------------------------------------
+# 8. Screen: Concept map
+# -----------------------------------------------------------------------------
+def screen_concepts():
+    titles = sorted(entities_df["title"].astype(str).tolist()) if not entities_df.empty else []
+
+    split = st.container(key="split")
+    graph_col, rail_col = split.columns([1, 0.42], gap=None)
+
+    with graph_col:
+        with st.container(key="topbar_concepts", horizontal=True, vertical_alignment="center"):
+            st.markdown(
+                '<div class="k-topbar__title">Concept map</div>'
+                f'<div class="k-topbar__note">{len(entities_df)} nodes · {len(relationships_df)} edges · Louvain</div>',
+                unsafe_allow_html=True,
+            )
+            with st.container(key="find_node"):
+                selected_title = st.selectbox(
+                    "Find node",
+                    titles,
+                    index=0 if titles else None,
+                    label_visibility="collapsed",
+                    placeholder="Find node",
+                )
+
+        with st.container(key="graph"):
+            graph_file = Path("./notebook/interactive_graph.html")
+            if graph_file.exists():
+                st.components.v1.html(graph_file.read_text(encoding="utf-8"), height=640, scrolling=False)
+                st.markdown(
+                    '<div class="k-graph__note">Embedded PyVis network · physics on · drag to explore</div>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.markdown(
+                    '<div class="k-empty"><div class="k-empty__title">No concept map yet.</div>'
+                    '<div class="k-empty__text">Ingest a document in the Vault to build the graph.</div></div>',
+                    unsafe_allow_html=True,
+                )
+
+    body = (
+        render_node_inspector(selected_title)
+        if selected_title
+        else '<div class="k-ev__more">No concepts indexed yet.</div>'
+    )
+    with rail_col:
+        st.markdown(
+            '<div class="k-rail"><div class="k-rail__head">Selected node</div>'
+            f'<div class="k-rail__body k-rail__body--node">{body}</div></div>',
+            unsafe_allow_html=True,
+        )
+
+
+def render_node_inspector(title: str) -> str:
+    entity = entities_df[entities_df["title"].astype(str) == title].iloc[0]
+    node_row = None
+    if not nodes_df.empty and "title" in nodes_df.columns:
+        matches = nodes_df[nodes_df["title"].astype(str) == title]
+        node_row = matches.iloc[0] if not matches.empty else None
+
+    community = node_row["community"] if node_row is not None and "community" in node_row else "—"
+    degree = node_row["degree"] if node_row is not None and "degree" in node_row else "—"
+    community_title = ""
+    if not community_df.empty and community != "—":
+        match = community_df[community_df["community"].astype(str) == str(community)]
+        if not match.empty:
+            community_title = match.iloc[0]["title"]
+
+    related = pd.DataFrame()
+    if not relationships_df.empty:
+        related = relationships_df[
+            (relationships_df["source"].astype(str) == title)
+            | (relationships_df["target"].astype(str) == title)
+        ].head(4)
+
+    relationship_rows = "".join(
+        '<div style="display:flex;gap:8px;align-items:center">'
+        f'<span>{design.esc(r["target"] if str(r["source"]) == title else r["source"])}</span>'
+        f'<span class="k-mono k-faint" style="margin-left:auto;font-size:11px">{r.get("weight", "—")}/10</span></div>'
+        for _i, r in related.iterrows()
+    ) or '<div class="k-faint">No relationships recorded.</div>'
+
+    return (
+        f'<div><div style="font:500 17px/1.2 var(--k-sans);letter-spacing:-.01em">{design.esc(title)}</div>'
+        '<div style="margin-top:4px;display:flex;gap:6px;font:11px var(--k-mono);color:var(--k-faint)">'
+        f'<span>{design.esc(entity.get("type", "CONCEPT"))}</span><span>·</span>'
+        f'<span style="color:{design.ACCENT}">{design.esc(community_title or f"community {community}")}</span></div></div>'
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'
+        f'{design.stat_box(degree, "degree")}{design.stat_box(community, "community")}'
+        f'{design.stat_box(len(related), "links")}</div>'
+        f'<div class="k-muted" style="line-height:1.55">{design.esc(entity.get("description", ""))}</div>'
+        '<div><div class="k-side-label" style="margin:0 0 8px;padding:0">Relationships</div>'
+        f'<div style="display:grid;gap:6px;color:var(--k-muted)">{relationship_rows}</div></div>'
+    )
+
+
+# -----------------------------------------------------------------------------
+# 9. Screen: Catalog
+# -----------------------------------------------------------------------------
+PAGE_SIZE = 25
+
+
+def screen_catalog():
+    tabs = {
+        f"Concepts `{len(entities_df)}`": "concepts",
+        f"Relationships `{len(relationships_df)}`": "relationships",
+        f"Nodes `{len(nodes_df)}`": "nodes",
+        f"Domain briefs `{len(community_df)}`": "briefs",
+    }
+
+    with st.container(key="topbar_catalog", horizontal=True, vertical_alignment="center"):
+        st.markdown('<div class="k-topbar__title">Catalog</div>', unsafe_allow_html=True)
+        with st.container(key="tabs_catalog"):
+            tab_label = st.radio("Catalog view", list(tabs), horizontal=True, label_visibility="collapsed")
+        with st.container(key="search_catalog"):
+            term = st.text_input("Search", placeholder="Search catalog", label_visibility="collapsed")
+
+    view = tabs[tab_label]
+    with st.container(key="pad_catalog"):
+        if view == "concepts":
+            render_catalog_concepts(term)
+        elif view == "relationships":
+            render_catalog_relationships(term)
+        elif view == "nodes":
+            render_catalog_nodes(term)
         else:
-            st.info("Changelog will be generated upon first sync.")
+            render_catalog_briefs(term)
+
+
+def _paginate(frame: pd.DataFrame, state_key: str) -> pd.DataFrame:
+    page = st.session_state.get(state_key, 0)
+    total_pages = max(1, (len(frame) + PAGE_SIZE - 1) // PAGE_SIZE)
+    page = min(page, total_pages - 1)
+    st.session_state[state_key] = page
+    return frame.iloc[page * PAGE_SIZE:(page + 1) * PAGE_SIZE]
+
+
+def _pager(frame: pd.DataFrame, state_key: str, term: str):
+    total_pages = max(1, (len(frame) + PAGE_SIZE - 1) // PAGE_SIZE)
+    page = st.session_state.get(state_key, 0)
+    shown = min(PAGE_SIZE, max(0, len(frame) - page * PAGE_SIZE))
+    with st.container(key=f"link_pager_{state_key}", horizontal=True, vertical_alignment="center"):
+        suffix = f" · filtered by “{term}”" if term else ""
+        st.markdown(
+            f'<span class="k-foot__label">Showing {shown} of {len(frame)}{design.esc(suffix)}</span>',
+            unsafe_allow_html=True,
+        )
+        if st.button("Previous", key=f"prev_{state_key}", disabled=page == 0):
+            st.session_state[state_key] = page - 1
+            st.rerun()
+        st.markdown(
+            f'<span class="k-foot__page k-mono">{page + 1} / {total_pages}</span>',
+            unsafe_allow_html=True,
+        )
+        if st.button("Next", key=f"next_{state_key}", disabled=page + 1 >= total_pages):
+            st.session_state[state_key] = page + 1
+            st.rerun()
+        st.download_button(
+            "Export CSV",
+            data=frame.to_csv(index=False).encode("utf-8"),
+            file_name=f"{state_key}.csv",
+            mime="text/csv",
+            key=f"csv_{state_key}",
+            width="content",
+        )
+
+
+def _empty_card(message: str):
+    st.markdown(
+        f'<div class="k-card"><div class="k-card__body k-faint">{design.esc(message)}</div></div>',
+        unsafe_allow_html=True,
+    )
+
+
+def render_catalog_concepts(term: str):
+    if entities_df.empty:
+        _empty_card("No concepts indexed yet. Ingest a document in the Vault to build the graph.")
+        return
+    frame = entities_df
+    if term:
+        frame = frame[
+            frame["title"].str.contains(term, case=False, na=False)
+            | frame["description"].str.contains(term, case=False, na=False)
+        ]
+    columns = "1.4fr .8fr 3fr .6fr .8fr"
+    rows = [
+        f'<div class="k-grid__head" style="grid-template-columns:{columns}">'
+        "<span>Title</span><span>Type</span><span>Description</span>"
+        '<span style="text-align:right">Degree</span><span>Community</span></div>'
+    ]
+    degrees = {}
+    if not nodes_df.empty and "title" in nodes_df.columns:
+        degrees = nodes_df.set_index(nodes_df["title"].astype(str))[["degree", "community"]].to_dict("index")
+    for _i, row in _paginate(frame, "catalog_concepts").iterrows():
+        stats = degrees.get(str(row["title"]), {})
+        community = stats.get("community", "—")
+        rows.append(
+            f'<div class="k-grid__row" style="grid-template-columns:{columns}">'
+            f'<span class="k-grid__name">{design.highlight(row["title"], term)}</span>'
+            f'<span class="k-mono k-muted" style="font-size:11px">{design.esc(row["type"])}</span>'
+            f'<span class="k-muted k-clip">{design.highlight(row["description"], term)}</span>'
+            f'<span class="k-mono" style="text-align:right">{stats.get("degree", "—")}</span>'
+            '<span style="display:flex;align-items:center;gap:6px">'
+            f'<span style="width:8px;height:8px;border-radius:2px;background:{design.community_color(community)}"></span>'
+            f"{design.esc(community)}</span></div>"
+        )
+    st.markdown(f'<div class="k-card">{"".join(rows)}</div>', unsafe_allow_html=True)
+    _pager(frame, "catalog_concepts", term)
+
+
+def render_catalog_relationships(term: str):
+    if relationships_df.empty:
+        _empty_card("No relationships indexed yet.")
+        return
+    frame = relationships_df
+    if term:
+        frame = frame[
+            frame["source"].str.contains(term, case=False, na=False)
+            | frame["target"].str.contains(term, case=False, na=False)
+            | frame["description"].str.contains(term, case=False, na=False)
+        ]
+    columns = "1.2fr 1.2fr 3fr .6fr"
+    rows = [
+        f'<div class="k-grid__head" style="grid-template-columns:{columns}">'
+        "<span>Source</span><span>Target</span><span>Description</span>"
+        '<span style="text-align:right">Weight</span></div>'
+    ]
+    for _i, row in _paginate(frame, "catalog_relationships").iterrows():
+        rows.append(
+            f'<div class="k-grid__row" style="grid-template-columns:{columns}">'
+            f'<span class="k-grid__name">{design.highlight(row["source"], term)}</span>'
+            f'<span class="k-grid__name">{design.highlight(row["target"], term)}</span>'
+            f'<span class="k-muted k-clip">{design.highlight(row["description"], term)}</span>'
+            f'<span class="k-mono" style="text-align:right">{design.esc(row["weight"])}</span></div>'
+        )
+    st.markdown(f'<div class="k-card">{"".join(rows)}</div>', unsafe_allow_html=True)
+    _pager(frame, "catalog_relationships", term)
+
+
+def render_catalog_nodes(term: str):
+    if nodes_df.empty:
+        _empty_card("No graph nodes indexed yet.")
+        return
+    frame = nodes_df
+    if term:
+        frame = frame[frame["title"].str.contains(term, case=False, na=False)]
+    columns = "2fr .8fr .8fr"
+    rows = [
+        f'<div class="k-grid__head" style="grid-template-columns:{columns}">'
+        "<span>Title</span><span>Community</span>"
+        '<span style="text-align:right">Degree</span></div>'
+    ]
+    for _i, row in _paginate(frame, "catalog_nodes").iterrows():
+        rows.append(
+            f'<div class="k-grid__row" style="grid-template-columns:{columns}">'
+            f'<span class="k-grid__name">{design.highlight(row["title"], term)}</span>'
+            '<span style="display:flex;align-items:center;gap:6px">'
+            f'<span style="width:8px;height:8px;border-radius:2px;background:{design.community_color(row["community"])}"></span>'
+            f'{design.esc(row["community"])}</span>'
+            f'<span class="k-mono" style="text-align:right">{design.esc(row["degree"])}</span></div>'
+        )
+    st.markdown(f'<div class="k-card">{"".join(rows)}</div>', unsafe_allow_html=True)
+    _pager(frame, "catalog_nodes", term)
+
+
+def render_catalog_briefs(term: str):
+    if community_df.empty:
+        _empty_card("No domain briefs generated yet.")
+        return
+    frame = community_df
+    if term:
+        frame = frame[
+            frame["title"].str.contains(term, case=False, na=False)
+            | frame["summary"].str.contains(term, case=False, na=False)
+        ]
+    for _i, row in frame.head(PAGE_SIZE).iterrows():
+        st.markdown(
+            '<div class="k-card" style="margin-bottom:10px"><div class="k-card__body">'
+            '<div style="display:flex;align-items:baseline;gap:8px">'
+            f'<span class="k-card__title">{design.highlight(row["title"], term)}</span>'
+            f'<span class="k-mono k-faint" style="font-size:11px">community {design.esc(row["community"])}</span>'
+            f'<span class="k-tag k-tag--accent" style="margin-left:auto">rank {design.esc(row["rank"])}</span></div>'
+            f'<div class="k-muted" style="margin-top:8px;line-height:1.55">{design.highlight(row["summary"], term)}</div>'
+            "</div></div>",
+            unsafe_allow_html=True,
+        )
+        with st.expander("Full brief"):
+            st.markdown(row["full_content"])
+
+
+# -----------------------------------------------------------------------------
+# 10. Screen: Governance
+# -----------------------------------------------------------------------------
+def screen_governance():
+    with st.container(key="topbar_governance", horizontal=True, vertical_alignment="center"):
+        st.markdown(
+            '<div class="k-topbar__title">Governance</div>'
+            f'<div class="k-topbar__note">Change Management Agent · last run {design.esc(qa_report.get("timestamp", ""))}</div>',
+            unsafe_allow_html=True,
+        )
+        if st.button("Re-run QA & sync", key="gov_sync"):
+            with st.spinner("Running the change management cycle…"):
+                result = change_agent.run_full_sync()
+            st.success(f"Synchronized v{result['version']} with the changelog and README.")
+            st.rerun()
+
+    with st.container(key="pad_governance"):
+        left, right = st.columns([1, 1.2], gap="medium")
+
+        with left:
+            all_passed = qa_passed_count == len(qa_checks)
+            checks_html = "".join(
+                f'<div class="k-check"><span class="{"k-check__ok" if check["ok"] else "k-check__bad"}">'
+                f'{"✓" if check["ok"] else "✕"}</span><span>{design.esc(check["label"])}</span>'
+                f'<span class="k-check__meta">{design.esc(check["meta"])}</span></div>'
+                for check in qa_checks
+            )
+            st.markdown(
+                '<div class="k-card"><div class="k-card__head">'
+                '<span class="k-card__title">QA health</span>'
+                f'<span class="k-tag{"" if all_passed else " k-tag--warn"}" '
+                'style="display:flex;align-items:center;gap:6px;border-radius:999px;padding:2px 8px">'
+                f'<span class="k-dot" style="background:{design.SUCCESS if all_passed else design.WARN}"></span>'
+                f'{qa_passed_count} / {len(qa_checks)} passed</span>'
+                f'<span class="k-check__meta">v{design.esc(app_version)}</span></div>'
+                f"{checks_html}</div>",
+                unsafe_allow_html=True,
+            )
+            if qa_report.get("errors"):
+                with st.expander(f"Reported issues ({len(qa_report['errors'])})"):
+                    for issue in qa_report["errors"]:
+                        st.markdown(f"- {issue}")
+
+        with right:
+            releases = parse_changelog(Path("./CHANGELOG.md"))
+            if not releases:
+                _empty_card("The changelog is generated on the first sync.")
+                return
+            entries = []
+            for position, release in enumerate(releases):
+                is_current = position == 0
+                commits = "".join(
+                    f'<div class="k-tl__commit"><span class="k-tl__sha">{design.esc(c["sha"])}</span>'
+                    f'<span>{design.esc(c["message"])}</span></div>'
+                    for c in release["commits"][:4]
+                )
+                extra = (
+                    f'<div class="k-faint" style="font-size:11.5px;margin-top:6px">'
+                    f'{len(release["commits"]) - 4} more commits</div>'
+                    if len(release["commits"]) > 4
+                    else ""
+                )
+                connector = '<span class="k-tl__line"></span>' if position < len(releases) - 1 else ""
+                entries.append(
+                    '<div class="k-tl"><div class="k-tl__rail">'
+                    f'<span class="k-tl__dot{"" if is_current else " k-tl__dot--past"}"></span>'
+                    f"{connector}</div>"
+                    '<div class="k-tl__body"><div style="display:flex;align-items:baseline;gap:8px">'
+                    f'<span class="k-tl__ver">v{design.esc(release["version"])}</span>'
+                    f'<span class="k-faint" style="font-size:11.5px">{design.esc(release["date"])}</span>'
+                    + (
+                        '<span class="k-tag k-tag--accent" style="margin-left:auto">current</span>'
+                        if is_current
+                        else ""
+                    )
+                    + f"</div>{commits}{extra}</div></div>"
+                )
+            st.markdown(
+                '<div class="k-card"><div class="k-card__head">'
+                '<span class="k-card__title">Changelog</span>'
+                '<span class="k-mono k-faint" style="font-size:11px">CHANGELOG.md</span>'
+                '<span class="k-muted" style="margin-left:auto;font-size:11.5px">'
+                "Semantic versioning · patch on sync</span></div>"
+                f'<div style="padding:16px 16px 6px">{"".join(entries)}</div></div>',
+                unsafe_allow_html=True,
+            )
+
+
+# -----------------------------------------------------------------------------
+# 11. Router
+# -----------------------------------------------------------------------------
+if screen == "search":
+    screen_search()
+elif screen == "vault":
+    screen_vault()
+elif screen == "concepts":
+    screen_concepts()
+elif screen == "catalog":
+    screen_catalog()
+else:
+    screen_governance()
