@@ -1,0 +1,36 @@
+[
+  {
+    "id": "doc_a6abda2bdd97",
+    "title": "The Ultimate Guide to Fine-Tuning LLMs.txt",
+    "filename": "The Ultimate Guide to Fine-Tuning LLMs.txt",
+    "storage_path": "vault/documents/doc_a6abda2bdd97_The Ultimate Guide to Fine-Tuning LLMs.txt",
+    "file_size_bytes": 322254,
+    "file_size_kb": 314.7,
+    "sha256": "a6abda2bdd977bd7afbc386f97c3e81b5cca737137bd5a77103318010b1e20e0",
+    "source_type": "TXT",
+    "page_count": 121,
+    "char_count": 320859,
+    "uploaded_at": "2026-09-17 10:06:50",
+    "status": "Indexed in Vault",
+    "metadata": {
+      "origin": "CeADAR Research Paper"
+    }
+  },
+  {
+    "id": "doc_f0fcef27b135",
+    "title": "2408.13296v3_Fine_Tuning_Guide.pdf",
+    "filename": "2408.13296v3_Fine_Tuning_Guide.pdf",
+    "storage_path": "vault/documents/doc_f0fcef27b135_2408.13296v3_Fine_Tuning_Guide.pdf",
+    "file_size_bytes": 15940052,
+    "file_size_kb": 15566.5,
+    "sha256": "f0fcef27b1358c51ac7daafd26ddb7b459d644ada7b7adb197dbaadf369c04ca",
+    "source_type": "PDF",
+    "page_count": 115,
+    "char_count": 320859,
+    "uploaded_at": "2026-09-17 10:06:50",
+    "status": "Indexed in Vault",
+    "metadata": {
+      "origin": "arXiv Preprint"
+    }
+  }
+]
