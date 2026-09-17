@@ -2,7 +2,8 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import Dict, Any, Tuple, List
+from concurrent.futures import ThreadPoolExecutor
+from typing import Dict, Any, Tuple, List, Optional
 
 import streamlit as st
 import pandas as pd
@@ -19,9 +20,11 @@ import importlib
 import core.vault
 import core.pipeline
 import core.change_manager
+import core.design
 importlib.reload(core.vault)
 importlib.reload(core.pipeline)
 importlib.reload(core.change_manager)
+importlib.reload(core.design)
 
 from core.vault import DocumentVault
 from core.pipeline import DocumentIngestor, GraphRAGEngine
@@ -354,28 +357,26 @@ with st.sidebar:
 
     nav_keys = [key for key, _label in design.NAV]
     requested_screen = st.query_params.get("screen", "search")
-    with st.container(key="nav"):
-        nav_label = st.radio(
-            "Navigation",
-            [label for _key, label in design.NAV],
-            index=nav_keys.index(requested_screen) if requested_screen in nav_keys else 0,
-            label_visibility="collapsed",
-        )
-    screen = {label: key for key, label in design.NAV}[nav_label]
-    # Keep the screen in the URL so in-page links (vault rows) survive a reload.
-    if screen != requested_screen:
-        st.query_params["screen"] = screen
+    if requested_screen not in nav_keys:
+        requested_screen = "search"
+    screen = requested_screen
+
+    st.markdown(design.nav_bar(screen, nav_counts), unsafe_allow_html=True)
 
     if screen == "search":
-        with st.container(key="modes"):
-            mode_label = st.radio("Reasoning", MODE_LABELS)
-        mode_key = MODE_KEY_BY_LABEL[mode_label]
+        valid_modes = [k for k, _ in design.MODES]
+        requested_mode = st.query_params.get("mode", st.session_state.get("reasoning_mode", "global"))
+        if requested_mode not in valid_modes:
+            requested_mode = "global"
+        mode_key = requested_mode
+        st.session_state["reasoning_mode"] = mode_key
+        st.markdown(design.reasoning_modes(mode_key), unsafe_allow_html=True)
 
         with st.container(key="controls"):
             temp = st.slider("Temperature", min_value=0.0, max_value=1.0, value=0.2, step=0.05)
             top_k_passages = st.slider("Citations", min_value=2, max_value=8, value=4)
     else:
-        mode_label, mode_key = design.MODES[0][1], design.MODES[0][0]
+        mode_key = "global"
         temp, top_k_passages = 0.2, 4
 
     if screen == "concepts" and not nodes_df.empty and "community" in nodes_df.columns:
@@ -411,9 +412,17 @@ if "pending_query" not in st.session_state:
 CITATION_RE = re.compile(r"\[(\d+)\](?!\()")
 
 
-def render_answer(text: str, key: str):
-    """Render an answer body with citation markers styled as accent superscripts."""
-    marked = CITATION_RE.sub(r'<sup class="k-cite">[\1]</sup>', text)
+def render_answer(text: str, key: str, citations: Optional[List[Dict[str, Any]]] = None):
+    """Render an answer body with citation markers [n] styled as accent superscripts linking to evidence cards."""
+    max_c = len(citations) if citations else 999
+
+    def _repl(match):
+        idx = int(match.group(1))
+        if 1 <= idx <= max_c:
+            return f'<sup class="k-cite"><a href="#cite-{idx}" aria-label="Source {idx}">[{idx}]</a></sup>'
+        return match.group(0)
+
+    marked = CITATION_RE.sub(_repl, text)
     with st.container(key=key):
         st.markdown(marked, unsafe_allow_html=True)
 
@@ -423,24 +432,42 @@ def render_compare(comparison: Dict[str, Any], key: str):
         left, right = st.columns(2, gap="small")
         with left:
             with st.container(key=f"cmpcard_{key}_graph"):
+                g_ground = design.grounding_tag(comparison.get("graph_grounding", 0.95))
                 st.markdown(
                     '<div class="k-compare__head"><span class="k-swatch" '
                     f'style="background:{design.ACCENT}"></span><span class="k-card__title">Graph · '
-                    f'{design.esc(comparison.get("graph_mode", "DRIFT"))}</span>'
-                    f'<span class="k-compare__meta">{comparison.get("graph_sources", 0)} sources</span></div>',
+                    f'{design.esc(comparison.get("graph_mode", "DRIFT deep-dive"))}</span>'
+                    f'<span class="k-compare__meta">{comparison.get("graph_sources", 0)} sources</span>'
+                    f'<span style="margin-left:auto">{g_ground}</span></div>',
                     unsafe_allow_html=True,
                 )
-                render_answer(comparison["graph_answer"], key=f"ans_cmp_{key}_graph")
+                render_answer(comparison["graph_answer"], key=f"ans_cmp_{key}_graph", citations=comparison.get("graph_citations"))
+                if comparison.get("graph_citations"):
+                    footnotes = "".join(
+                        f'<div style="font-size:11.5px;color:var(--k-muted);padding:2px 0">'
+                        f'<span class="k-cite">[{c.get("index", idx+1)}]</span> {design.esc(c.get("kind", "Source"))} · {design.esc(c.get("name", ""))}</div>'
+                        for idx, c in enumerate(comparison["graph_citations"][:4])
+                    )
+                    st.markdown(f'<div style="padding:8px 16px 12px;border-top:1px solid var(--k-border)">{footnotes}</div>', unsafe_allow_html=True)
         with right:
             with st.container(key=f"cmpcard_{key}_vector"):
+                v_ground = design.grounding_tag(comparison.get("vector_grounding", 0.82))
                 st.markdown(
                     '<div class="k-compare__head"><span class="k-swatch" '
                     f'style="background:{design.FAINT}"></span><span class="k-card__title">Vector · top-'
                     f'{comparison.get("vector_sources", 0)} passages</span>'
-                    '<span class="k-compare__meta">ChromaDB · paper_collection</span></div>',
+                    '<span class="k-compare__meta">ChromaDB · paper_collection</span>'
+                    f'<span style="margin-left:auto">{v_ground}</span></div>',
                     unsafe_allow_html=True,
                 )
-                render_answer(comparison["vector_answer"], key=f"ans_cmp_{key}_vector")
+                render_answer(comparison["vector_answer"], key=f"ans_cmp_{key}_vector", citations=comparison.get("vector_citations"))
+                if comparison.get("vector_citations"):
+                    footnotes = "".join(
+                        f'<div style="font-size:11.5px;color:var(--k-muted);padding:2px 0">'
+                        f'<span class="k-cite">[{c.get("index", idx+1)}]</span> {design.esc(c.get("kind", "Source"))} · {design.esc(c.get("name", ""))}</div>'
+                        for idx, c in enumerate(comparison["vector_citations"][:4])
+                    )
+                    st.markdown(f'<div style="padding:8px 16px 12px;border-top:1px solid var(--k-border)">{footnotes}</div>', unsafe_allow_html=True)
 
 
 def run_query(question: str, mode: str, temperature: float, citations_k: int) -> Dict[str, Any]:
@@ -449,21 +476,28 @@ def run_query(question: str, mode: str, temperature: float, citations_k: int) ->
     started = time.perf_counter()
 
     if mode == "global":
-        answer, _ctx, citations = query_graphrag_global(question, community_df, llm)
+        answer, ctx, citations = query_graphrag_global(question, community_df, llm)
     elif mode == "local":
-        answer, _ctx, citations = query_graphrag_local(question, entities_df, relationships_df, llm)
+        answer, ctx, citations = query_graphrag_local(question, entities_df, relationships_df, llm)
     elif mode == "drift":
-        answer, _ctx, citations = query_graphrag_drift(question, community_df, relationships_df, llm)
+        answer, ctx, citations = query_graphrag_drift(question, community_df, relationships_df, llm)
     elif mode == "vector":
-        answer, _ctx, citations = query_chroma_rag(question, paper_collection, llm, num_results=citations_k)
+        answer, ctx, citations = query_chroma_rag(question, paper_collection, llm, num_results=citations_k)
     else:
-        graph_answer, _gctx, graph_citations = query_graphrag_drift(question, community_df, relationships_df, llm)
-        vector_answer, _vctx, vector_citations = query_chroma_rag(
-            question, paper_collection, llm, num_results=citations_k
-        )
+        # Concurrent execution of Graph and Vector reasoning engines for Compare mode
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            fut_graph = executor.submit(query_graphrag_drift, question, community_df, relationships_df, llm)
+            fut_vector = executor.submit(query_chroma_rag, question, paper_collection, llm, citations_k)
+            graph_answer, gctx, graph_citations = fut_graph.result()
+            vector_answer, vctx, vector_citations = fut_vector.result()
+
         citations = graph_citations + vector_citations
         for position, citation in enumerate(citations, 1):
             citation["index"] = position
+
+        graph_grounding = design.compute_grounding(graph_answer)
+        vector_grounding = design.compute_grounding(vector_answer)
+
         return {
             "role": "assistant",
             "content": "",
@@ -472,15 +506,22 @@ def run_query(question: str, mode: str, temperature: float, citations_k: int) ->
             "query": question,
             "citations": citations,
             "elapsed": time.perf_counter() - started,
+            "grounding": max(graph_grounding, vector_grounding),
+            "raw_context": f"### Graph Context (DRIFT):\n{gctx}\n\n### Vector Context (ChromaDB):\n{vctx}",
             "comparison": {
                 "graph_answer": graph_answer,
                 "vector_answer": vector_answer,
-                "graph_mode": "DRIFT",
+                "graph_mode": "DRIFT deep-dive",
                 "graph_sources": len(graph_citations),
                 "vector_sources": len(vector_citations),
+                "graph_grounding": graph_grounding,
+                "vector_grounding": vector_grounding,
+                "graph_citations": graph_citations,
+                "vector_citations": vector_citations,
             },
         }
 
+    grounding = design.compute_grounding(answer)
     return {
         "role": "assistant",
         "content": answer,
@@ -489,41 +530,47 @@ def run_query(question: str, mode: str, temperature: float, citations_k: int) ->
         "query": question,
         "citations": citations,
         "elapsed": time.perf_counter() - started,
+        "grounding": grounding,
+        "raw_context": ctx,
     }
 
 
 def screen_search():
+    if "prompt" in st.query_params:
+        try:
+            p_val = st.query_params.pop("prompt")
+            p_idx = int(p_val) - 1
+            if 0 <= p_idx < len(design.SUGGESTED_PROMPTS):
+                p_text, p_mode = design.SUGGESTED_PROMPTS[p_idx]
+                st.session_state.pending_query = (p_text, p_mode)
+                st.rerun()
+        except Exception:
+            pass
+
     last_query = next(
         (m["content"] for m in reversed(st.session_state.messages) if m["role"] == "user"),
         "",
     )
+    source_filter_key = st.query_params.get("source", "all").lower()
+
     split = st.container(key="split")
     thread_col, rail_col = split.columns([1, 0.42], gap=None)
 
     with thread_col:
-        with st.container(key="topbar_search", horizontal=True, vertical_alignment="center"):
-            crumb = f"Thread · {last_query[:46]}" if last_query else "New thread"
-            st.markdown(
-                f'<div class="k-topbar__title">Search</div><div class="k-topbar__sep">/</div>'
-                f'<div class="k-topbar__crumb">{design.esc(crumb)}</div>',
-                unsafe_allow_html=True,
-            )
-            with st.container(key="pills_sources"):
-                evidence_filter = st.radio(
-                    "Evidence filter",
-                    ["All sources", "Documents", "Graph", "Tables"],
-                    horizontal=True,
-                    label_visibility="collapsed",
-                )
+        crumb = f"Thread · {last_query[:46]}" if last_query else "New thread"
+        st.markdown(
+            f'<div style="height:48px;display:flex;align-items:center;gap:6px;padding:0 24px;'
+            f'border-bottom:1px solid var(--k-border);background:#FFFFFF">'
+            f'<div class="k-topbar__title">Search</div><div class="k-topbar__sep">/</div>'
+            f'<div class="k-topbar__crumb">{design.esc(crumb)}</div>'
+            f'<div style="margin-left:auto">{design.source_pills(source_filter_key)}</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
 
         with st.container(key="thread"):
             if not st.session_state.messages:
-                st.markdown(
-                    '<div class="k-empty"><div class="k-empty__title">Ask the knowledge base.</div>'
-                    "<div class=\"k-empty__text\">Answers are grounded in vault documents, graph concepts "
-                    "and extracted tables. Pick a reasoning mode in the sidebar, then ask a question.</div></div>",
-                    unsafe_allow_html=True,
-                )
+                st.markdown(design.suggested_prompts_box(), unsafe_allow_html=True)
 
             for position, message in enumerate(st.session_state.messages):
                 if message["role"] == "user":
@@ -534,17 +581,20 @@ def screen_search():
                     )
                     continue
 
+                grounding_score = message.get("grounding", 0.0)
+                grounding_pill = f'<span>·</span>{design.grounding_tag(grounding_score)}' if grounding_score > 0 else ""
                 st.markdown(
                     '<div class="k-msg k-msg--ai"><div class="k-msg__av k-msg__av--ai">G</div><div class="k-msg__meta">'
                     f'<span class="k-msg__mode">{design.esc(message.get("mode", ""))}</span><span>·</span>'
                     f'<span>{len(message.get("citations", []))} sources</span><span>·</span>'
-                    f'<span class="k-mono">{message.get("elapsed", 0):.1f}s</span></div></div>',
+                    f'<span class="k-mono">{message.get("elapsed", 0):.1f}s</span>'
+                    f'{grounding_pill}</div></div>',
                     unsafe_allow_html=True,
                 )
                 if message.get("comparison"):
                     render_compare(message["comparison"], key=f"cmp_{position}")
                 else:
-                    render_answer(message["content"], key=f"ans_msg_{position}")
+                    render_answer(message["content"], key=f"ans_msg_{position}", citations=message.get("citations"))
 
                 with st.container(key=f"link_actions_{position}", horizontal=True):
                     if st.button("Compare with vector search", key=f"cmp_btn_{position}"):
@@ -562,7 +612,7 @@ def screen_search():
         (m.get("citations", []) for m in reversed(st.session_state.messages) if m["role"] == "assistant"),
         [],
     )
-    source_filter = {"Documents": "documents", "Graph": "graph", "Tables": "tables"}.get(evidence_filter)
+    source_filter = {"documents": "documents", "graph": "graph", "tables": "tables"}.get(source_filter_key)
     shown = [c for c in last_citations if not source_filter or c.get("source") == source_filter]
 
     if shown:
@@ -574,10 +624,33 @@ def screen_search():
         body = '<div class="k-ev__more">Citations appear here once you run a query.</div>'
 
     with rail_col:
+        r_head_col1, r_head_col2 = st.columns([1, 1], vertical_alignment="center")
+        with r_head_col1:
+            st.markdown(
+                f'<div class="k-rail__head" style="border-bottom:none;height:auto;padding:14px 0 0 16px">Evidence '
+                f'<span class="k-rail__count">{len(shown)}</span></div>',
+                unsafe_allow_html=True,
+            )
+        with r_head_col2:
+            show_context = st.toggle("Show context", value=st.session_state.get("show_raw_context", False), key="toggle_raw_context")
+            st.session_state.show_raw_context = show_context
+
+        if show_context:
+            last_assistant_msg = next((m for m in reversed(st.session_state.messages) if m["role"] == "assistant"), None)
+            raw_ctx = last_assistant_msg.get("raw_context", "") if last_assistant_msg else ""
+            if raw_ctx:
+                st.markdown(
+                    f'<div style="padding:8px 12px;font:11px/1.4 var(--k-mono);color:var(--k-muted);'
+                    f'background:var(--k-canvas);border:1px solid var(--k-border);border-radius:6px;'
+                    f'margin:8px 12px;max-height:220px;overflow-y:auto;white-space:pre-wrap;">'
+                    f'{design.esc(raw_ctx)}</div>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.markdown('<div class="k-faint" style="padding:6px 12px;font-size:11.5px">No raw context captured.</div>', unsafe_allow_html=True)
+
         st.markdown(
-            '<div class="k-rail"><div class="k-rail__head">Evidence'
-            f'<span class="k-rail__count">{len(shown)}</span></div>'
-            f'<div class="k-rail__body">{body}</div></div>',
+            f'<div class="k-rail__body">{body}</div>',
             unsafe_allow_html=True,
         )
 
@@ -693,8 +766,8 @@ def screen_vault():
                 f'<div style="display:flex;align-items:center;margin-bottom:12px">'
                 f'<span class="k-card__title">{design.esc(document["title"])}</span></div>'
                 '<div class="k-kv">'
-                f'<span>SHA-256</span><span class="k-mono" style="font-size:11.5px;word-break:break-all">'
-                f'{design.esc(document["sha256"][:32])}…</span>'
+                f'<span>SHA-256</span><span class="k-mono" style="font-size:11px;word-break:break-all">'
+                f'{design.esc(document["sha256"])}</span>'
                 f'<span>Storage</span><span class="k-mono" style="font-size:11.5px;word-break:break-all">'
                 f'{design.esc(Path(document["storage_path"]).name)}</span>'
                 f'<span>Characters</span><span class="k-mono" style="font-size:11.5px">'
@@ -706,10 +779,25 @@ def screen_vault():
                 unsafe_allow_html=True,
             )
             with st.container(key="link_delete", horizontal=True):
-                if st.button("Delete document", key=f"delete_{selected_id}"):
-                    vault.delete_document(selected_id)
-                    st.query_params.pop("doc", None)
-                    st.rerun()
+                confirm_key = f"confirm_del_{selected_id}"
+                if st.session_state.get(confirm_key, False):
+                    st.markdown(
+                        f'<span class="k-faint" style="font-size:12px">Delete {design.esc(selected_id[:12])}…?</span>',
+                        unsafe_allow_html=True,
+                    )
+                    if st.button("Delete", key=f"do_delete_{selected_id}", type="primary"):
+                        vault.delete_document(selected_id)
+                        st.session_state[confirm_key] = False
+                        st.query_params.pop("doc", None)
+                        st.cache_data.clear()
+                        st.rerun()
+                    if st.button("Cancel", key=f"cancel_delete_{selected_id}"):
+                        st.session_state[confirm_key] = False
+                        st.rerun()
+                else:
+                    if st.button("Delete document", key=f"delete_{selected_id}"):
+                        st.session_state[confirm_key] = True
+                        st.rerun()
 
         with right:
             table_rows = "".join(
@@ -781,6 +869,8 @@ def render_vault_uploader():
 # -----------------------------------------------------------------------------
 def screen_concepts():
     titles = sorted(entities_df["title"].astype(str).tolist()) if not entities_df.empty else []
+    find_param = st.query_params.get("find") or st.query_params.get("node")
+    default_idx = titles.index(find_param) if (find_param and find_param in titles) else (0 if titles else None)
 
     split = st.container(key="split")
     graph_col, rail_col = split.columns([1, 0.42], gap=None)
@@ -796,7 +886,7 @@ def screen_concepts():
                 selected_title = st.selectbox(
                     "Find node",
                     titles,
-                    index=0 if titles else None,
+                    index=default_idx,
                     label_visibility="collapsed",
                     placeholder="Find node",
                 )
@@ -827,6 +917,19 @@ def screen_concepts():
             f'<div class="k-rail__body k-rail__body--node">{body}</div></div>',
             unsafe_allow_html=True,
         )
+        if selected_title:
+            with st.container(key="link_node_actions", horizontal=True):
+                if st.button(f"Ask about {selected_title[:16]}", key="ask_about_node"):
+                    st.session_state.pending_query = (
+                        f"What is {selected_title} and how does it relate to other concepts in the corpus?",
+                        "local",
+                    )
+                    st.query_params["screen"] = "search"
+                    st.rerun()
+                if st.button("Open in catalog", key="open_in_catalog"):
+                    st.query_params["screen"] = "catalog"
+                    st.query_params["term"] = selected_title
+                    st.rerun()
 
 
 def render_node_inspector(title: str) -> str:
@@ -879,27 +982,34 @@ PAGE_SIZE = 25
 
 
 def screen_catalog():
-    tabs = {
-        f"Concepts `{len(entities_df)}`": "concepts",
-        f"Relationships `{len(relationships_df)}`": "relationships",
-        f"Nodes `{len(nodes_df)}`": "nodes",
-        f"Domain briefs `{len(community_df)}`": "briefs",
+    tab_counts = {
+        "concepts": len(entities_df),
+        "relationships": len(relationships_df),
+        "nodes": len(nodes_df),
+        "briefs": len(community_df),
     }
+    current_tab = st.query_params.get("tab", "concepts").lower()
+    if current_tab not in tab_counts:
+        current_tab = "concepts"
 
+    initial_term = st.query_params.get("term", "")
     with st.container(key="topbar_catalog", horizontal=True, vertical_alignment="center"):
-        st.markdown('<div class="k-topbar__title">Catalog</div>', unsafe_allow_html=True)
-        with st.container(key="tabs_catalog"):
-            tab_label = st.radio("Catalog view", list(tabs), horizontal=True, label_visibility="collapsed")
+        st.markdown(
+            f'<div style="display:flex;align-items:center;gap:22px;height:48px">'
+            f'<div class="k-topbar__title">Catalog</div>'
+            f'{design.catalog_tabs(current_tab, tab_counts)}'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
         with st.container(key="search_catalog"):
-            term = st.text_input("Search", placeholder="Search catalog", label_visibility="collapsed")
+            term = st.text_input("Search", value=initial_term, placeholder="Search catalog", label_visibility="collapsed")
 
-    view = tabs[tab_label]
     with st.container(key="pad_catalog"):
-        if view == "concepts":
+        if current_tab == "concepts":
             render_catalog_concepts(term)
-        elif view == "relationships":
+        elif current_tab == "relationships":
             render_catalog_relationships(term)
-        elif view == "nodes":
+        elif current_tab == "nodes":
             render_catalog_nodes(term)
         else:
             render_catalog_briefs(term)
@@ -968,7 +1078,8 @@ def render_catalog_concepts(term: str):
     ]
     degrees = {}
     if not nodes_df.empty and "title" in nodes_df.columns:
-        degrees = nodes_df.set_index(nodes_df["title"].astype(str))[["degree", "community"]].to_dict("index")
+        dedup_nodes = nodes_df.drop_duplicates(subset=["title"])
+        degrees = dedup_nodes.set_index(dedup_nodes["title"].astype(str))[["degree", "community"]].to_dict("index")
     for _i, row in _paginate(frame, "catalog_concepts").iterrows():
         stats = degrees.get(str(row["title"]), {})
         community = stats.get("community", "—")
@@ -1087,11 +1198,18 @@ def screen_governance():
 
         with left:
             all_passed = qa_passed_count == len(qa_checks)
+            sorted_checks = sorted(qa_checks, key=lambda c: 0 if not c["ok"] else 1)
             checks_html = "".join(
                 f'<div class="k-check"><span class="{"k-check__ok" if check["ok"] else "k-check__bad"}">'
                 f'{"✓" if check["ok"] else "✕"}</span><span>{design.esc(check["label"])}</span>'
                 f'<span class="k-check__meta">{design.esc(check["meta"])}</span></div>'
-                for check in qa_checks
+                + (
+                    f'<div style="padding:4px 16px 8px;font:11px var(--k-mono);color:var(--k-danger);background:#FFF5F5">'
+                    f'{design.esc(check.get("error", ""))}</div>'
+                    if not check["ok"] and check.get("error")
+                    else ""
+                )
+                for check in sorted_checks
             )
             st.markdown(
                 '<div class="k-card"><div class="k-card__head">'

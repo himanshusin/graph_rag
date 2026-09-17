@@ -443,30 +443,42 @@ class GraphRAGEngine:
         }
 
     def _generate_visualizations(self, nodes_df: pd.DataFrame, relationships_df: pd.DataFrame):
-        colors = ['#3056D3', '#1F8A5B', '#B7791F', '#8A8A83', '#B03A2E', '#5B4BC4', '#2F7F8F', '#9C5518', '#4B7A2F', '#7A4B6B']
+        colors = ['#3056D3', '#1F8A5B', '#B7791F', '#8A8A83', '#B03A2E', '#6B4FBB', '#2A8FA8', '#C25E9A']
 
-        # Interactive PyVis Graph
-        net = Network(height='600px', width='100%', bgcolor='#FFFFFF', font_color='#111110', notebook=True, cdn_resources='in_line')
+        # Interactive PyVis Graph (Developer Guide §2 & §5 specs)
+        net = Network(height='640px', width='100%', bgcolor='#FFFFFF', font_color='#111110', notebook=True, cdn_resources='in_line')
         
         for _, row in nodes_df.iterrows():
             comm = int(row['community'])
             color = colors[comm % len(colors)]
             degree = int(row.get('degree', 1))
+            title_text = str(row['title'])
             net.add_node(
-                row['title'],
-                label=row['title'],
-                title=f"Concept: {row['title']}<br>Domain: {comm}<br>Centrality: {degree}",
-                color=color,
-                size=14 + min(degree * 4, 32)
+                title_text,
+                label=title_text,
+                title=f"Concept: {title_text}<br>Community: {comm}<br>Centrality: {degree}",
+                color={
+                    "background": color,
+                    "border": "#111110",
+                    "highlight": {"background": "#3056D3", "border": "#111110"},
+                    "hover": {"background": color, "border": "#3056D3"}
+                },
+                borderWidth=1,
+                borderWidthSelected=2,
+                font={"face": "Geist, system-ui, sans-serif", "size": 12, "color": "#111110"},
+                size=14 + min(degree * 3, 30)
             )
 
         for _, row in relationships_df.iterrows():
-            if row['source'] in net.get_nodes() and row['target'] in net.get_nodes():
+            src, tgt = str(row['source']), str(row['target'])
+            if src in net.get_nodes() and tgt in net.get_nodes():
+                weight = float(row.get('weight', 1.0))
                 net.add_edge(
-                    row['source'],
-                    row['target'],
-                    value=float(row['weight']),
-                    title=f"Confidence: {row['weight']}/10<br>{row['description']}"
+                    src,
+                    tgt,
+                    value=weight,
+                    color={"color": "#D6D6D0", "highlight": "#3056D3", "hover": "#3056D3"},
+                    title=f"Strength: {weight}/10<br>{row.get('description', '')}"
                 )
 
         html_path = self.notebook_dir / "interactive_graph.html"

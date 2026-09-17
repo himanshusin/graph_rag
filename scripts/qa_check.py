@@ -7,11 +7,12 @@ ROOT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
 from core.change_manager import ChangeManagementAgent
+from scripts.ui_qa_agent import UIQAAgent
 
 
 def main():
     print("=" * 60)
-    print("🛡️  Enterprise QA & Code Quality Verification")
+    print("Enterprise QA & UI Mockups Compliance Verification")
     print("=" * 60)
 
     agent = ChangeManagementAgent(root_dir=str(ROOT_DIR))
@@ -25,16 +26,24 @@ def main():
     print(f"Structured Tabs: {results.get('structured_tables', 'PASSED')}")
 
     if results["errors"]:
-        print("\n⚠️  Warnings / Errors:")
+        print("\nWarnings / Errors:")
         for err in results["errors"]:
             print(f"  - {err}")
 
     if not results["passed"]:
-        print("\n❌ QA Verification FAILED. Please resolve errors before pushing.")
+        print("\nQA Verification FAILED. Please resolve errors before release.")
         sys.exit(1)
-    else:
-        print("\n✅ QA Verification PASSED. Codebase is clean and ready for production.")
-        sys.exit(0)
+
+    print("\n--- Running UI Mockup & End-to-End QA Suite ---")
+    ui_agent = UIQAAgent(root_dir=ROOT_DIR)
+    ui_passed = ui_agent.run_all()
+
+    if not ui_passed:
+        print("\nUI Verification FAILED. Please resolve errors before release.")
+        sys.exit(1)
+
+    print("\nQA & UI Verification PASSED. Codebase and UI design are verified for release.")
+    sys.exit(0)
 
 
 if __name__ == "__main__":
