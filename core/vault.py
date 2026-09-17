@@ -12,7 +12,7 @@ import pymupdf
 class DocumentVault:
     """
     Enterprise Document Retention & Vault Manager.
-    Persists uploaded files, tracks metadata catalog, and generates Glean-style source citations.
+    Persists uploaded files, tracks metadata catalog, and generates verified source citations.
     """
 
     def __init__(self, vault_dir: str = "./vault"):
@@ -125,11 +125,11 @@ class DocumentVault:
         return False
 
     @staticmethod
-    def format_glean_citations(
+    def format_citations(
         sources: List[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
         """
-        Format source excerpts into Glean-style citation cards with direct links.
+        Format source excerpts into verified citation cards with direct links.
         """
         citations = []
         for idx, src in enumerate(sources, 1):

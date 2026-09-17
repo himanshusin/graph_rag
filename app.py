@@ -21,11 +21,11 @@ from core.pipeline import DocumentIngestor, GraphRAGEngine
 from core.change_manager import ChangeManagementAgent
 
 # -----------------------------------------------------------------------------
-# 1. Page Configuration & Glean-Style Enterprise Design System
+# 1. Page Configuration & Enterprise Design System
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Glean Enterprise — GraphRAG Knowledge Platform",
-    page_icon="🔍",
+    page_title="Enterprise Knowledge Platform",
+    page_icon="🏛️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -38,7 +38,7 @@ vault = DocumentVault(vault_dir="./vault")
 change_agent = ChangeManagementAgent()
 app_version = change_agent.get_version()
 
-# Glean-Inspired Enterprise Styling
+# Enterprise Styling
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -52,8 +52,8 @@ st.markdown("""
         color: #E2E8F0;
     }
     
-    /* Glean Work Header */
-    .glean-header {
+    /* Work Header */
+    .app-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -62,13 +62,13 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
     
-    .glean-brand {
+    .app-brand {
         display: flex;
         align-items: center;
         gap: 12px;
     }
     
-    .glean-logo-badge {
+    .app-logo-badge {
         background: linear-gradient(135deg, #2563EB, #4F46E5);
         color: white;
         padding: 8px 12px;
@@ -78,7 +78,7 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
     }
     
-    .glean-title {
+    .app-title {
         font-size: 1.55rem;
         font-weight: 800;
         color: #F8FAFC;
@@ -86,7 +86,7 @@ st.markdown("""
         margin: 0;
     }
     
-    .glean-subtitle {
+    .app-subtitle {
         color: #94A3B8;
         font-size: 0.85rem;
         font-weight: 500;
@@ -107,7 +107,7 @@ st.markdown("""
         gap: 6px;
     }
 
-    /* Glean Search Filter Chips */
+    /* Search Filter Chips */
     .source-chip {
         display: inline-flex;
         align-items: center;
@@ -130,7 +130,7 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
     
-    .glean-stat-card {
+    .app-stat-card {
         background: #121622;
         border: 1px solid rgba(255, 255, 255, 0.07);
         border-radius: 10px;
@@ -138,7 +138,7 @@ st.markdown("""
         position: relative;
     }
     
-    .glean-stat-card::before {
+    .app-stat-card::before {
         content: '';
         position: absolute;
         top: 0;
@@ -148,14 +148,14 @@ st.markdown("""
         background: linear-gradient(90deg, #2563EB, #4F46E5);
     }
     
-    .glean-stat-num {
+    .app-stat-num {
         font-size: 1.65rem;
         font-weight: 800;
         color: #F8FAFC;
         font-family: 'JetBrains Mono', monospace;
     }
     
-    .glean-stat-text {
+    .app-stat-text {
         font-size: 0.76rem;
         font-weight: 600;
         text-transform: uppercase;
@@ -164,7 +164,7 @@ st.markdown("""
         margin-top: 3px;
     }
 
-    /* Glean Citation Cards */
+    /* Citation Cards */
     .citation-card {
         background: #0E121A;
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -255,7 +255,7 @@ chroma_client, paper_collection = load_chroma_db()
 catalog_docs = vault.get_catalog()
 
 # -----------------------------------------------------------------------------
-# 3. Query Reasoning Engines with Glean Citations
+# 3. Query Reasoning Engines with Source Citations
 # -----------------------------------------------------------------------------
 def query_graphrag_global(query: str, reports: pd.DataFrame, llm: ChatOpenAI) -> Tuple[str, str, List[Dict[str, Any]]]:
     context_lines = ["### Executive Thematic Domain Summaries:"]
@@ -376,15 +376,15 @@ def query_chroma_rag(query: str, collection, llm: ChatOpenAI, num_results: int =
     return answer, context_text, citations
 
 # -----------------------------------------------------------------------------
-# 4. Glean Top Header & KPI Dashboard
+# 4. Enterprise Top Header & KPI Dashboard
 # -----------------------------------------------------------------------------
 st.markdown(f"""
-<div class="glean-header">
-    <div class="glean-brand">
-        <div class="glean-logo-badge">Glean</div>
+<div class="app-header">
+    <div class="app-brand">
+        <div class="app-logo-badge">🏛️</div>
         <div>
-            <h1 class="glean-title">Enterprise Knowledge Assistant</h1>
-            <p class="glean-subtitle">Autonomous Graph Intelligence • Document Retention Vault • Verified Source Attribution</p>
+            <h1 class="app-title">Enterprise Knowledge Assistant</h1>
+            <p class="app-subtitle">Autonomous Graph Intelligence • Document Retention Vault • Verified Source Attribution</p>
         </div>
     </div>
     <div style="display: flex; gap: 10px; align-items: center;">
@@ -397,13 +397,13 @@ st.markdown(f"""
 # Metric Row
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    st.markdown(f'<div class="glean-stat-card"><div class="glean-stat-num">{len(entities_df)}</div><div class="glean-stat-text">Indexed Concepts</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(entities_df)}</div><div class="app-stat-text">Indexed Concepts</div></div>', unsafe_allow_html=True)
 with col2:
-    st.markdown(f'<div class="glean-stat-card"><div class="glean-stat-num">{len(relationships_df)}</div><div class="glean-stat-text">Verified Links</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(relationships_df)}</div><div class="app-stat-text">Verified Links</div></div>', unsafe_allow_html=True)
 with col3:
-    st.markdown(f'<div class="glean-stat-card"><div class="glean-stat-num">{len(catalog_docs)}</div><div class="glean-stat-text">Retained Documents</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(catalog_docs)}</div><div class="app-stat-text">Retained Documents</div></div>', unsafe_allow_html=True)
 with col4:
-    st.markdown(f'<div class="glean-stat-card"><div class="glean-stat-num">{paper_collection.count()}</div><div class="glean-stat-text">Evidence Passages</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{paper_collection.count()}</div><div class="app-stat-text">Evidence Passages</div></div>', unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
 # 5. Sidebar Controls & Settings
@@ -445,17 +445,17 @@ if "messages" not in st.session_state:
     st.session_state.messages = [
         {
             "role": "assistant",
-            "content": "👋 Welcome to **Glean Enterprise Knowledge Assistant**.\n\nI am connected to your organizational document vault and enterprise knowledge graph. Every response is grounded with **verified source citations [1], [2]** linking directly to underlying documents.\n\nAsk a strategic question below, browse the **Document Vault**, or inspect the **Concept Map**!",
-            "mode": "Glean Assistant",
+            "content": "👋 Welcome to the **Enterprise Knowledge Assistant**.\n\nI am connected to your organizational document vault and enterprise knowledge graph. Every response is grounded with **verified source citations [1], [2]** linking directly to underlying documents.\n\nAsk a strategic question below, browse the **Document Vault**, or inspect the **Concept Map**!",
+            "mode": "Executive Assistant",
             "citations": []
         }
     ]
 
 # -----------------------------------------------------------------------------
-# 6. Glean Work Navigation Tabs
+# 6. Enterprise Work Navigation Tabs
 # -----------------------------------------------------------------------------
-tab_glean_chat, tab_vault_ui, tab_concept_map, tab_catalog_ui, tab_governance = st.tabs([
-    "🔍 Glean Search & Assistant",
+tab_search_chat, tab_vault_ui, tab_concept_map, tab_catalog_ui, tab_governance = st.tabs([
+    "🔍 Enterprise Search & Assistant",
     "📑 Enterprise Document Vault",
     "🕸️ Knowledge Concept Map",
     "📊 Enterprise Data Catalog",
@@ -463,9 +463,9 @@ tab_glean_chat, tab_vault_ui, tab_concept_map, tab_catalog_ui, tab_governance = 
 ])
 
 # =============================================================================
-# TAB 1: Glean Search & Assistant
+# TAB 1: Enterprise Search & Assistant
 # =============================================================================
-with tab_glean_chat:
+with tab_search_chat:
     # Source Filter Chips
     st.markdown("""
     <div>
@@ -491,7 +491,7 @@ with tab_glean_chat:
     clicked_chip = None
     for i, col in enumerate(p_cols):
         with col:
-            if st.button(biz_prompts[i], key=f"glean_chip_{i}", use_container_width=True):
+            if st.button(biz_prompts[i], key=f"search_chip_{i}", use_container_width=True):
                 clicked_chip = biz_prompts[i]
     
     st.divider()
@@ -499,12 +499,12 @@ with tab_glean_chat:
     # Render Chat History
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
-            if "mode" in msg and msg["mode"] != "Glean Assistant":
+            if "mode" in msg and msg["mode"] != "Executive Assistant":
                 st.markdown(f'<span class="source-chip">{msg["mode"]}</span>', unsafe_allow_html=True)
             
             st.markdown(msg["content"])
             
-            # Render Glean Citations if present
+            # Render Citations if present
             if msg.get("citations"):
                 with st.expander(f"📚 Verified Sources & Citations ({len(msg['citations'])} sources)"):
                     for c in msg["citations"]:
@@ -544,7 +544,7 @@ with tab_glean_chat:
         
         llm = get_llm(temperature=temp)
         with st.chat_message("assistant"):
-            with st.spinner(f"Glean Assistant searching & synthesizing across knowledge sources..."):
+            with st.spinner(f"Searching & synthesizing across knowledge sources..."):
                 try:
                     if "Synthesis" in search_mode:
                         ans, ctx, cits = query_graphrag_global(user_input, community_df, llm)

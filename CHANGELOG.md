@@ -4,9 +4,10 @@ All notable changes, release updates, and governance audits for **GraphRAG Enter
 
 ---
 
-## [v2.3.0] - 2026-09-17
+## [v2.3.1] - 2026-09-17
 
 ### 🚀 New Features & Capabilities
+- [`feb13fc`] feat: implement Sub-tree architecture, Change Management Agent, Document Vault with source attribution, and Glean-style UI
 - [`5dbe40b`] feat: update interactive graph styling and dataset alongside vector database and knowledge graph assets
 - [`bd6176e`] feat: elevate UI with business-friendly terminology, executive navigation, and audit workflows
 - [`f8dfbdb`] feat: add on-demand GraphRAG builder pipeline and modern startup minimalist UI
