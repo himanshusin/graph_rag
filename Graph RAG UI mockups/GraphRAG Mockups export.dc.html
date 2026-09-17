@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<template id="__bundler_thumbnail" data-bg-color="#EDEDEA"><svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg"><rect x="440" y="240" width="320" height="320" rx="48" fill="#111110"/><text x="600" y="455" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="600" font-size="200" fill="#ffffff">G</text><circle cx="880" cy="300" r="22" fill="#3056D3"/></svg></template>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"><style>body{margin:0;background:#EDEDEA;font-family:Geist,system-ui,sans-serif;color:#111110;-webkit-font-smoothing:antialiased}a{color:#3056D3}a:hover{color:#1F3FA8}.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}.dv-tid{font:600 10px 'Geist Mono',monospace;padding:3px 7px;background:#111110;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 Geist,sans-serif;color:#111110}.dv-opts{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}.dv-oid{font:600 10.5px 'Geist Mono',monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#111110;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 Geist,sans-serif;color:rgba(0,0,0,.6)}.dv-card{max-width:100%;background:#F7F7F5;border:1px solid rgba(0,0,0,.1);border-radius:10px;box-shadow:0 1px 2px rgba(0,0,0,.05),0 12px 32px -16px rgba(0,0,0,.18);overflow:hidden;font-size:13px;line-height:1.45}.dv-opt:target .dv-oid{background:#3056D3;color:#fff}.dv-next{margin:22px 0 0;font:12px/1.5 Geist,sans-serif;color:rgba(0,0,0,.5)}</style></helmet>
+
+<section style="padding:36px 44px 28px;border-bottom:1px solid rgba(0,0,0,.08);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;max-width:1240px">
+  <div>
+    <div style="font:600 10px 'Geist Mono',monospace;letter-spacing:.08em;color:#8A8A83;text-transform:uppercase;margin-bottom:10px">Brief</div>
+    <h1 style="margin:0 0 10px;font:600 22px/1.2 Geist,sans-serif;letter-spacing:-.02em">GraphRAG · Knowledge workspace</h1>
+    <p style="margin:0 0 14px;color:#55554F;max-width:520px;font-size:13.5px">Redesign of the Streamlit app in <span style="font-family:'Geist Mono',monospace;font-size:12px">himanshusin/graph_rag</span>: five reasoning modes (Global, Local, DRIFT, Vector, Comparative), a document vault, a concept map, a data catalog, and governance. Light mode, analyst audience, restrained AI-startup minimalism.</p>
+    <p style="margin:0;font-size:13px;color:#55554F"><a href="GraphRAG Developer Guide.dc.html" style="font-weight:500">Open the developer guide →</a></p>
+  </div>
+  <div style="font-size:12.5px;color:#55554F;display:grid;gap:10px">
+    <div><strong style="color:#111110;font-weight:600">Assumptions.</strong> Counts shown (312 concepts, 548 links, 1,204 passages) are sample data; the two vault documents and 10 tables come from <span style="font-family:'Geist Mono',monospace;font-size:11.5px">vault/catalog.json</span>.</div>
+    <div><strong style="color:#111110;font-weight:600">Reasoning.</strong> Analysts live in the answer + evidence loop, so every direction puts citations one glance away from the prose and drops the KPI hero, emoji, gradients, and the “Enterprise” prefixes. One accent color, hairline borders, mono for IDs and numbers.</div>
+    <div><strong style="color:#111110;font-weight:600">Directions.</strong> <a class="dv-oid" href="#1a">1a</a> sidebar workspace with an evidence rail · <a class="dv-oid" href="#1b">1b</a> tabbed console built around the comparative audit · <a class="dv-oid" href="#1c">1c</a> command-first, chrome-free. Secondary screens <a class="dv-oid" href="#1d">1d</a>–<a class="dv-oid" href="#1g">1g</a> follow <a class="dv-oid" href="#1a">1a</a>.</div>
+  </div>
+</section>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Three directions for Search, then the secondary screens</span></div>
+<div class="dv-opts">
+
+<!-- 1a -->
+<div class="dv-opt" id="1a"><div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Workspace — sidebar nav, thread in the middle, evidence rail on the right</div>
+<div class="dv-card" style="width:1200px;height:760px;display:flex">
+  <aside style="width:212px;flex:none;border-right:1px solid #E8E8E4;background:#FFFFFF;display:flex;flex-direction:column;padding:14px 10px 12px">
+    <div style="display:flex;align-items:center;gap:8px;padding:2px 8px 16px"><div style="width:22px;height:22px;border-radius:6px;background:#111110;color:#fff;font:600 11px 'Geist Mono',monospace;display:grid;place-items:center">G</div><div style="font-weight:600">Knowledge</div><div style="margin-left:auto;font:500 10px 'Geist Mono',monospace;color:#8A8A83">v2.4.1</div></div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;background:#F1F1EE;font-weight:500"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#111110" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>Search</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M2 7h12"/></svg>Vault<span style="margin-left:auto;font:500 10.5px 'Geist Mono',monospace;color:#8A8A83">2</span></div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="4" r="2"/><path d="M7 5.5L5 10M9 5.5l2 4.5"/></svg>Concept map</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Catalog</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><path d="M8 2l5 2v4c0 3-2.2 5-5 6-2.8-1-5-3-5-6V4l5-2z"/></svg>Governance</div>
+    </div>
+    <div style="margin-top:22px;padding:0 8px;font:500 10.5px 'Geist Mono',monospace;letter-spacing:.06em;color:#8A8A83;text-transform:uppercase">Reasoning</div>
+    <div style="margin:8px 0 0;display:flex;flex-direction:column;gap:1px">
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;font-weight:500"><span style="width:6px;height:6px;border-radius:50%;background:#3056D3"></span>Global synthesis</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;color:#55554F"><span style="width:6px;height:6px;border-radius:50%;border:1px solid #D6D6D0"></span>Local lookup</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;color:#55554F"><span style="width:6px;height:6px;border-radius:50%;border:1px solid #D6D6D0"></span>DRIFT deep-dive</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;color:#55554F"><span style="width:6px;height:6px;border-radius:50%;border:1px solid #D6D6D0"></span>Vector passages</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;color:#55554F"><span style="width:6px;height:6px;border-radius:50%;border:1px solid #D6D6D0"></span>Compare graph vs vector</div>
+    </div>
+    <div style="margin-top:18px;padding:0 8px;display:grid;gap:10px;font-size:12px;color:#55554F">
+      <div><div style="display:flex;justify-content:space-between"><span>Temperature</span><span style="font-family:'Geist Mono',monospace;color:#111110">0.20</span></div><div style="margin-top:6px;height:2px;background:#E8E8E4;border-radius:2px;position:relative"><div style="width:20%;height:100%;background:#111110;border-radius:2px"></div><div style="position:absolute;left:20%;top:-4px;width:10px;height:10px;border-radius:50%;background:#fff;border:1.5px solid #111110;transform:translateX(-50%)"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between"><span>Citations</span><span style="font-family:'Geist Mono',monospace;color:#111110">4</span></div><div style="margin-top:6px;height:2px;background:#E8E8E4;border-radius:2px;position:relative"><div style="width:33%;height:100%;background:#111110;border-radius:2px"></div><div style="position:absolute;left:33%;top:-4px;width:10px;height:10px;border-radius:50%;background:#fff;border:1.5px solid #111110;transform:translateX(-50%)"></div></div></div>
+    </div>
+    <div style="margin-top:auto;padding:8px;display:flex;align-items:center;gap:7px;font-size:11.5px;color:#1F8A5B"><span style="width:6px;height:6px;border-radius:50%;background:#1F8A5B"></span>QA passed · 12 checks</div>
+  </aside>
+
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column;background:#F7F7F5">
+    <div style="height:48px;flex:none;display:flex;align-items:center;gap:6px;padding:0 24px;border-bottom:1px solid #E8E8E4;background:#FFFFFF">
+      <div style="font-weight:500">Search</div><div style="color:#B4B4AE;padding:0 4px">/</div><div style="color:#55554F">Thread · RAG vs fine-tuning</div>
+      <div style="margin-left:auto;display:flex;gap:6px">
+        <span style="padding:4px 10px;border-radius:999px;background:#111110;color:#fff;font-size:11.5px;font-weight:500">All sources</span>
+        <span style="padding:4px 10px;border-radius:999px;border:1px solid #E0E0DB;font-size:11.5px;color:#55554F">Documents</span>
+        <span style="padding:4px 10px;border-radius:999px;border:1px solid #E0E0DB;font-size:11.5px;color:#55554F">Graph</span>
+        <span style="padding:4px 10px;border-radius:999px;border:1px solid #E0E0DB;font-size:11.5px;color:#55554F">Tables</span>
+      </div>
+    </div>
+    <div style="flex:1;overflow:hidden;padding:28px 40px 0;display:flex;flex-direction:column;gap:24px;max-width:720px;width:100%;box-sizing:border-box;margin:0 auto">
+      <div style="display:flex;gap:12px"><div style="width:24px;height:24px;border-radius:50%;background:#E0E0DB;flex:none;font:500 10px Geist;display:grid;place-items:center;color:#55554F">HS</div><div style="font-size:15px;font-weight:500;letter-spacing:-.01em;padding-top:2px">What are the cost, ROI, and resource trade-offs between RAG and fine-tuning?</div></div>
+      <div style="display:flex;gap:12px">
+        <div style="width:24px;height:24px;border-radius:6px;background:#111110;flex:none;color:#fff;font:600 10px 'Geist Mono',monospace;display:grid;place-items:center">G</div>
+        <div style="min-width:0;flex:1">
+          <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:#8A8A83;margin-bottom:10px"><span style="color:#3056D3;font-weight:500">Global synthesis</span><span>·</span><span>6 sources</span><span>·</span><span style="font-family:'Geist Mono',monospace">4.2s</span></div>
+          <div style="font-size:14px;line-height:1.6;color:#111110;display:grid;gap:10px">
+            <p style="margin:0"><strong style="font-weight:600">Summary.</strong> RAG carries lower up-front cost and keeps knowledge current without retraining; fine-tuning wins on latency and per-token cost once query volume is high enough to amortize training<sup style="font:500 10px 'Geist Mono',monospace;color:#3056D3;margin-left:2px">[1]</sup><sup style="font:500 10px 'Geist Mono',monospace;color:#3056D3">[3]</sup>.</p>
+            <p style="margin:0"><strong style="font-weight:600">Quantitative.</strong> The benchmark table reports LoRA fine-tuning at <span style="font-family:'Geist Mono',monospace;font-size:13px">0.8×</span> the compute of full fine-tuning with a <span style="font-family:'Geist Mono',monospace;font-size:13px">1.2 pt</span> drop on MMLU, while retrieval adds roughly <span style="font-family:'Geist Mono',monospace;font-size:13px">180–340 ms</span> per query<sup style="font:500 10px 'Geist Mono',monospace;color:#3056D3;margin-left:2px">[2]</sup>.</p>
+            <p style="margin:0"><strong style="font-weight:600">Trade-offs.</strong> Fine-tuned weights drift as source documents change; RAG systems inherit retrieval error and prompt-length cost<sup style="font:500 10px 'Geist Mono',monospace;color:#3056D3;margin-left:2px">[4]</sup>.</p>
+            <p style="margin:0;color:#55554F">Recommendation: start with RAG over the vault, add PEFT only for stable, high-volume tasks.</p>
+          </div>
+          <div style="display:flex;gap:14px;margin-top:14px;font-size:12px;color:#8A8A83"><span>Copy</span><span>Compare with vector search</span><span>Rerun</span><span style="margin-left:auto;font-family:'Geist Mono',monospace;font-size:11px">gpt-4o-mini</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="flex:none;padding:16px 40px 20px;max-width:720px;width:100%;box-sizing:border-box;margin:0 auto">
+      <div style="background:#fff;border:1px solid #D6D6D0;border-radius:10px;box-shadow:0 1px 2px rgba(0,0,0,.04);padding:12px 12px 10px">
+        <div style="color:#8A8A83;font-size:14px;padding:2px 4px 14px">Ask the knowledge base…</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;border:1px solid #E8E8E4;font-size:11.5px;color:#55554F"><span style="width:6px;height:6px;border-radius:50%;background:#3056D3"></span>Global synthesis<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#8A8A83" stroke-width="1.4"><path d="M2 4l3 3 3-3"/></svg></span><span style="padding:4px 8px;border-radius:6px;font-size:11.5px;color:#8A8A83">Attach</span><span style="margin-left:auto;width:28px;height:28px;border-radius:7px;background:#111110;display:grid;place-items:center"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.6"><path d="M6 10V2M2.5 5.5L6 2l3.5 3.5"/></svg></span></div>
+      </div>
+      <div style="text-align:center;font-size:11px;color:#8A8A83;margin-top:8px">Answers cite vault documents and graph nodes. Verify numbers before publishing.</div>
+    </div>
+  </main>
+
+  <aside style="width:300px;flex:none;border-left:1px solid #E8E8E4;background:#FFFFFF;display:flex;flex-direction:column">
+    <div style="height:48px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #E8E8E4;font-weight:500">Evidence<span style="margin-left:6px;font:500 11px 'Geist Mono',monospace;color:#8A8A83">6</span><span style="margin-left:auto;font-size:11.5px;color:#8A8A83">Show context</span></div>
+    <div style="padding:12px;display:flex;flex-direction:column;gap:8px;overflow:hidden">
+      <div style="border:1px solid #E8E8E4;border-radius:8px;padding:10px 12px">
+        <div style="display:flex;align-items:center;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;background:#EEF2FD;padding:1px 6px;border-radius:4px">1</span><span style="font-weight:500;font-size:12.5px">Domain · Fine-tuning strategies</span><span style="margin-left:auto;font:500 10px 'Geist Mono',monospace;color:#8A8A83">rank 8.5</span></div>
+        <div style="margin-top:6px;font-size:12px;color:#55554F;line-height:1.5">Community report summarizing PEFT, LoRA, QLoRA and full fine-tuning cost profiles across the corpus.</div>
+      </div>
+      <div style="border:1px solid #E8E8E4;border-radius:8px;padding:10px 12px;border-color:#C9D3F5;background:#FBFCFF">
+        <div style="display:flex;align-items:center;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;background:#EEF2FD;padding:1px 6px;border-radius:4px">2</span><span style="font-weight:500;font-size:12.5px">Table · Benchmark comparison</span><span style="margin-left:auto;font:500 10px 'Geist Mono',monospace;color:#8A8A83">p. 42</span></div>
+        <div style="margin-top:8px;border:1px solid #E8E8E4;border-radius:6px;overflow:hidden;font-size:11px;font-family:'Geist Mono',monospace">
+          <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;background:#F7F7F5;color:#8A8A83;padding:5px 8px;gap:8px"><span>Method</span><span>Compute</span><span>MMLU</span></div>
+          <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;padding:5px 8px;gap:8px;border-top:1px solid #EFEFEC"><span>Full FT</span><span>1.0×</span><span>64.1</span></div>
+          <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;padding:5px 8px;gap:8px;border-top:1px solid #EFEFEC"><span>LoRA</span><span>0.8×</span><span>62.9</span></div>
+          <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;padding:5px 8px;gap:8px;border-top:1px solid #EFEFEC"><span>RAG</span><span>—</span><span>61.4</span></div>
+        </div>
+        <div style="margin-top:8px;font-size:11.5px;color:#8A8A83">2408.13296v3_Fine_Tuning_Guide.pdf</div>
+      </div>
+      <div style="border:1px solid #E8E8E4;border-radius:8px;padding:10px 12px">
+        <div style="display:flex;align-items:center;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;background:#EEF2FD;padding:1px 6px;border-radius:4px">3</span><span style="font-weight:500;font-size:12.5px">Concept · Retrieval-Augmented Generation</span></div>
+        <div style="margin-top:6px;font-size:12px;color:#55554F;line-height:1.5">Graph node, type <span style="font-family:'Geist Mono',monospace;font-size:11px">METHOD</span> · 14 relationships</div>
+      </div>
+      <div style="border:1px solid #E8E8E4;border-radius:8px;padding:10px 12px">
+        <div style="display:flex;align-items:center;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;background:#EEF2FD;padding:1px 6px;border-radius:4px">4</span><span style="font-weight:500;font-size:12.5px">Passage · Guide to Fine-Tuning LLMs</span><span style="margin-left:auto;font:500 10px 'Geist Mono',monospace;color:#8A8A83">chunk 118</span></div>
+        <div style="margin-top:6px;font:12px/1.5 'Geist Mono',monospace;color:#55554F;background:#F7F7F5;border-radius:6px;padding:8px 10px">…fine-tuned weights encode a snapshot of the corpus and require retraining as source documents change…</div>
+      </div>
+      <div style="text-align:center;font-size:11.5px;color:#8A8A83;padding-top:4px">2 more</div>
+    </div>
+  </aside>
+</div></div>
+
+<!-- 1b -->
+<div class="dv-opt" id="1b"><div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Console — top tabs, stats strip, comparative audit as the main event</div>
+<div class="dv-card" style="width:1200px;height:760px;display:flex;flex-direction:column;background:#FFFFFF">
+  <div style="height:52px;flex:none;display:flex;align-items:center;padding:0 24px;gap:28px;border-bottom:1px solid #E8E8E4">
+    <div style="display:flex;align-items:center;gap:8px"><div style="width:22px;height:22px;border-radius:6px;background:#111110;color:#fff;font:600 11px 'Geist Mono',monospace;display:grid;place-items:center">G</div><div style="font-weight:600">Knowledge</div></div>
+    <div style="display:flex;gap:22px;height:52px;align-items:stretch;font-size:13px">
+      <div style="display:flex;align-items:center;border-bottom:2px solid #111110;font-weight:500">Search</div>
+      <div style="display:flex;align-items:center;color:#55554F">Vault</div>
+      <div style="display:flex;align-items:center;color:#55554F">Concept map</div>
+      <div style="display:flex;align-items:center;color:#55554F">Catalog</div>
+      <div style="display:flex;align-items:center;color:#55554F">Governance</div>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;color:#55554F"><span style="display:flex;align-items:center;gap:6px;color:#1F8A5B"><span style="width:6px;height:6px;border-radius:50%;background:#1F8A5B"></span>QA passed</span><span style="font-family:'Geist Mono',monospace;font-size:11px">v2.4.1</span><div style="width:24px;height:24px;border-radius:50%;background:#E0E0DB"></div></div>
+  </div>
+  <div style="flex:none;display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid #E8E8E4">
+    <div style="padding:14px 24px;border-right:1px solid #E8E8E4"><div style="font:500 20px 'Geist Mono',monospace;letter-spacing:-.02em">312</div><div style="font-size:11.5px;color:#8A8A83;margin-top:2px">Concepts</div></div>
+    <div style="padding:14px 24px;border-right:1px solid #E8E8E4"><div style="font:500 20px 'Geist Mono',monospace;letter-spacing:-.02em">548</div><div style="font-size:11.5px;color:#8A8A83;margin-top:2px">Relationships</div></div>
+    <div style="padding:14px 24px;border-right:1px solid #E8E8E4"><div style="font:500 20px 'Geist Mono',monospace;letter-spacing:-.02em">2</div><div style="font-size:11.5px;color:#8A8A83;margin-top:2px">Documents</div></div>
+    <div style="padding:14px 24px;border-right:1px solid #E8E8E4"><div style="font:500 20px 'Geist Mono',monospace;letter-spacing:-.02em">10</div><div style="font-size:11.5px;color:#8A8A83;margin-top:2px">Tables</div></div>
+    <div style="padding:14px 24px"><div style="font:500 20px 'Geist Mono',monospace;letter-spacing:-.02em">1,204</div><div style="font-size:11.5px;color:#8A8A83;margin-top:2px">Passages</div></div>
+  </div>
+  <div style="flex:none;padding:20px 24px 0;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="flex:1;display:flex;align-items:center;gap:10px;border:1px solid #D6D6D0;border-radius:8px;padding:9px 12px;background:#fff"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#8A8A83" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg><span style="font-size:14px">Which techniques reduce operational compute overhead and deployment risks?</span><span style="margin-left:auto;font:500 10.5px 'Geist Mono',monospace;color:#8A8A83;border:1px solid #E8E8E4;border-radius:4px;padding:1px 5px">⌘K</span></div>
+      <div style="display:inline-flex;border:1px solid #E0E0DB;border-radius:8px;padding:2px;background:#F7F7F5;font-size:12px">
+        <span style="padding:5px 10px;border-radius:6px;color:#55554F">Global</span><span style="padding:5px 10px;border-radius:6px;color:#55554F">Local</span><span style="padding:5px 10px;border-radius:6px;color:#55554F">DRIFT</span><span style="padding:5px 10px;border-radius:6px;color:#55554F">Vector</span><span style="padding:5px 10px;border-radius:6px;background:#fff;color:#111110;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.08)">Compare</span>
+      </div>
+      <span style="padding:8px 14px;border-radius:8px;background:#111110;color:#fff;font-weight:500;font-size:12.5px">Run</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#8A8A83"><span>Comparative audit</span><span>·</span><span>DRIFT deep-dive vs top-4 vector passages</span><span>·</span><span style="font-family:'Geist Mono',monospace">7.9s</span><span style="margin-left:auto;display:flex;gap:6px"><span style="padding:3px 9px;border-radius:999px;background:#F1F1EE;color:#111110;font-weight:500">Synced scroll</span><span style="padding:3px 9px;border-radius:999px;border:1px solid #E0E0DB">Diff claims</span></span></div>
+  </div>
+  <div style="flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:14px 24px 20px">
+    <div style="border:1px solid #E8E8E4;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #E8E8E4"><span style="width:8px;height:8px;border-radius:2px;background:#3056D3"></span><span style="font-weight:500">Graph · DRIFT</span><span style="font-size:11.5px;color:#8A8A83">6 reports · 20 relationships · 1 table</span><span style="margin-left:auto;font:500 10.5px 'Geist Mono',monospace;color:#1F8A5B;background:#E8F5EE;padding:2px 6px;border-radius:4px">grounded 96%</span></div>
+      <div style="padding:16px;font-size:13.5px;line-height:1.6;display:grid;gap:9px;flex:1">
+        <p style="margin:0"><strong style="font-weight:600">Parameter-efficient methods</strong> — LoRA and QLoRA cut trainable parameters by >99% and reduce GPU memory by up to 3× versus full fine-tuning<sup style="font:500 10px 'Geist Mono',monospace;color:#3056D3;margin-left:2px">[1]</sup><sup style="font:500 10px 'Geist Mono',monospace;color:#3056D3">[3]</sup>.</p>
+        <p style="margin:0"><strong style="font-weight:600">Deployment risk</strong> — the <em>Evaluation & Monitoring</em> community links quantization to a documented accuracy cliff below 4-bit; the report recommends staged rollout with regression suites<sup style="font:500 10px 'Geist Mono',monospace;color:#3056D3;margin-left:2px">[2]</sup>.</p>
+        <p style="margin:0"><strong style="font-weight:600">Cross-domain dependency</strong> — Distillation → Smaller serving footprint → Lower inference cost (weight 8/10)<sup style="font:500 10px 'Geist Mono',monospace;color:#3056D3;margin-left:2px">[4]</sup>.</p>
+      </div>
+      <div style="border-top:1px solid #E8E8E4;padding:10px 16px;display:grid;gap:5px;font-size:11.5px;color:#55554F">
+        <div style="display:flex;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;width:18px">[1]</span>Domain · PEFT & adapter methods</div>
+        <div style="display:flex;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;width:18px">[2]</span>Domain · Evaluation & monitoring</div>
+        <div style="display:flex;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;width:18px">[3]</span>Table · Memory footprint by method, p. 57</div>
+        <div style="display:flex;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;width:18px">[4]</span>Relationship · Distillation → Inference cost</div>
+      </div>
+    </div>
+    <div style="border:1px solid #E8E8E4;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #E8E8E4"><span style="width:8px;height:8px;border-radius:2px;background:#8A8A83"></span><span style="font-weight:500">Vector · top-4 passages</span><span style="font-size:11.5px;color:#8A8A83">ChromaDB · paper_collection</span><span style="margin-left:auto;font:500 10.5px 'Geist Mono',monospace;color:#B7791F;background:#FBF3E4;padding:2px 6px;border-radius:4px">grounded 81%</span></div>
+      <div style="padding:16px;font-size:13.5px;line-height:1.6;display:grid;gap:9px;flex:1">
+        <p style="margin:0">The retrieved passages describe LoRA as a technique that “freezes the pretrained weights and injects trainable rank-decomposition matrices”, reducing memory use<sup style="font:500 10px 'Geist Mono',monospace;color:#3056D3;margin-left:2px">[1]</sup>.</p>
+        <p style="margin:0">Quantization is mentioned as reducing model size for deployment<sup style="font:500 10px 'Geist Mono',monospace;color:#3056D3;margin-left:2px">[2]</sup>; no passage quantifies the accuracy impact.</p>
+        <p style="margin:0;color:#8A8A83">Deployment risk is not directly addressed in the retrieved context.</p>
+      </div>
+      <div style="border-top:1px solid #E8E8E4;padding:10px 16px;display:grid;gap:5px;font-size:11.5px;color:#55554F">
+        <div style="display:flex;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;width:18px">[1]</span>Passage · Guide to Fine-Tuning LLMs, chunk 212</div>
+        <div style="display:flex;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;width:18px">[2]</span>Passage · Guide to Fine-Tuning LLMs, chunk 340</div>
+        <div style="display:flex;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;width:18px">[3]</span>Passage · 2408.13296v3, chunk 77</div>
+        <div style="display:flex;gap:8px"><span style="font:500 10.5px 'Geist Mono',monospace;color:#3056D3;width:18px">[4]</span>Passage · 2408.13296v3, chunk 81</div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- 1c -->
+<div class="dv-opt" id="1c"><div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Command-first — no chrome, one column, evidence expands inline under the claim</div>
+<div class="dv-card" style="width:1200px;height:760px;background:#FFFFFF;position:relative;display:flex;flex-direction:column;align-items:center">
+  <div style="position:absolute;top:18px;left:24px;display:flex;align-items:center;gap:8px"><div style="width:20px;height:20px;border-radius:5px;background:#111110;color:#fff;font:600 10px 'Geist Mono',monospace;display:grid;place-items:center">G</div></div>
+  <div style="position:absolute;top:16px;right:24px;display:flex;gap:18px;font-size:12.5px;color:#55554F;align-items:center"><span>Vault <span style="font-family:'Geist Mono',monospace;font-size:11px;color:#8A8A83">2</span></span><span>Concept map</span><span>Catalog</span><span>Governance</span><span style="width:1px;height:14px;background:#E0E0DB"></span><span style="display:flex;align-items:center;gap:6px;color:#1F8A5B"><span style="width:6px;height:6px;border-radius:50%;background:#1F8A5B"></span>v2.4.1</span></div>
+  <div style="width:680px;margin-top:150px">
+    <div style="font:500 26px/1.2 Geist,sans-serif;letter-spacing:-.025em;margin-bottom:22px">Ask the knowledge base.</div>
+    <div style="border:1px solid #D6D6D0;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px -12px rgba(0,0,0,.12);padding:14px 14px 12px">
+      <div style="font-size:16px;display:flex;align-items:center">What are the strategic dependencies and recommendations outlined in this report?<span style="width:1.5px;height:18px;background:#111110;margin-left:1px"></span></div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:16px">
+        <span style="padding:4px 10px;border-radius:999px;background:#111110;color:#fff;font-size:11.5px;font-weight:500">Global</span>
+        <span style="padding:4px 10px;border-radius:999px;border:1px solid #E0E0DB;font-size:11.5px;color:#55554F">Local</span>
+        <span style="padding:4px 10px;border-radius:999px;border:1px solid #E0E0DB;font-size:11.5px;color:#55554F">DRIFT</span>
+        <span style="padding:4px 10px;border-radius:999px;border:1px solid #E0E0DB;font-size:11.5px;color:#55554F">Vector</span>
+        <span style="padding:4px 10px;border-radius:999px;border:1px solid #E0E0DB;font-size:11.5px;color:#55554F">Compare</span>
+        <span style="margin-left:auto;font-size:11.5px;color:#8A8A83;font-family:'Geist Mono',monospace">↵ to run</span>
+      </div>
+    </div>
+    <div style="margin-top:28px;display:grid;gap:0;border-top:1px solid #EFEFEC">
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid #EFEFEC;font-size:13.5px;color:#55554F"><span style="font:500 10.5px 'Geist Mono',monospace;color:#8A8A83;width:14px">1</span>Cost, ROI, and resource trade-offs between RAG and fine-tuning<span style="margin-left:auto;font-size:11px;color:#8A8A83">Global</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid #EFEFEC;font-size:13.5px;color:#55554F"><span style="font:500 10.5px 'Geist Mono',monospace;color:#8A8A83;width:14px">2</span>Techniques that reduce compute overhead and deployment risk<span style="margin-left:auto;font-size:11px;color:#8A8A83">DRIFT</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid #EFEFEC;font-size:13.5px;color:#55554F"><span style="font:500 10.5px 'Geist Mono',monospace;color:#8A8A83;width:14px">3</span>Core thematic knowledge domains across the document<span style="margin-left:auto;font-size:11px;color:#8A8A83">Global</span></div>
+    </div>
+    <div style="margin-top:44px;padding-top:24px;border-top:1px solid #E8E8E4">
+      <div style="font-size:11.5px;color:#8A8A83;margin-bottom:10px;display:flex;gap:8px"><span>Previous · Local lookup</span><span>·</span><span>3 sources</span></div>
+      <div style="font-size:14.5px;line-height:1.65">LoRA reduces trainable parameters to <span style="font-family:'Geist Mono',monospace;font-size:13.5px">0.1–1%</span> of the base model by learning low-rank update matrices<span style="display:inline-flex;align-items:center;gap:4px;margin:0 3px;padding:1px 7px;border-radius:999px;background:#EEF2FD;color:#3056D3;font:500 11px 'Geist Mono',monospace;vertical-align:1px">1 · Concept</span>; QLoRA adds 4-bit NormalFloat quantization of the frozen base<span style="display:inline-flex;align-items:center;gap:4px;margin:0 3px;padding:1px 7px;border-radius:999px;border:1px solid #C9D3F5;color:#3056D3;font:500 11px 'Geist Mono',monospace;vertical-align:1px">2 · Table</span>.</div>
+      <div style="margin-top:10px;margin-left:12px;padding:10px 12px 10px 14px;border-left:2px solid #3056D3;background:#FBFCFF;font-size:12.5px;color:#55554F;line-height:1.5"><span style="color:#111110;font-weight:500">Concept · LoRA</span> <span style="font:11px 'Geist Mono',monospace;color:#8A8A83">METHOD · degree 14 · community 3</span><br>Low-Rank Adaptation freezes pretrained weights and injects trainable rank-decomposition matrices into each transformer layer. <span style="color:#3056D3">Open in concept map →</span></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- 1d Vault -->
+<div class="dv-opt" id="1d"><div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Vault — registry with an ingest-in-progress row and the document inspector</div>
+<div class="dv-card" style="width:1200px;height:760px;display:flex">
+  <aside style="width:212px;flex:none;border-right:1px solid #E8E8E4;background:#FFFFFF;display:flex;flex-direction:column;padding:14px 10px 12px">
+    <div style="display:flex;align-items:center;gap:8px;padding:2px 8px 16px"><div style="width:22px;height:22px;border-radius:6px;background:#111110;color:#fff;font:600 11px 'Geist Mono',monospace;display:grid;place-items:center">G</div><div style="font-weight:600">Knowledge</div><div style="margin-left:auto;font:500 10px 'Geist Mono',monospace;color:#8A8A83">v2.4.1</div></div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>Search</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;background:#F1F1EE;font-weight:500"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#111110" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M2 7h12"/></svg>Vault<span style="margin-left:auto;font:500 10.5px 'Geist Mono',monospace;color:#8A8A83">3</span></div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="4" r="2"/><path d="M7 5.5L5 10M9 5.5l2 4.5"/></svg>Concept map</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Catalog</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><path d="M8 2l5 2v4c0 3-2.2 5-5 6-2.8-1-5-3-5-6V4l5-2z"/></svg>Governance</div>
+    </div>
+    <div style="margin-top:auto;padding:8px;display:flex;align-items:center;gap:7px;font-size:11.5px;color:#1F8A5B"><span style="width:6px;height:6px;border-radius:50%;background:#1F8A5B"></span>QA passed · 12 checks</div>
+  </aside>
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column;background:#F7F7F5">
+    <div style="height:48px;flex:none;display:flex;align-items:center;gap:6px;padding:0 24px;border-bottom:1px solid #E8E8E4;background:#FFFFFF"><div style="font-weight:500">Vault</div><div style="color:#8A8A83;font-size:12px;margin-left:8px">Retained permanently · SHA-256 deduplicated</div><span style="margin-left:auto;padding:6px 12px;border-radius:7px;background:#111110;color:#fff;font-size:12px;font-weight:500">Add document</span></div>
+    <div style="padding:24px;display:grid;gap:20px">
+      <div style="background:#fff;border:1px solid #E8E8E4;border-radius:10px;overflow:hidden;font-size:12.5px">
+        <div style="display:grid;grid-template-columns:2.2fr .7fr .7fr .8fr .8fr 1.2fr 1fr;gap:12px;padding:9px 16px;color:#8A8A83;font-size:11px;border-bottom:1px solid #E8E8E4;background:#FAFAF8"><span>Document</span><span>Format</span><span>Size</span><span>Pages</span><span>Tables</span><span>Uploaded</span><span>Status</span></div>
+        <div style="display:grid;grid-template-columns:2.2fr .7fr .7fr .8fr .8fr 1.2fr 1fr;gap:12px;padding:11px 16px;align-items:center;border-bottom:1px solid #EFEFEC;background:#FBFCFF"><span><span style="font-weight:500">2408.13296v3_Fine_Tuning_Guide.pdf</span><br><span style="font:11px 'Geist Mono',monospace;color:#8A8A83">doc_f0fcef27b135</span></span><span>PDF</span><span style="font-family:'Geist Mono',monospace;font-size:12px">15.6 MB</span><span style="font-family:'Geist Mono',monospace;font-size:12px">115</span><span style="font-family:'Geist Mono',monospace;font-size:12px">10</span><span style="color:#55554F">Sep 17, 10:49</span><span style="display:flex;align-items:center;gap:6px;color:#1F8A5B"><span style="width:6px;height:6px;border-radius:50%;background:#1F8A5B"></span>Indexed</span></div>
+        <div style="display:grid;grid-template-columns:2.2fr .7fr .7fr .8fr .8fr 1.2fr 1fr;gap:12px;padding:11px 16px;align-items:center;border-bottom:1px solid #EFEFEC"><span><span style="font-weight:500">The Ultimate Guide to Fine-Tuning LLMs.txt</span><br><span style="font:11px 'Geist Mono',monospace;color:#8A8A83">doc_a6abda2bdd97</span></span><span>TXT</span><span style="font-family:'Geist Mono',monospace;font-size:12px">315 KB</span><span style="font-family:'Geist Mono',monospace;font-size:12px">121</span><span style="font-family:'Geist Mono',monospace;font-size:12px">—</span><span style="color:#55554F">Sep 17, 10:06</span><span style="display:flex;align-items:center;gap:6px;color:#1F8A5B"><span style="width:6px;height:6px;border-radius:50%;background:#1F8A5B"></span>Indexed</span></div>
+        <div style="display:grid;grid-template-columns:2.2fr .7fr .7fr .8fr .8fr 1.2fr 1fr;gap:12px;padding:11px 16px;align-items:center"><span><span style="font-weight:500">Q3_Model_Eval_Report.pdf</span><br><span style="font:11px 'Geist Mono',monospace;color:#8A8A83">doc_91c2e07a44b0</span></span><span>PDF</span><span style="font-family:'Geist Mono',monospace;font-size:12px">2.1 MB</span><span style="font-family:'Geist Mono',monospace;font-size:12px">38</span><span style="font-family:'Geist Mono',monospace;font-size:12px">4</span><span style="color:#55554F">Just now</span><span><span style="display:flex;align-items:center;gap:6px;color:#55554F"><span style="width:6px;height:6px;border-radius:50%;background:#3056D3"></span>Extracting 3 / 5</span><span style="display:block;margin-top:5px;height:2px;background:#E8E8E4;border-radius:2px"><span style="display:block;width:60%;height:100%;background:#3056D3;border-radius:2px"></span></span></span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div style="background:#fff;border:1px solid #E8E8E4;border-radius:10px;padding:16px 18px;font-size:12.5px">
+          <div style="display:flex;align-items:center;margin-bottom:12px"><span style="font-weight:500">2408.13296v3_Fine_Tuning_Guide.pdf</span><span style="margin-left:auto;font-size:11.5px;color:#B03A2E">Delete</span></div>
+          <div style="display:grid;grid-template-columns:110px 1fr;row-gap:8px;column-gap:12px;color:#55554F">
+            <span>SHA-256</span><span style="font:11.5px 'Geist Mono',monospace;color:#111110;word-break:break-all">f0fcef27b1358c51ac7daafd26ddb7b4…</span>
+            <span>Storage</span><span style="font:11.5px 'Geist Mono',monospace;color:#111110">vault/documents/doc_f0fcef27b135_…</span>
+            <span>Characters</span><span style="font:11.5px 'Geist Mono',monospace;color:#111110">370,822</span>
+            <span>Chunks in graph</span><span style="font:11.5px 'Geist Mono',monospace;color:#111110">5 of 5 · re-index</span>
+            <span>Origin</span><span style="color:#111110">User upload</span>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #E8E8E4;border-radius:10px;padding:16px 18px;font-size:12.5px">
+          <div style="display:flex;align-items:center;margin-bottom:12px"><span style="font-weight:500">Extracted tables</span><span style="margin-left:6px;font:500 11px 'Geist Mono',monospace;color:#8A8A83">10</span><span style="margin-left:auto;font-size:11.5px;color:#8A8A83">Row facts</span></div>
+          <div style="display:grid;gap:6px;color:#55554F">
+            <div style="display:flex;gap:10px;align-items:center"><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;width:34px">p. 42</span><span style="color:#111110">Benchmark comparison across methods</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">3 × 6</span></div>
+            <div style="display:flex;gap:10px;align-items:center"><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;width:34px">p. 57</span><span style="color:#111110">Memory footprint by method</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">4 × 5</span></div>
+            <div style="display:flex;gap:10px;align-items:center"><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;width:34px">p. 63</span><span style="color:#111110">Hyperparameter ranges for LoRA</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">5 × 4</span></div>
+            <div style="display:flex;gap:10px;align-items:center"><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;width:34px">p. 88</span><span style="color:#111110">DPO vs RLHF evaluation</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">3 × 4</span></div>
+            <div style="font-size:11.5px;color:#8A8A83;padding-top:4px">6 more</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div></div>
+
+<!-- 1e Concept map -->
+<div class="dv-opt" id="1e"><div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Concept map — PyVis embed with a selection inspector (placeholder graph)</div>
+<div class="dv-card" style="width:1200px;height:760px;display:flex">
+  <aside style="width:212px;flex:none;border-right:1px solid #E8E8E4;background:#FFFFFF;display:flex;flex-direction:column;padding:14px 10px 12px">
+    <div style="display:flex;align-items:center;gap:8px;padding:2px 8px 16px"><div style="width:22px;height:22px;border-radius:6px;background:#111110;color:#fff;font:600 11px 'Geist Mono',monospace;display:grid;place-items:center">G</div><div style="font-weight:600">Knowledge</div><div style="margin-left:auto;font:500 10px 'Geist Mono',monospace;color:#8A8A83">v2.4.1</div></div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>Search</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M2 7h12"/></svg>Vault<span style="margin-left:auto;font:500 10.5px 'Geist Mono',monospace;color:#8A8A83">2</span></div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;background:#F1F1EE;font-weight:500"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#111110" stroke-width="1.5"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="4" r="2"/><path d="M7 5.5L5 10M9 5.5l2 4.5"/></svg>Concept map</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Catalog</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><path d="M8 2l5 2v4c0 3-2.2 5-5 6-2.8-1-5-3-5-6V4l5-2z"/></svg>Governance</div>
+    </div>
+    <div style="margin-top:22px;padding:0 8px;font:500 10.5px 'Geist Mono',monospace;letter-spacing:.06em;color:#8A8A83;text-transform:uppercase">Communities</div>
+    <div style="margin:8px 0 0;display:grid;gap:1px;font-size:12px">
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 8px"><span style="width:8px;height:8px;border-radius:2px;background:#3056D3"></span>Fine-tuning strategies<span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">64</span></div>
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 8px"><span style="width:8px;height:8px;border-radius:2px;background:#1F8A5B"></span>Evaluation & monitoring<span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">41</span></div>
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 8px"><span style="width:8px;height:8px;border-radius:2px;background:#B7791F"></span>Data preparation<span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">38</span></div>
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 8px"><span style="width:8px;height:8px;border-radius:2px;background:#8A8A83"></span>Deployment<span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">29</span></div>
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 8px"><span style="width:8px;height:8px;border-radius:2px;background:#B03A2E"></span>Alignment (DPO / RLHF)<span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">22</span></div>
+    </div>
+    <div style="margin-top:auto;padding:8px;display:flex;align-items:center;gap:7px;font-size:11.5px;color:#1F8A5B"><span style="width:6px;height:6px;border-radius:50%;background:#1F8A5B"></span>QA passed · 12 checks</div>
+  </aside>
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column;background:#FFFFFF;position:relative">
+    <div style="height:48px;flex:none;display:flex;align-items:center;gap:10px;padding:0 24px;border-bottom:1px solid #E8E8E4"><div style="font-weight:500">Concept map</div><div style="color:#8A8A83;font-size:12px">312 nodes · 548 edges · Louvain</div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;border:1px solid #E0E0DB;border-radius:7px;padding:5px 10px;width:200px;font-size:12px;color:#8A8A83"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#8A8A83" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>Find node</div>
+      <div style="display:inline-flex;border:1px solid #E0E0DB;border-radius:7px;padding:2px;font-size:11.5px"><span style="padding:3px 8px;border-radius:5px;background:#F1F1EE;font-weight:500">Degree</span><span style="padding:3px 8px;color:#55554F">Rank</span></div>
+    </div>
+    <div style="flex:1;position:relative;background:radial-gradient(#E4E4E0 1px,transparent 1px) 0 0/22px 22px">
+      <svg width="100%" height="100%" viewBox="0 0 980 700" style="position:absolute;inset:0" fill="none" stroke="#D6D6D0" stroke-width="1">
+        <path d="M420 330L300 250M420 330L520 220M420 330L560 400M420 330L330 450M420 330L600 300M300 250L200 200M300 250L240 330M520 220L610 160M520 220L640 240M560 400L650 470M560 400L690 380M330 450L260 540M330 450L400 560M600 300L700 260M700 260L780 200M700 260L800 320M650 470L740 540M240 330L160 400M610 160L680 100"/>
+        <g fill="#FFFFFF" stroke="#8A8A83"><circle cx="200" cy="200" r="5"/><circle cx="240" cy="330" r="6"/><circle cx="160" cy="400" r="4"/><circle cx="260" cy="540" r="5"/><circle cx="400" cy="560" r="4"/><circle cx="680" cy="100" r="4"/><circle cx="740" cy="540" r="5"/><circle cx="780" cy="200" r="5"/><circle cx="800" cy="320" r="4"/></g>
+        <g fill="#3056D3" stroke="#3056D3"><circle cx="420" cy="330" r="14"/><circle cx="300" cy="250" r="8"/><circle cx="520" cy="220" r="9"/><circle cx="610" cy="160" r="6"/></g>
+        <g fill="#1F8A5B" stroke="#1F8A5B"><circle cx="560" cy="400" r="9"/><circle cx="650" cy="470" r="6"/><circle cx="690" cy="380" r="5"/></g>
+        <g fill="#B7791F" stroke="#B7791F"><circle cx="330" cy="450" r="8"/><circle cx="640" cy="240" r="6"/></g>
+        <g fill="#8A8A83" stroke="#8A8A83"><circle cx="600" cy="300" r="7"/><circle cx="700" cy="260" r="7"/></g>
+        <circle cx="420" cy="330" r="20" stroke="#3056D3" stroke-dasharray="2 3"/>
+      </svg>
+      <div style="position:absolute;left:calc(420/980*100% + 26px);top:calc(330/700*100% - 9px);font-size:12px;font-weight:500;background:#fff;padding:1px 6px;border-radius:4px;border:1px solid #E8E8E4">LoRA</div>
+      <div style="position:absolute;left:calc(520/980*100% + 14px);top:calc(220/700*100% - 8px);font-size:11.5px;color:#55554F">QLoRA</div>
+      <div style="position:absolute;left:calc(300/980*100% - 76px);top:calc(250/700*100% - 8px);font-size:11.5px;color:#55554F">Adapters</div>
+      <div style="position:absolute;left:calc(560/980*100% + 14px);top:calc(400/700*100% - 8px);font-size:11.5px;color:#55554F">Evaluation</div>
+      <div style="position:absolute;left:calc(330/980*100% - 110px);top:calc(450/700*100% - 8px);font-size:11.5px;color:#55554F">Data preparation</div>
+      <div style="position:absolute;left:24px;bottom:16px;font-size:11px;color:#8A8A83">Embedded PyVis network · physics on · drag to explore</div>
+      <div style="position:absolute;right:16px;bottom:16px;display:flex;flex-direction:column;border:1px solid #E0E0DB;border-radius:7px;background:#fff;font-size:14px;color:#55554F;overflow:hidden"><span style="padding:4px 9px;border-bottom:1px solid #E8E8E4">+</span><span style="padding:4px 9px">−</span></div>
+    </div>
+  </main>
+  <aside style="width:300px;flex:none;border-left:1px solid #E8E8E4;background:#FFFFFF;display:flex;flex-direction:column">
+    <div style="height:48px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #E8E8E4;font-weight:500">Selected node</div>
+    <div style="padding:16px;font-size:12.5px;display:grid;gap:14px">
+      <div><div style="font:500 17px/1.2 Geist;letter-spacing:-.01em">LoRA</div><div style="margin-top:4px;display:flex;gap:6px;font:11px 'Geist Mono',monospace;color:#8A8A83"><span>METHOD</span><span>·</span><span style="color:#3056D3">Fine-tuning strategies</span></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div style="border:1px solid #E8E8E4;border-radius:7px;padding:8px 10px"><div style="font:500 15px 'Geist Mono',monospace">14</div><div style="font-size:11px;color:#8A8A83">degree</div></div>
+        <div style="border:1px solid #E8E8E4;border-radius:7px;padding:8px 10px"><div style="font:500 15px 'Geist Mono',monospace">3</div><div style="font-size:11px;color:#8A8A83">community</div></div>
+        <div style="border:1px solid #E8E8E4;border-radius:7px;padding:8px 10px"><div style="font:500 15px 'Geist Mono',monospace">7</div><div style="font-size:11px;color:#8A8A83">passages</div></div>
+      </div>
+      <div style="color:#55554F;line-height:1.55">Low-Rank Adaptation freezes pretrained weights and injects trainable rank-decomposition matrices into each layer, reducing trainable parameters by up to 10,000×.</div>
+      <div><div style="font:500 10.5px 'Geist Mono',monospace;letter-spacing:.06em;color:#8A8A83;text-transform:uppercase;margin-bottom:8px">Relationships</div>
+        <div style="display:grid;gap:6px;color:#55554F">
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:#111110">QLoRA</span><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;margin-left:auto">extends · 9/10</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:#111110">Full fine-tuning</span><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;margin-left:auto">alternative · 8/10</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:#111110">GPU memory</span><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;margin-left:auto">reduces · 8/10</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span style="color:#111110">Adapters</span><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;margin-left:auto">related · 6/10</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px"><span style="flex:1;text-align:center;padding:7px;border-radius:7px;background:#111110;color:#fff;font-weight:500;font-size:12px">Ask about LoRA</span><span style="flex:1;text-align:center;padding:7px;border-radius:7px;border:1px solid #E0E0DB;font-size:12px">Open in catalog</span></div>
+    </div>
+  </aside>
+</div></div>
+
+<!-- 1f Catalog -->
+<div class="dv-opt" id="1f"><div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Catalog — analyst tables for concepts, relationships, nodes and domain briefs</div>
+<div class="dv-card" style="width:1200px;height:760px;display:flex">
+  <aside style="width:212px;flex:none;border-right:1px solid #E8E8E4;background:#FFFFFF;display:flex;flex-direction:column;padding:14px 10px 12px">
+    <div style="display:flex;align-items:center;gap:8px;padding:2px 8px 16px"><div style="width:22px;height:22px;border-radius:6px;background:#111110;color:#fff;font:600 11px 'Geist Mono',monospace;display:grid;place-items:center">G</div><div style="font-weight:600">Knowledge</div><div style="margin-left:auto;font:500 10px 'Geist Mono',monospace;color:#8A8A83">v2.4.1</div></div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>Search</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M2 7h12"/></svg>Vault<span style="margin-left:auto;font:500 10.5px 'Geist Mono',monospace;color:#8A8A83">2</span></div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="4" r="2"/><path d="M7 5.5L5 10M9 5.5l2 4.5"/></svg>Concept map</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;background:#F1F1EE;font-weight:500"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#111110" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Catalog</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><path d="M8 2l5 2v4c0 3-2.2 5-5 6-2.8-1-5-3-5-6V4l5-2z"/></svg>Governance</div>
+    </div>
+    <div style="margin-top:auto;padding:8px;display:flex;align-items:center;gap:7px;font-size:11.5px;color:#1F8A5B"><span style="width:6px;height:6px;border-radius:50%;background:#1F8A5B"></span>QA passed · 12 checks</div>
+  </aside>
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column;background:#F7F7F5">
+    <div style="height:48px;flex:none;display:flex;align-items:center;gap:22px;padding:0 24px;border-bottom:1px solid #E8E8E4;background:#FFFFFF">
+      <div style="font-weight:500">Catalog</div>
+      <div style="display:flex;gap:18px;height:48px;font-size:12.5px">
+        <div style="display:flex;align-items:center;border-bottom:2px solid #111110;font-weight:500">Concepts <span style="margin-left:6px;font:11px 'Geist Mono',monospace;color:#8A8A83">312</span></div>
+        <div style="display:flex;align-items:center;color:#55554F">Relationships <span style="margin-left:6px;font:11px 'Geist Mono',monospace;color:#8A8A83">548</span></div>
+        <div style="display:flex;align-items:center;color:#55554F">Nodes <span style="margin-left:6px;font:11px 'Geist Mono',monospace;color:#8A8A83">312</span></div>
+        <div style="display:flex;align-items:center;color:#55554F">Domain briefs <span style="margin-left:6px;font:11px 'Geist Mono',monospace;color:#8A8A83">12</span></div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;border:1px solid #E0E0DB;border-radius:7px;padding:5px 10px;width:240px;font-size:12px"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#8A8A83" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>lora<span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">9 results</span></div>
+      <span style="font-size:12px;color:#55554F">Export CSV</span>
+    </div>
+    <div style="padding:20px 24px">
+      <div style="background:#fff;border:1px solid #E8E8E4;border-radius:10px;overflow:hidden;font-size:12.5px">
+        <div style="display:grid;grid-template-columns:1.4fr .8fr 3fr .6fr .8fr;gap:14px;padding:9px 16px;color:#8A8A83;font-size:11px;border-bottom:1px solid #E8E8E4;background:#FAFAF8"><span>Title</span><span>Type</span><span>Description</span><span style="text-align:right">Degree</span><span>Community</span></div>
+        <div style="display:grid;grid-template-columns:1.4fr .8fr 3fr .6fr .8fr;gap:14px;padding:10px 16px;border-bottom:1px solid #EFEFEC;align-items:center"><span style="font-weight:500"><mark style="background:#FFF0B3;color:inherit;padding:0 1px">LoRA</mark></span><span style="font:11px 'Geist Mono',monospace;color:#55554F">METHOD</span><span style="color:#55554F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Low-Rank Adaptation freezes pretrained weights and injects trainable rank-decomposition matrices…</span><span style="text-align:right;font-family:'Geist Mono',monospace">14</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#3056D3"></span>3</span></div>
+        <div style="display:grid;grid-template-columns:1.4fr .8fr 3fr .6fr .8fr;gap:14px;padding:10px 16px;border-bottom:1px solid #EFEFEC;align-items:center"><span style="font-weight:500">Q<mark style="background:#FFF0B3;color:inherit;padding:0 1px">LoRA</mark></span><span style="font:11px 'Geist Mono',monospace;color:#55554F">METHOD</span><span style="color:#55554F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Quantized LoRA: 4-bit NormalFloat base model with paged optimizers, enabling 65B fine-tuning on a single 48 GB GPU…</span><span style="text-align:right;font-family:'Geist Mono',monospace">9</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#3056D3"></span>3</span></div>
+        <div style="display:grid;grid-template-columns:1.4fr .8fr 3fr .6fr .8fr;gap:14px;padding:10px 16px;border-bottom:1px solid #EFEFEC;align-items:center"><span style="font-weight:500"><mark style="background:#FFF0B3;color:inherit;padding:0 1px">LoRA</mark> rank</span><span style="font:11px 'Geist Mono',monospace;color:#55554F">PARAMETER</span><span style="color:#55554F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Dimensionality r of the low-rank matrices; typical values 4–64, trading capacity for parameter count…</span><span style="text-align:right;font-family:'Geist Mono',monospace">6</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#3056D3"></span>3</span></div>
+        <div style="display:grid;grid-template-columns:1.4fr .8fr 3fr .6fr .8fr;gap:14px;padding:10px 16px;border-bottom:1px solid #EFEFEC;align-items:center"><span style="font-weight:500">Do<mark style="background:#FFF0B3;color:inherit;padding:0 1px">RA</mark></span><span style="font:11px 'Geist Mono',monospace;color:#55554F">METHOD</span><span style="color:#55554F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Weight-Decomposed Low-Rank Adaptation splits weights into magnitude and direction components…</span><span style="text-align:right;font-family:'Geist Mono',monospace">5</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#3056D3"></span>3</span></div>
+        <div style="display:grid;grid-template-columns:1.4fr .8fr 3fr .6fr .8fr;gap:14px;padding:10px 16px;border-bottom:1px solid #EFEFEC;align-items:center"><span style="font-weight:500">Adapter modules</span><span style="font:11px 'Geist Mono',monospace;color:#55554F">METHOD</span><span style="color:#55554F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Small bottleneck layers inserted between transformer blocks; predecessor to <mark style="background:#FFF0B3;color:inherit;padding:0 1px">LoRA</mark>-style updates…</span><span style="text-align:right;font-family:'Geist Mono',monospace">7</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#3056D3"></span>3</span></div>
+        <div style="display:grid;grid-template-columns:1.4fr .8fr 3fr .6fr .8fr;gap:14px;padding:10px 16px;border-bottom:1px solid #EFEFEC;align-items:center"><span style="font-weight:500">GPU memory</span><span style="font:11px 'Geist Mono',monospace;color:#55554F">RESOURCE</span><span style="color:#55554F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Accelerator memory budget; the binding constraint that <mark style="background:#FFF0B3;color:inherit;padding:0 1px">LoRA</mark> and quantization relax…</span><span style="text-align:right;font-family:'Geist Mono',monospace">11</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#8A8A83"></span>6</span></div>
+        <div style="display:grid;grid-template-columns:1.4fr .8fr 3fr .6fr .8fr;gap:14px;padding:10px 16px;border-bottom:1px solid #EFEFEC;align-items:center"><span style="font-weight:500">PEFT</span><span style="font:11px 'Geist Mono',monospace;color:#55554F">CONCEPT</span><span style="color:#55554F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Parameter-Efficient Fine-Tuning; family including <mark style="background:#FFF0B3;color:inherit;padding:0 1px">LoRA</mark>, prefix tuning, and adapters…</span><span style="text-align:right;font-family:'Geist Mono',monospace">12</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#3056D3"></span>3</span></div>
+        <div style="display:grid;grid-template-columns:1.4fr .8fr 3fr .6fr .8fr;gap:14px;padding:10px 16px;border-bottom:1px solid #EFEFEC;align-items:center"><span style="font-weight:500">Catastrophic forgetting</span><span style="font:11px 'Geist Mono',monospace;color:#55554F">RISK</span><span style="color:#55554F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loss of pretrained capabilities during adaptation; mitigated by <mark style="background:#FFF0B3;color:inherit;padding:0 1px">LoRA</mark>'s frozen base…</span><span style="text-align:right;font-family:'Geist Mono',monospace">8</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#1F8A5B"></span>4</span></div>
+        <div style="display:grid;grid-template-columns:1.4fr .8fr 3fr .6fr .8fr;gap:14px;padding:10px 16px;align-items:center"><span style="font-weight:500">Hugging Face PEFT</span><span style="font:11px 'Geist Mono',monospace;color:#55554F">TOOL</span><span style="color:#55554F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Library implementing <mark style="background:#FFF0B3;color:inherit;padding:0 1px">LoRA</mark>, IA³ and prompt tuning on top of Transformers…</span><span style="text-align:right;font-family:'Geist Mono',monospace">4</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#8A8A83"></span>6</span></div>
+      </div>
+      <div style="display:flex;align-items:center;margin-top:12px;font-size:11.5px;color:#8A8A83"><span>Showing 9 of 312 · filtered by “lora”</span><span style="margin-left:auto;display:flex;gap:12px"><span>Rows 25</span><span style="color:#111110">1</span><span>2</span><span>3</span><span>…</span><span>13</span></span></div>
+    </div>
+  </main>
+</div></div>
+
+<!-- 1g Governance -->
+<div class="dv-opt" id="1g"><div class="dv-olabel"><a class="dv-oid" href="#1g">1g</a>Governance — QA checks as a list instead of raw JSON, changelog as a timeline</div>
+<div class="dv-card" style="width:1200px;height:760px;display:flex">
+  <aside style="width:212px;flex:none;border-right:1px solid #E8E8E4;background:#FFFFFF;display:flex;flex-direction:column;padding:14px 10px 12px">
+    <div style="display:flex;align-items:center;gap:8px;padding:2px 8px 16px"><div style="width:22px;height:22px;border-radius:6px;background:#111110;color:#fff;font:600 11px 'Geist Mono',monospace;display:grid;place-items:center">G</div><div style="font-weight:600">Knowledge</div><div style="margin-left:auto;font:500 10px 'Geist Mono',monospace;color:#8A8A83">v2.4.1</div></div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>Search</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M2 7h12"/></svg>Vault<span style="margin-left:auto;font:500 10.5px 'Geist Mono',monospace;color:#8A8A83">2</span></div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="4" r="2"/><path d="M7 5.5L5 10M9 5.5l2 4.5"/></svg>Concept map</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;color:#55554F"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#55554F" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Catalog</div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;background:#F1F1EE;font-weight:500"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#111110" stroke-width="1.5"><path d="M8 2l5 2v4c0 3-2.2 5-5 6-2.8-1-5-3-5-6V4l5-2z"/></svg>Governance</div>
+    </div>
+    <div style="margin-top:auto;padding:8px;display:flex;align-items:center;gap:7px;font-size:11.5px;color:#1F8A5B"><span style="width:6px;height:6px;border-radius:50%;background:#1F8A5B"></span>QA passed · 12 checks</div>
+  </aside>
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column;background:#F7F7F5">
+    <div style="height:48px;flex:none;display:flex;align-items:center;gap:6px;padding:0 24px;border-bottom:1px solid #E8E8E4;background:#FFFFFF"><div style="font-weight:500">Governance</div><div style="color:#8A8A83;font-size:12px;margin-left:8px">Change Management Agent · last run 14:52</div><span style="margin-left:auto;padding:6px 12px;border-radius:7px;border:1px solid #D6D6D0;background:#fff;font-size:12px;font-weight:500">Re-run QA & sync</span></div>
+    <div style="padding:24px;display:grid;grid-template-columns:1fr 1.2fr;gap:20px">
+      <div style="background:#fff;border:1px solid #E8E8E4;border-radius:10px;font-size:12.5px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #E8E8E4"><span style="font-weight:500">QA health</span><span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#1F8A5B;background:#E8F5EE;padding:2px 8px;border-radius:999px"><span style="width:6px;height:6px;border-radius:50%;background:#1F8A5B"></span>12 / 12 passed</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">3.4s</span></div>
+        <div style="display:grid">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #EFEFEC"><span style="color:#1F8A5B">✓</span><span>Python syntax · app.py, core/*</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">0.2s</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #EFEFEC"><span style="color:#1F8A5B">✓</span><span>Parquet · create_final_entities</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">312 rows</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #EFEFEC"><span style="color:#1F8A5B">✓</span><span>Parquet · create_final_relationships</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">548 rows</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #EFEFEC"><span style="color:#1F8A5B">✓</span><span>Parquet · create_final_community_reports</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">12 rows</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #EFEFEC"><span style="color:#1F8A5B">✓</span><span>ChromaDB · paper_collection reachable</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">1,204 docs</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #EFEFEC"><span style="color:#1F8A5B">✓</span><span>Vault catalog integrity · SHA-256</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">2 docs</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #EFEFEC"><span style="color:#1F8A5B">✓</span><span>OPENAI_API_KEY present</span><span style="margin-left:auto;font:11px 'Geist Mono',monospace;color:#8A8A83">.env</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#8A8A83"><span>…</span><span>5 more checks</span></div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #E8E8E4;border-radius:10px;font-size:12.5px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #E8E8E4"><span style="font-weight:500">Changelog</span><span style="font:11px 'Geist Mono',monospace;color:#8A8A83">CHANGELOG.md</span><span style="margin-left:auto;font-size:11.5px;color:#55554F">Semantic versioning · patch on sync</span></div>
+        <div style="padding:16px 16px 6px;display:grid;gap:0">
+          <div style="display:flex;gap:14px"><div style="display:flex;flex-direction:column;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#111110;margin-top:5px"></span><span style="width:1px;flex:1;background:#E8E8E4;margin:4px 0"></span></div><div style="padding-bottom:18px;flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font:500 13px 'Geist Mono',monospace">v2.4.1</span><span style="font-size:11.5px;color:#8A8A83">Sep 17, 2026</span><span style="margin-left:auto;font-size:11px;color:#3056D3;background:#EEF2FD;padding:1px 6px;border-radius:4px">current</span></div>
+            <div style="margin-top:8px;display:grid;gap:6px;color:#55554F">
+              <div style="display:flex;gap:8px"><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;width:52px">66f61d0</span><span>Table-Graph RAG with structured table extraction and tabular provenance</span></div>
+              <div style="display:flex;gap:8px"><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;width:52px">feb13fc</span><span>Sub-tree architecture, Change Management Agent, Document Vault</span></div>
+              <div style="display:flex;gap:8px"><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;width:52px">5dbe40b</span><span>Interactive graph styling and dataset updates</span></div>
+              <div style="display:flex;gap:8px"><span style="font:11px 'Geist Mono',monospace;color:#8A8A83;width:52px">bd6176e</span><span>Business-friendly terminology and audit workflows</span></div>
+              <div style="font-size:11.5px;color:#8A8A83">8 more commits</div>
+            </div></div></div>
+          <div style="display:flex;gap:14px"><div style="display:flex;flex-direction:column;align-items:center"><span style="width:8px;height:8px;border-radius:50%;border:1px solid #D6D6D0;background:#fff;margin-top:5px"></span><span style="width:1px;flex:1;background:#E8E8E4;margin:4px 0"></span></div><div style="padding-bottom:18px;flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font:500 13px 'Geist Mono',monospace;color:#55554F">v2.3.2</span><span style="font-size:11.5px;color:#8A8A83">Sep 16, 2026</span></div><div style="margin-top:6px;color:#8A8A83">Docs: conceptual knowledge-graph breakdown in README</div></div></div>
+          <div style="display:flex;gap:14px"><div style="display:flex;flex-direction:column;align-items:center"><span style="width:8px;height:8px;border-radius:50%;border:1px solid #D6D6D0;background:#fff;margin-top:5px"></span></div><div style="padding-bottom:12px;flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font:500 13px 'Geist Mono',monospace;color:#55554F">v2.3.1</span><span style="font-size:11.5px;color:#8A8A83">Sep 15, 2026</span></div><div style="margin-top:6px;color:#8A8A83">On-demand GraphRAG builder pipeline</div></div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div></div>
+
+</div>
+<p class="dv-next">Try next: "build the vault and catalog in the <a class="dv-oid" href="#1c">1c</a> style" · "merge the evidence rail from <a class="dv-oid" href="#1a">1a</a> into <a class="dv-oid" href="#1b">1b</a>" · "show loading, empty and error states for <a class="dv-oid" href="#1a">1a</a>"</p>
+</section>
+</x-dc>
+</body>
+</html>
