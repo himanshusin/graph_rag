@@ -1,11 +1,10 @@
-# 🏛️ Enterprise Knowledge Intelligence Platform (GraphRAG)
+# 🏛️ GraphRAG Knowledge Workspace
 
 [![Version](https://img.shields.io/badge/Version-2.4.1-blue.svg?style=flat-square)](#)
-[![Compliance](https://img.shields.io/badge/Compliance-SOC2_Audit_Ready-emerald.svg?style=flat-square)](#)
-[![Design](https://img.shields.io/badge/Design-Enterprise_Minimalist-indigo.svg?style=flat-square)](#)
+[![Design](https://img.shields.io/badge/Design-Analyst_Workspace-indigo.svg?style=flat-square)](#)
 [![Python](https://img.shields.io/badge/Python-3.13+-3776AB.svg?style=flat-square&logo=python&logoColor=white)](#)
 
-An enterprise-grade autonomous knowledge extraction, community graph reasoning, and hybrid vector intelligence platform built on **Microsoft GraphRAG**, **ChromaDB**, and **Enterprise Document Intelligence**.
+Knowledge extraction, community graph reasoning and hybrid vector retrieval over a document vault, built on **GraphRAG** concepts, **ChromaDB** and **Streamlit**. Analysts ask a question, read the answer, and check where every claim came from.
 
 ---
 
@@ -105,101 +104,145 @@ This platform implements Microsoft GraphRAG's primary search paradigms alongside
 
 ---
 
-## 🏗️ Enterprise Sub-Tree Architecture
+## 🏗️ Architecture
 
-The platform is engineered with a clean, decoupled **sub-tree architecture** ensuring separation of concerns between core AI engines, persistent storage vaults, automation agents, and the executive web portal:
+Engines, presentation and screens are separated so the reasoning logic can be tested without Streamlit and the design tokens live in one place.
 
 ```
 GraphRAG-Breakdown/
-├── app.py                          # Enterprise Web Application (Executive UI)
-├── CHANGELOG.md                    # Auto-generated audit log by Change Management Agent
-├── VERSION                         # Semantic Versioning (2.4.1)
-├── requirements.txt                # Production dependencies
+├── app.py                          # Entry point: sidebar, query-param routing
+├── VERSION                         # Semantic versioning (2.4.1)
+├── CHANGELOG.md                    # Generated from git history by the change agent
 │
-├── core/                           # Sub-Tree: Core Enterprise Services
-│   ├── __init__.py                 # Clean package exports
-│   ├── pipeline.py                 # GraphRAG engine, Louvain clustering & ChromaDB sync
-│   ├── vault.py                    # Document Retention Vault & Citation Attribution Builder
-│   └── change_manager.py           # Change Management Agent (QA, Versioning, Git sync)
+├── core/                           # Engines (no Streamlit imports)
+│   ├── pipeline.py                 # Chunking, extraction, Louvain, LLM community reports, exports
+│   ├── rag.py                      # Retrieval + generation for the five modes
+│   ├── vault.py                    # Document retention, table extraction, index state
+│   └── change_manager.py           # Versioning, changelog, health checks
 │
-├── vault/                          # Sub-Tree: Managed Document Store
-│   ├── documents/                  # Persisted uploaded source files (PDF, TXT, MD)
-│   └── catalog.json                # Document registry with SHA-256 hashes & chunk mappings
+├── ui/                             # Presentation
+│   ├── theme.css                   # Design tokens and every component rule
+│   ├── tokens.py                   # Token values, escaping and query-string helpers
+│   ├── components.py               # HTML fragments (nav, evidence cards, tables, timeline)
+│   └── data.py                     # Cached loaders for parquet, ChromaDB, vault, QA
 │
-├── scripts/                        # Sub-Tree: Automation & Governance
-│   ├── qa_check.py                 # Automated test suite (syntax, parquet tables, ChromaDB)
-│   └── sync_and_push.py            # Pre-push automation CLI with Change Management integration
+├── screens/                        # One module per screen
+│   ├── search.py                   # Thread, streaming answers, evidence rail, compare
+│   ├── vault.py                    # Registry, ingest progress row, inspector
+│   ├── concept_map.py              # PyVis network, community filter, node inspector
+│   ├── catalog.py                  # Concepts, relationships, nodes, domain briefs
+│   └── governance.py               # QA check list and changelog timeline
 │
-├── ragtest/output/                 # Parquet datasets (entities, relationships, nodes, reports)
-├── notebook/                       # Interactive PyVis physics network & ChromaDB store
-└── media/                          # Conceptual diagrams, architectural graphics & visual assets
+├── scripts/
+│   ├── ui_qa_agent.py              # Design + functional QA suite (no LLM calls)
+│   ├── app_smoke.py                # Drives the real app via Streamlit AppTest
+│   ├── pipeline_e2e.py             # Live indexing + answering test (calls the API)
+│   ├── qa_check.py                 # Health checks + QA suite
+│   └── sync_and_push.py            # Pre-push orchestration
+│
+├── vault/                          # Retained documents, extracted tables, catalog.json
+├── ragtest/output/                 # Parquet artifacts (entities, relationships, nodes, reports)
+├── notebook/                       # Concept map HTML and the ChromaDB store
+└── media/                          # Diagrams used in this README
 ```
 
 ---
 
-## 🌟 Production Capabilities
+## 🌟 Capabilities
 
-1. **📑 Enterprise Document Retention Vault (`core/vault.py`)**:
-   - Upload and permanently retain enterprise documents (PDF, TXT, MD).
-   - SHA-256 cryptographic verification prevents duplicate ingestion.
-   - Generates inline verified citations `[1]`, `[2]` linking answers directly to specific documents and page numbers.
+1. **Document vault (`core/vault.py`)**
+   - Retains PDF, TXT and MD uploads, deduplicated by SHA-256.
+   - Extracts structured tables with per-row facts, so numeric questions can be answered from the table rather than from prose.
+   - Tracks index state per document (`chunks_indexed` of `chunks_total`) and purges a document's vectors when it is deleted.
 
-2. **🤖 Multi-Strategy Search & Comparative Audit**:
-   - **🌐 Strategic Synthesis (Global)**: Hierarchical summaries across all strategic knowledge domains.
-   - **🔍 Targeted Lookup (Local)**: Entity-centric traversal with verified source proof.
-   - **🌀 Deep-Dive Cross-Functional (DRIFT)**: Multi-hop reasoning connecting macro strategy with operational details.
-   - **📚 Standard Document Search**: Dense vector similarity search across source passages.
-   - **⚖️ Side-by-Side Comparative Audit**: Real-time evaluation comparing Graph Intelligence against flat vector retrieval.
+2. **Indexing pipeline (`core/pipeline.py`)**
+   - Rebuilds the graph **cumulatively over the whole vault**, so several documents share one graph.
+   - Extracts typed relationships (`extends`, `reduces`, `evaluated on`, …) alongside entities and weights.
+   - Writes **LLM-authored community reports** — a real title, summary, findings and importance rating per community, not a template.
+   - Namespaces chunk ids per document (`doc_abc::chunk_3`) and tags every vector with `document_id`, so each citation traces back to its source file.
 
-3. **🕸️ Knowledge Concept Map**:
-   - Interactive physics-based PyVis network with Louvain community coloring, node degree sizing, and real-time concept exploration.
+3. **Five reasoning modes (`core/rag.py`)**
+   - **Global synthesis** — ranks community reports by relevance, with importance as the tie-breaker.
+   - **Local lookup** — scores concepts against the question, then pulls the relationships that touch them.
+   - **DRIFT deep-dive** — a global pass picks the domains, a local pass drills into their concepts.
+   - **Vector passages** — nearest passages from ChromaDB, dropping hits past the relevance threshold and saying so.
+   - **Compare** — the graph and vector engines run concurrently, side by side, each with its own grounding score.
 
-4. **📊 Enterprise Data Catalog**:
-   - Live inspection and filtering of extracted entities, relationships, graph nodes, and community reports.
+4. **Evidence that stays adjacent**
+   - Every `[n]` in an answer links to a visible evidence card; numbers with no matching card stay plain text.
+   - Cards open the screen that owns the source: passages open the Vault inspector, concepts the Concept map, domains the Catalog.
+   - `grounded n%` is computed per answer as cited sentences ÷ total sentences.
 
-5. **🛡️ Change Management Agent (`core/change_manager.py`)**:
-   - Automated semantic versioning (`VERSION`), release audit log (`CHANGELOG.md`), automated test validation (`scripts/qa_check.py`), and pre-push git synchronization.
+5. **Governance (`core/change_manager.py`)**
+   - Eleven measured health checks — syntax, each parquet, ChromaDB reachability, vector provenance, vault SHA-256 integrity, concept map, API key — each individually timed, with failures listed first.
+   - Semantic versioning, changelog generated from git history, README badge sync.
 
 ---
 
 ## 🚀 Quickstart
 
-### 1. Prerequisites & Installation
+### 1. Install
 ```bash
-# Clone the repository
 git clone https://github.com/himanshusin/graph_rag.git
 cd graph_rag
 
-# Create and activate virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Configure Environment
+### 2. Configure
 Create a `.env` file in the project root:
 ```bash
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-### 3. Run the Web Application
+### 3. Run
 ```bash
 streamlit run app.py
 ```
-Access the application at **[http://localhost:8501](http://localhost:8501)**.
+Open **[http://localhost:8501](http://localhost:8501)**.
+
+### 4. Build the knowledge base
+The graph starts empty. Open **Vault → Add document**, upload a PDF or text file, leave *Re-index graph now* on and set the chunk limit, then **Upload & retain**. Progress appears as a row in the registry. You can also attach a file directly in the Search composer.
+
+Indexing rebuilds from every retained document, so adding a second file produces one graph spanning both.
 
 ---
 
-## 🛡️ Change Management & Pre-Push Workflow
-
-Before pushing changes to GitHub, execute the pre-push automation hook. This runs the automated QA test suite, increments the semantic version, compiles the changelog, and pushes cleanly:
+## 🧪 Testing
 
 ```bash
-# Automated Patch Bump (e.g., v2.3.1 -> v2.3.2)
-python scripts/sync_and_push.py --bump patch --msg "feat: your change description"
+# Design tokens, components, retrieval accuracy, pipeline, vault, governance.
+# No LLM calls, so it is free and deterministic.
+python scripts/ui_qa_agent.py
 
-# Or run QA checks standalone
+# Runs the real app for every screen via Streamlit AppTest and asserts
+# what rendered, in both the empty and populated states.
+python scripts/app_smoke.py
+
+# Live: indexes a sample document end to end and answers in every mode,
+# checking that citations resolve. Calls the OpenAI API.
+python scripts/pipeline_e2e.py
+
+# Health checks followed by the QA suite.
 python scripts/qa_check.py
 ```
+
+---
+
+## 🛡️ Change management
+
+```bash
+# Health checks, QA suite, version bump, changelog, commit and push.
+python scripts/sync_and_push.py --bump patch --msg "feat: your change description"
+
+# Sync without pushing.
+python scripts/sync_and_push.py --no-push
+```
+
+---
+
+## 🎨 Design
+
+The UI implements the handoff in `Graph RAG UI mockups/` — direction **1a** (sidebar, thread, evidence rail) as the shell, **1b**'s two-column block for Compare, and **1c**'s empty state. Tokens live in `ui/theme.css` as `:root` custom properties; edit them there rather than in Python. `scripts/ui_qa_agent.py` asserts the token values, typography, palette and the guide's acceptance checklist, so a drift from the handoff fails the suite.

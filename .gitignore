@@ -4,3 +4,6 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 ragtest/output/
+
+# Transient per-filter concept map renders
+notebook/concept_map_*.html

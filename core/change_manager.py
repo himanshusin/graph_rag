@@ -123,11 +123,12 @@ class ChangeManagementAgent:
                 f'img.shields.io/badge/Version-{version}-blue.svg',
                 content
             )
-            # Update VERSION line in ASCII tree: ├── VERSION    # Semantic Versioning (X.Y.Z)
+            # Update the VERSION line in the architecture tree.
             content = re.sub(
-                r'├── VERSION\s+# Semantic Versioning \([\d\.]+\)',
-                f'├── VERSION                         # Semantic Versioning ({version})',
-                content
+                r'├── VERSION(\s+)# Semantic versioning \([\d.]+\)',
+                lambda m: f'├── VERSION{m.group(1)}# Semantic versioning ({version})',
+                content,
+                flags=re.IGNORECASE,
             )
             self.readme_file.write_text(content, encoding="utf-8")
             return content

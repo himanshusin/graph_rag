@@ -1,12 +1,14 @@
-# 📜 Enterprise Change Log
+# Change log
 
-All notable changes, release updates, and governance audits for **GraphRAG Enterprise Platform** are documented here.
+Release history for the GraphRAG knowledge workspace, generated from git history.
 
 ---
 
 ## [v2.4.1] - 2026-09-17
 
-### 🚀 New Features & Capabilities
+### Features
+- [`715f438`] feat: add UI screens, RAG core module, and end-to-end testing scripts
+- [`2e6a947`] feat: rebuild UI as light analyst workspace with updated design tokens and add UI QA agent script
 - [`a89205a`] feat: add GraphRAG UI mockups and developer guide assets alongside local database updates
 - [`2ea88b6`] feat: rebuild the UI as the light analyst workspace from the design handoff
 - [`66f61d0`] feat: implement Table-Graph RAG with structured table extraction, numeric-aware ontology, and tabular provenance
@@ -17,18 +19,18 @@ All notable changes, release updates, and governance audits for **GraphRAG Enter
 - [`7b86d21`] feat: add Streamlit app and enhance graph examples notebook with pipeline building and performance benchmarks
 - [`0f85619`] feat: add LLM fine-tuning guide, requirements, and project configuration files
 
-### 🎨 Enterprise UI & Design System
+### UI and design system
 - [`4ac25d9`] docs: add Graph RAG UI mockups
 
-### 🐛 Bug Fixes & Stability
+### Fixes
 - [`38a03f5`] fix: resolve Streamlit daemon module caching and add defensive hasattr checks for vault table queries
 
-### 🔧 Architecture & Sub-tree Refactoring
+### Architecture
 - [`021a009`] Merge pull request #1 from himanshusin/claudedev
 - [`2db0604`] Add files via upload
 - [`104a206`] Main Files
 
-### 📖 Documentation & Governance
+### Documentation
 - [`0e4f2b7`] docs: incorporate conceptual knowledge graph RAG breakdown with enterprise platform architecture in README
 - [`2624691`] chore: remove all references to glean across codebase and documentation
 - [`bf302b6`] Create README.md
