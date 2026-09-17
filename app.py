@@ -16,6 +16,14 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
+import importlib
+import core.vault
+import core.pipeline
+import core.change_manager
+importlib.reload(core.vault)
+importlib.reload(core.pipeline)
+importlib.reload(core.change_manager)
+
 from core.vault import DocumentVault
 from core.pipeline import DocumentIngestor, GraphRAGEngine
 from core.change_manager import ChangeManagementAgent
@@ -453,7 +461,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Metric Row (5 Core Enterprise Metrics)
-all_vault_tables = vault.get_tables()
+all_vault_tables = vault.get_tables() if hasattr(vault, "get_tables") else []
 col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
     st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(entities_df)}</div><div class="app-stat-text">Indexed Concepts</div></div>', unsafe_allow_html=True)
@@ -729,7 +737,7 @@ with tab_vault_ui:
                 st.info(f"**Extracted Tables:** `{doc_details.get('table_count', 0)}`")
             
             # Show Extracted Structured Tables if present
-            doc_tables = vault.get_tables(selected_doc_id)
+            doc_tables = vault.get_tables(selected_doc_id) if hasattr(vault, "get_tables") else []
             if doc_tables:
                 with st.expander(f"📊 Extracted Structured Tables & Numerical Data ({len(doc_tables)} tables detected)", expanded=True):
                     for tab_info in doc_tables:

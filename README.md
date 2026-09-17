@@ -1,6 +1,6 @@
 # 🏛️ Enterprise Knowledge Intelligence Platform (GraphRAG)
 
-[![Version](https://img.shields.io/badge/Version-2.4.0-blue.svg?style=flat-square)](#)
+[![Version](https://img.shields.io/badge/Version-2.4.1-blue.svg?style=flat-square)](#)
 [![Compliance](https://img.shields.io/badge/Compliance-SOC2_Audit_Ready-emerald.svg?style=flat-square)](#)
 [![Design](https://img.shields.io/badge/Design-Enterprise_Minimalist-indigo.svg?style=flat-square)](#)
 [![Python](https://img.shields.io/badge/Python-3.13+-3776AB.svg?style=flat-square&logo=python&logoColor=white)](#)
@@ -113,7 +113,7 @@ The platform is engineered with a clean, decoupled **sub-tree architecture** ens
 GraphRAG-Breakdown/
 ├── app.py                          # Enterprise Web Application (Executive UI)
 ├── CHANGELOG.md                    # Auto-generated audit log by Change Management Agent
-├── VERSION                         # Semantic Versioning (2.4.0)
+├── VERSION                         # Semantic Versioning (2.4.1)
 ├── requirements.txt                # Production dependencies
 │
 ├── core/                           # Sub-Tree: Core Enterprise Services
