@@ -1,0 +1,703 @@
+[
+  {
+    "table_id": "doc_f0fcef27b135_p12_t1",
+    "doc_id": "doc_f0fcef27b135",
+    "page": 12,
+    "title": "Table 1 (Page 12): Aspect, Pre-training, Fine-tuning",
+    "columns": [
+      "Aspect",
+      "Pre-training",
+      "Fine-tuning"
+    ],
+    "rows_count": 9,
+    "markdown": "|Aspect|Pre-training|Fine-tuning|\n|---|---|---|\n|Definition|Training on a vast amount of<br>unlabelled text data|Adapting a pre-trained model to<br>specific tasks|\n|Data Requirement|Extensive<br>and<br>diverse<br>unla-<br>belled text data|Smaller,<br>task-specific labelled<br>data|\n|Objective|Build general linguistic knowl-<br>edge|Specialise<br>model<br>for<br>specific<br>tasks|\n|Process|Data<br>collection,<br>training<br>on<br>large<br>dataset,<br>predict<br>next<br>word/sequence|Task-specific<br>data<br>collection,<br>modify last layer for task, train<br>on new dataset, generate output<br>based on tasks|\n|Model Modification|Entire model trained|Last layers adapted for new task|\n|Computational Cost|High (large dataset,<br>complex<br>model)|Lower (smaller dataset,<br>fine-<br>tuning layers)|\n|Training Duration|Weeks to months|Days to weeks|\n|Purpose|General language understand-<br>ing|Task-specific performance im-<br>provement|\n|Examples|GPT, LLaMA 3|Fine-tuning LLaMA 3 for sum-<br>marisation|\n\n",
+    "row_facts": [
+      "Row 1: [Aspect] = Definition, [Pre-training] = Training on a vast amount of unlabelled text data, [Fine-tuning] = Adapting a pre-trained model to specific tasks",
+      "Row 2: [Aspect] = Data Requirement, [Pre-training] = Extensive and diverse unla- belled text data, [Fine-tuning] = Smaller, task-specific labelled data",
+      "Row 3: [Aspect] = Objective, [Pre-training] = Build general linguistic knowl- edge, [Fine-tuning] = Specialise model for specific tasks",
+      "Row 4: [Aspect] = Process, [Pre-training] = Data collection, training on large dataset, predict next word/sequence, [Fine-tuning] = Task-specific data collection, modify last layer for task, train on new dataset, generate output based on tasks",
+      "Row 5: [Aspect] = Model Modification, [Pre-training] = Entire model trained, [Fine-tuning] = Last layers adapted for new task",
+      "Row 6: [Aspect] = Computational Cost, [Pre-training] = High (large dataset, complex model), [Fine-tuning] = Lower (smaller dataset, fine- tuning layers)",
+      "Row 7: [Aspect] = Training Duration, [Pre-training] = Weeks to months, [Fine-tuning] = Days to weeks",
+      "Row 8: [Aspect] = Purpose, [Pre-training] = General language understand- ing, [Fine-tuning] = Task-specific performance im- provement",
+      "Row 9: [Aspect] = Examples, [Pre-training] = GPT, LLaMA 3, [Fine-tuning] = Fine-tuning LLaMA 3 for sum- marisation"
+    ],
+    "records": [
+      {
+        "Aspect": "Definition",
+        "Pre-training": "Training on a vast amount of unlabelled text data",
+        "Fine-tuning": "Adapting a pre-trained model to specific tasks"
+      },
+      {
+        "Aspect": "Data Requirement",
+        "Pre-training": "Extensive and diverse unla- belled text data",
+        "Fine-tuning": "Smaller, task-specific labelled data"
+      },
+      {
+        "Aspect": "Objective",
+        "Pre-training": "Build general linguistic knowl- edge",
+        "Fine-tuning": "Specialise model for specific tasks"
+      },
+      {
+        "Aspect": "Process",
+        "Pre-training": "Data collection, training on large dataset, predict next word/sequence",
+        "Fine-tuning": "Task-specific data collection, modify last layer for task, train on new dataset, generate output based on tasks"
+      },
+      {
+        "Aspect": "Model Modification",
+        "Pre-training": "Entire model trained",
+        "Fine-tuning": "Last layers adapted for new task"
+      },
+      {
+        "Aspect": "Computational Cost",
+        "Pre-training": "High (large dataset, complex model)",
+        "Fine-tuning": "Lower (smaller dataset, fine- tuning layers)"
+      },
+      {
+        "Aspect": "Training Duration",
+        "Pre-training": "Weeks to months",
+        "Fine-tuning": "Days to weeks"
+      },
+      {
+        "Aspect": "Purpose",
+        "Pre-training": "General language understand- ing",
+        "Fine-tuning": "Task-specific performance im- provement"
+      },
+      {
+        "Aspect": "Examples",
+        "Pre-training": "GPT, LLaMA 3",
+        "Fine-tuning": "Fine-tuning LLaMA 3 for sum- marisation"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_f0fcef27b135_p20_t1",
+    "doc_id": "doc_f0fcef27b135",
+    "page": 20,
+    "title": "Table 1 (Page 20): Data Format, Python Li- brary, Description, Library Link",
+    "columns": [
+      "Data Format",
+      "Python Li- brary",
+      "Description",
+      "Library Link"
+    ],
+    "rows_count": 6,
+    "markdown": "|Data Format|Python Li-<br>brary|Description|Library Link|\n|---|---|---|---|\n|CSV Files|pandas|pandas is a powerful library for data ma-<br>nipulation and analysis. It provides the<br>`read` ~~`c`~~`sv` function for easy and efficient<br>reading of CSV files into DataFrame ob-<br>jects.<br>It also supports reading data in<br>Excel, JSON, and more.|pandas documenta-<br>tion|\n|Web Pages|BeautifulSoup<br>and requests|BeautifulSoup is a library for parsing<br>HTML and XML documents. Combined<br>with `requests` for sending HTTP re-<br>quests, it enables data extraction from<br>web pages, essential for web scraping<br>tasks.|BeautifulSoup<br>documentation,<br>requests documen-<br>tation|\n|SQL Databases|SQLAlchemy|SQLAlchemy<br>is<br>a<br>SQL<br>toolkit<br>and<br>Object-Relational Mapping (ORM) li-<br>brary for Python, providing a full suite<br>of enterprise-level persistence patterns.|SQLAlchemy docu-<br>mentation|\n|S3 Storage|boto3|boto3 is the Amazon Web Services<br>(AWS) SDK for Python, allowing devel-<br>opers to use services like Amazon S3 and<br>EC2. It enables interaction with AWS<br>services, including uploading, download-<br>ing, and managing S3 bucket files.|boto3<br>documenta-<br>tion|\n|Data<br>Integra-<br>tion|RapidMiner|RapidMiner is a comprehensive envi-<br>ronment for data preparation, machine<br>learning, and predictive analytics, allow-<br>ing efficient processing and transforma-<br>tion of raw data into actionable insights.|RapidMiner<br>docu-<br>mentation|\n|Data Cleaning|Trifacta<br>Wran-<br>gler|Trifacta Wrangler focuses on simplify-<br>ing and automating data wrangling pro-<br>cesses, transforming raw data into clean<br>and structured formats.|Trifacta<br>Wrangler<br>documentation|\n\n",
+    "row_facts": [
+      "Row 1: [Data Format] = CSV Files, [Python Li- brary] = pandas, [Description] = pandas is a powerful library for data ma- nipulation and analysis. It provides the read csv function for easy and efficient reading of CSV files into DataFrame ob- jects. It also supports reading data in Excel, JSON, and more., [Library Link] = pandas documenta- tion",
+      "Row 2: [Data Format] = Web Pages, [Python Li- brary] = BeautifulSoup and requests, [Description] = BeautifulSoup is a library for parsing HTML and XML documents. Combined with requests for sending HTTP re- quests, it enables data extraction from web pages, essential for web scraping tasks., [Library Link] = BeautifulSoup documentation, requests documen- tation",
+      "Row 3: [Data Format] = SQL Databases, [Python Li- brary] = SQLAlchemy, [Description] = SQLAlchemy is a SQL toolkit and Object-Relational Mapping (ORM) li- brary for Python, providing a full suite of enterprise-level persistence patterns., [Library Link] = SQLAlchemy docu- mentation",
+      "Row 4: [Data Format] = S3 Storage, [Python Li- brary] = boto3, [Description] = boto3 is the Amazon Web Services (AWS) SDK for Python, allowing devel- opers to use services like Amazon S3 and EC2. It enables interaction with AWS services, including uploading, download- ing, and managing S3 bucket files., [Library Link] = boto3 documenta- tion",
+      "Row 5: [Data Format] = Data Integra- tion, [Python Li- brary] = RapidMiner, [Description] = RapidMiner is a comprehensive envi- ronment for data preparation, machine learning, and predictive analytics, allow- ing efficient processing and transforma- tion of raw data into actionable insights., [Library Link] = RapidMiner docu- mentation",
+      "Row 6: [Data Format] = Data Cleaning, [Python Li- brary] = Trifacta Wran- gler, [Description] = Trifacta Wrangler focuses on simplify- ing and automating data wrangling pro- cesses, transforming raw data into clean and structured formats., [Library Link] = Trifacta Wrangler documentation"
+    ],
+    "records": [
+      {
+        "Data Format": "CSV Files",
+        "Python Li- brary": "pandas",
+        "Description": "pandas is a powerful library for data ma- nipulation and analysis. It provides the read csv function for easy and efficient reading of CSV files into DataFrame ob- jects. It also supports reading data in Excel, JSON, and more.",
+        "Library Link": "pandas documenta- tion"
+      },
+      {
+        "Data Format": "Web Pages",
+        "Python Li- brary": "BeautifulSoup and requests",
+        "Description": "BeautifulSoup is a library for parsing HTML and XML documents. Combined with requests for sending HTTP re- quests, it enables data extraction from web pages, essential for web scraping tasks.",
+        "Library Link": "BeautifulSoup documentation, requests documen- tation"
+      },
+      {
+        "Data Format": "SQL Databases",
+        "Python Li- brary": "SQLAlchemy",
+        "Description": "SQLAlchemy is a SQL toolkit and Object-Relational Mapping (ORM) li- brary for Python, providing a full suite of enterprise-level persistence patterns.",
+        "Library Link": "SQLAlchemy docu- mentation"
+      },
+      {
+        "Data Format": "S3 Storage",
+        "Python Li- brary": "boto3",
+        "Description": "boto3 is the Amazon Web Services (AWS) SDK for Python, allowing devel- opers to use services like Amazon S3 and EC2. It enables interaction with AWS services, including uploading, download- ing, and managing S3 bucket files.",
+        "Library Link": "boto3 documenta- tion"
+      },
+      {
+        "Data Format": "Data Integra- tion",
+        "Python Li- brary": "RapidMiner",
+        "Description": "RapidMiner is a comprehensive envi- ronment for data preparation, machine learning, and predictive analytics, allow- ing efficient processing and transforma- tion of raw data into actionable insights.",
+        "Library Link": "RapidMiner docu- mentation"
+      },
+      {
+        "Data Format": "Data Cleaning",
+        "Python Li- brary": "Trifacta Wran- gler",
+        "Description": "Trifacta Wrangler focuses on simplify- ing and automating data wrangling pro- cesses, transforming raw data into clean and structured formats.",
+        "Library Link": "Trifacta Wrangler documentation"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_f0fcef27b135_p21_t1",
+    "doc_id": "doc_f0fcef27b135",
+    "page": 21,
+    "title": "Table 1 (Page 21): Library Name, Data Preprocessing Options, Link",
+    "columns": [
+      "Library Name",
+      "Data Preprocessing Options",
+      "Link"
+    ],
+    "rows_count": 4,
+    "markdown": "|Library Name|Data Preprocessing Options|Link|\n|---|---|---|\n|spaCy|spaCy provides robust capabilities for text prepro-<br>cessing, including tokenization, lemmatization, and<br>efficient sentence boundary detection.|spaCy documentation|\n|NLTK|NLTK offers a comprehensive set of tools for data<br>preprocessing, such as tokenization, stemming, and<br>stop word removal.|NLTK documentation|\n|HuggingFace|HuggingFace provides extensive capabilities for<br>text preprocessing through its transformers library,<br>including functionalities for tokenization and sup-<br>port for various pre-trained models.|HuggingFace documentation|\n|KNIME|KNIME Analytics Platform allows visual workflow<br>design for data integration, preprocessing, and ad-<br>vanced manipulations like text mining and image<br>analysis.|KNIME documentation|\n\n",
+    "row_facts": [
+      "Row 1: [Library Name] = spaCy, [Data Preprocessing Options] = spaCy provides robust capabilities for text prepro- cessing, including tokenization, lemmatization, and efficient sentence boundary detection., [Link] = spaCy documentation",
+      "Row 2: [Library Name] = NLTK, [Data Preprocessing Options] = NLTK offers a comprehensive set of tools for data preprocessing, such as tokenization, stemming, and stop word removal., [Link] = NLTK documentation",
+      "Row 3: [Library Name] = HuggingFace, [Data Preprocessing Options] = HuggingFace provides extensive capabilities for text preprocessing through its transformers library, including functionalities for tokenization and sup- port for various pre-trained models., [Link] = HuggingFace documentation",
+      "Row 4: [Library Name] = KNIME, [Data Preprocessing Options] = KNIME Analytics Platform allows visual workflow design for data integration, preprocessing, and ad- vanced manipulations like text mining and image analysis., [Link] = KNIME documentation"
+    ],
+    "records": [
+      {
+        "Library Name": "spaCy",
+        "Data Preprocessing Options": "spaCy provides robust capabilities for text prepro- cessing, including tokenization, lemmatization, and efficient sentence boundary detection.",
+        "Link": "spaCy documentation"
+      },
+      {
+        "Library Name": "NLTK",
+        "Data Preprocessing Options": "NLTK offers a comprehensive set of tools for data preprocessing, such as tokenization, stemming, and stop word removal.",
+        "Link": "NLTK documentation"
+      },
+      {
+        "Library Name": "HuggingFace",
+        "Data Preprocessing Options": "HuggingFace provides extensive capabilities for text preprocessing through its transformers library, including functionalities for tokenization and sup- port for various pre-trained models.",
+        "Link": "HuggingFace documentation"
+      },
+      {
+        "Library Name": "KNIME",
+        "Data Preprocessing Options": "KNIME Analytics Platform allows visual workflow design for data integration, preprocessing, and ad- vanced manipulations like text mining and image analysis.",
+        "Link": "KNIME documentation"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_f0fcef27b135_p26_t1",
+    "doc_id": "doc_f0fcef27b135",
+    "page": 26,
+    "title": "Table 1 (Page 26): Challenge, Description",
+    "columns": [
+      "Challenge",
+      "Description"
+    ],
+    "rows_count": 10,
+    "markdown": "|Challenge|Description|\n|---|---|\n|Alignment with the<br>Target Task|It\u2019s essential that the pre-trained model closely aligns with your specific<br>task or domain. This initial alignment serves as a solid foundation for<br>further fine-tuning efforts, leading to improved efficiency and results[38].|\n|Understanding the<br>Pre-trained Model|Before making a selection, it\u2019s crucial to thoroughly comprehend the<br>architecture, capabilities, limitations, and the tasks the model was orig-<br>inally trained on. Without this understanding, fine-tuning efforts may<br>not yield the desired outcomes [23].|\n|Availability and<br>Compatibility|Careful consideration of a model\u2019s documentation, license, maintenance,<br>and update frequency is necessary to avoid potential issues and ensure<br>smooth integration into your application.|\n|Model Architecture|Not all models excel at every task.<br>Each model architecture has its<br>strengths and weaknesses, so selecting one aligned with your specific<br>task is essential for favourable outcomes [39].|\n|Resource Constraints|Loading pre-trained LLMs is resource-heavy and requires more compu-<br>tation. These models need high-performance CPUs and GPUs and a<br>significant amount of disk space. For instance, the Llama 3 8B model<br>requires a minimum of 16GB of memory to load and run the inference.|\n|Privacy|Privacy and confidentiality are crucial factors when selecting a large lan-<br>guage model (LLM). Many businesses prefer not to share their data<br>with external LLM providers.<br>In such instances, hosting an LLM on<br>local servers or using pre-trained LLMs available through private cloud<br>providers can be viable solutions. These approaches ensure that data<br>remains within the company\u2019s premises, thereby preserving privacy and<br>confidentiality.|\n|Cost and Maintenance|Hosting LLMs on local servers entails significant time and expense for<br>setup and ongoing maintenance. Conversely, utilising cloud vendors al-<br>leviates concerns about resource maintenance but incurs monthly billing<br>costs. These charges are typically based on factors such as model size<br>and the volume of requests per minute.|\n|Model Size and<br>Quantisation|utilising a pre-trained model with high memory consumption can still be<br>viable by employing its quantised version. Through quantisation, pre-<br>trained weights can be loaded with reduced precision, typically 4-bit or<br>8-bit floating point, substantially diminishing parameter volume while<br>maintaining considerable accuracy [40].|\n|Pre-training Datasets|Examine the datasets used for pre-training to gauge the model\u2019s under-<br>standing of language. These are important as there are models available<br>specifically for performing code generation, and we do not want to use<br>those models for finance text classification [41].|\n|Bias Awareness|Be vigilant regarding potential biases in pre-trained models, especially if<br>unbiased predictions are required. The bias awareness can be evaluated<br>by testing different models and backtracking the datasets used for pre-<br>training [42].|\n\n",
+    "row_facts": [
+      "Row 1: [Challenge] = Alignment with the Target Task, [Description] = It\u2019s essential that the pre-trained model closely aligns with your specific task or domain. This initial alignment serves as a solid foundation for further fine-tuning efforts, leading to improved efficiency and results [38].",
+      "Row 2: [Challenge] = Understanding the Pre-trained Model, [Description] = Before making a selection, it\u2019s crucial to thoroughly comprehend the architecture, capabilities, limitations, and the tasks the model was orig- inally trained on. Without this understanding, fine-tuning efforts may not yield the desired outcomes [23].",
+      "Row 3: [Challenge] = Availability and Compatibility, [Description] = Careful consideration of a model\u2019s documentation, license, maintenance, and update frequency is necessary to avoid potential issues and ensure smooth integration into your application.",
+      "Row 4: [Challenge] = Model Architecture, [Description] = Not all models excel at every task. Each model architecture has its strengths and weaknesses, so selecting one aligned with your specific task is essential for favourable outcomes [39].",
+      "Row 5: [Challenge] = Resource Constraints, [Description] = Loading pre-trained LLMs is resource-heavy and requires more compu- tation. These models need high-performance CPUs and GPUs and a significant amount of disk space. For instance, the Llama 3 8B model requires a minimum of 16GB of memory to load and run the inference.",
+      "Row 6: [Challenge] = Privacy, [Description] = Privacy and confidentiality are crucial factors when selecting a large lan- guage model (LLM). Many businesses prefer not to share their data with external LLM providers. In such instances, hosting an LLM on local servers or using pre-trained LLMs available through private cloud providers can be viable solutions. These approaches ensure that data remains within the company\u2019s premises, thereby preserving privacy and confidentiality.",
+      "Row 7: [Challenge] = Cost and Maintenance, [Description] = Hosting LLMs on local servers entails significant time and expense for setup and ongoing maintenance. Conversely, utilising cloud vendors al- leviates concerns about resource maintenance but incurs monthly billing costs. These charges are typically based on factors such as model size and the volume of requests per minute.",
+      "Row 8: [Challenge] = Model Size and Quantisation, [Description] = utilising a pre-trained model with high memory consumption can still be viable by employing its quantised version. Through quantisation, pre- trained weights can be loaded with reduced precision, typically 4-bit or 8-bit floating point, substantially diminishing parameter volume while maintaining considerable accuracy [40].",
+      "Row 9: [Challenge] = Pre-training Datasets, [Description] = Examine the datasets used for pre-training to gauge the model\u2019s under- standing of language. These are important as there are models available specifically for performing code generation, and we do not want to use those models for finance text classifciation [41].",
+      "Row 10: [Challenge] = Bias Awareness, [Description] = Be vigilant regarding potential biases in pre-trained models, especially if unbiased predictions are required. The bias awareness can be evaluated by testing different models and backtracking the datasets used for pre- training [42]."
+    ],
+    "records": [
+      {
+        "Challenge": "Alignment with the Target Task",
+        "Description": "It\u2019s essential that the pre-trained model closely aligns with your specific task or domain. This initial alignment serves as a solid foundation for further fine-tuning efforts, leading to improved efficiency and results [38]."
+      },
+      {
+        "Challenge": "Understanding the Pre-trained Model",
+        "Description": "Before making a selection, it\u2019s crucial to thoroughly comprehend the architecture, capabilities, limitations, and the tasks the model was orig- inally trained on. Without this understanding, fine-tuning efforts may not yield the desired outcomes [23]."
+      },
+      {
+        "Challenge": "Availability and Compatibility",
+        "Description": "Careful consideration of a model\u2019s documentation, license, maintenance, and update frequency is necessary to avoid potential issues and ensure smooth integration into your application."
+      },
+      {
+        "Challenge": "Model Architecture",
+        "Description": "Not all models excel at every task. Each model architecture has its strengths and weaknesses, so selecting one aligned with your specific task is essential for favourable outcomes [39]."
+      },
+      {
+        "Challenge": "Resource Constraints",
+        "Description": "Loading pre-trained LLMs is resource-heavy and requires more compu- tation. These models need high-performance CPUs and GPUs and a significant amount of disk space. For instance, the Llama 3 8B model requires a minimum of 16GB of memory to load and run the inference."
+      },
+      {
+        "Challenge": "Privacy",
+        "Description": "Privacy and confidentiality are crucial factors when selecting a large lan- guage model (LLM). Many businesses prefer not to share their data with external LLM providers. In such instances, hosting an LLM on local servers or using pre-trained LLMs available through private cloud providers can be viable solutions. These approaches ensure that data remains within the company\u2019s premises, thereby preserving privacy and confidentiality."
+      },
+      {
+        "Challenge": "Cost and Maintenance",
+        "Description": "Hosting LLMs on local servers entails significant time and expense for setup and ongoing maintenance. Conversely, utilising cloud vendors al- leviates concerns about resource maintenance but incurs monthly billing costs. These charges are typically based on factors such as model size and the volume of requests per minute."
+      },
+      {
+        "Challenge": "Model Size and Quantisation",
+        "Description": "utilising a pre-trained model with high memory consumption can still be viable by employing its quantised version. Through quantisation, pre- trained weights can be loaded with reduced precision, typically 4-bit or 8-bit floating point, substantially diminishing parameter volume while maintaining considerable accuracy [40]."
+      },
+      {
+        "Challenge": "Pre-training Datasets",
+        "Description": "Examine the datasets used for pre-training to gauge the model\u2019s under- standing of language. These are important as there are models available specifically for performing code generation, and we do not want to use those models for finance text classifciation [41]."
+      },
+      {
+        "Challenge": "Bias Awareness",
+        "Description": "Be vigilant regarding potential biases in pre-trained models, especially if unbiased predictions are required. The bias awareness can be evaluated by testing different models and backtracking the datasets used for pre- training [42]."
+      }
+    ]
+  },
+  {
+    "table_id": "doc_f0fcef27b135_p37_t1",
+    "doc_id": "doc_f0fcef27b135",
+    "page": 37,
+    "title": "Table 1 (Page 37): Task, Description, Key Models",
+    "columns": [
+      "Task",
+      "Description",
+      "Key Models"
+    ],
+    "rows_count": 4,
+    "markdown": "|Task|Description|Key Models|\n|---|---|---|\n|**Text Summarisation**|Condensing long texts into coherent sum-<br>maries while retaining key information. Ap-<br>proaches include Extractive (selecting key<br>sentences) and Abstractive summarisation<br>(generating new sentences).|BERTSUM, GPT-3, T5|\n|**Code Generation**|Automatically generating programming code<br>based on natural language descriptions, par-<br>tial code snippets, or structured data inputs.|Codex, GPT-3, CodeBERT|\n|**Classification**|Categorising text into predefined labels such<br>as Sentiment Analysis, Topic Classification,<br>and Entity Classification.|BERT, RoBERTa, GPT-4|\n|**Q&A**|Understanding and generating accurate, con-<br>textually relevant answers to natural lan-<br>guage questions.|BERT, GPT-3, T5|\n\n",
+    "row_facts": [
+      "Row 1: [Task] = Text Summarisation, [Description] = Condensing long texts into coherent sum- maries while retaining key information. Ap- proaches include Extractive (selecting key sentences) and Abstractive summarisation (generating new sentences)., [Key Models] = BERTSUM, GPT-3, T5",
+      "Row 2: [Task] = Code Generation, [Description] = Automatically generating programming code based on natural language descriptions, par- tial code snippets, or structured data inputs., [Key Models] = Codex, GPT-3, CodeBERT",
+      "Row 3: [Task] = Classification, [Description] = Categorising text into predefined labels such as Sentiment Analysis, Topic Classifciation, and Entity Classification., [Key Models] = BERT, RoBERTa, GPT-4",
+      "Row 4: [Task] = Q&A, [Description] = Understanding and generating accurate, con- textually relevant answers to natural lan- guage questions., [Key Models] = BERT, GPT-3, T5"
+    ],
+    "records": [
+      {
+        "Task": "Text Summarisation",
+        "Description": "Condensing long texts into coherent sum- maries while retaining key information. Ap- proaches include Extractive (selecting key sentences) and Abstractive summarisation (generating new sentences).",
+        "Key Models": "BERTSUM, GPT-3, T5"
+      },
+      {
+        "Task": "Code Generation",
+        "Description": "Automatically generating programming code based on natural language descriptions, par- tial code snippets, or structured data inputs.",
+        "Key Models": "Codex, GPT-3, CodeBERT"
+      },
+      {
+        "Task": "Classification",
+        "Description": "Categorising text into predefined labels such as Sentiment Analysis, Topic Classifciation, and Entity Classification.",
+        "Key Models": "BERT, RoBERTa, GPT-4"
+      },
+      {
+        "Task": "Q&A",
+        "Description": "Understanding and generating accurate, con- textually relevant answers to natural lan- guage questions.",
+        "Key Models": "BERT, GPT-3, T5"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_f0fcef27b135_p45_t1",
+    "doc_id": "doc_f0fcef27b135",
+    "page": 45,
+    "title": "Table 1 (Page 45): Criteria, LoRA (Low-Rank Adapta- tion), DoRA (Weight-Decomposed Low-Rank Adaptation)",
+    "columns": [
+      "Criteria",
+      "LoRA (Low-Rank Adapta- tion)",
+      "DoRA (Weight-Decomposed Low-Rank Adaptation)"
+    ],
+    "rows_count": 3,
+    "markdown": "|Criteria|LoRA (Low-Rank Adapta-<br>tion)|DoRA (Weight-Decomposed<br>Low-Rank Adaptation)|\n|---|---|---|\n|**Objective**|Provide an efficient method for<br>fine-tuning pre-trained models by<br>using low-rank matrix products<br>to update weights incrementally<br>without increasing inference la-<br>tency.|Improves<br>learning<br>capacity<br>by<br>closely mimicking the learning pat-<br>terns of full fine-tuning, optimis-<br>ing magnitude and direction sep-<br>arately.|\n|**Approach**|Implements a low-rank decompo-<br>sition where the weight update is<br>modelled as the product of two<br>low-rank matrices (B and A), keep-<br>ing the original weights static.|Uses weight decomposition anal-<br>ysis to reparameterise the weight<br>matrix into separate magnitude<br>and direction components for dis-<br>tinct updates.|\n|**Model Architecture**|Keeps the pre-trained weight ma-<br>trix (W0) unchanged and applies<br>updates using low-rank matrices<br>(B and A). Matrix A is initialised<br>with a uniform Kaiming distribu-<br>tion, while B is set to zero initially.|Restructures<br>the<br>weight<br>matrix<br>into<br>magnitude<br>and<br>directional<br>components, ensuring directional<br>vectors are unit vectors for more<br>detailed adjustments.|\n\n",
+    "row_facts": [
+      "Row 1: [Criteria] = Objective, [LoRA (Low-Rank Adapta- tion)] = Provide an efficient method for fine-tuning pre-trained models by using low-rank matrix products to update weights incrementally without increasing inference la- tency., [DoRA (Weight-Decomposed Low-Rank Adaptation)] = Improves learning capacity by closely mimicking the learning pat- terns of full fine-tuning, optimis- ing magnitude and direction sep- arately.",
+      "Row 2: [Criteria] = Approach, [LoRA (Low-Rank Adapta- tion)] = Implements a low-rank decompo- sition where the weight update is modelled as the product of two low-rank matrices (B and A), keep- ing the original weights static., [DoRA (Weight-Decomposed Low-Rank Adaptation)] = Uses weight decomposition anal- ysis to reparameterise the weight matrix into separate magnitude and direction components for dis- tinct updates.",
+      "Row 3: [Criteria] = Model Architecture, [LoRA (Low-Rank Adapta- tion)] = Keeps the pre-trained weight ma- trix (W0) unchanged and applies updates using low-rank matrices (B and A). Matrix A is initialised with a uniform Kaiming distribu- tion, while B is set to zero initially., [DoRA (Weight-Decomposed Low-Rank Adaptation)] = Restructures the weight matrix into magnitude and directional components, ensuring directional vectors are unit vectors for more detailed adjustments."
+    ],
+    "records": [
+      {
+        "Criteria": "Objective",
+        "LoRA (Low-Rank Adapta- tion)": "Provide an efficient method for fine-tuning pre-trained models by using low-rank matrix products to update weights incrementally without increasing inference la- tency.",
+        "DoRA (Weight-Decomposed Low-Rank Adaptation)": "Improves learning capacity by closely mimicking the learning pat- terns of full fine-tuning, optimis- ing magnitude and direction sep- arately."
+      },
+      {
+        "Criteria": "Approach",
+        "LoRA (Low-Rank Adapta- tion)": "Implements a low-rank decompo- sition where the weight update is modelled as the product of two low-rank matrices (B and A), keep- ing the original weights static.",
+        "DoRA (Weight-Decomposed Low-Rank Adaptation)": "Uses weight decomposition anal- ysis to reparameterise the weight matrix into separate magnitude and direction components for dis- tinct updates."
+      },
+      {
+        "Criteria": "Model Architecture",
+        "LoRA (Low-Rank Adapta- tion)": "Keeps the pre-trained weight ma- trix (W0) unchanged and applies updates using low-rank matrices (B and A). Matrix A is initialised with a uniform Kaiming distribu- tion, while B is set to zero initially.",
+        "DoRA (Weight-Decomposed Low-Rank Adaptation)": "Restructures the weight matrix into magnitude and directional components, ensuring directional vectors are unit vectors for more detailed adjustments."
+      }
+    ]
+  },
+  {
+    "table_id": "doc_f0fcef27b135_p48_t1",
+    "doc_id": "doc_f0fcef27b135",
+    "page": 48,
+    "title": "Table 1 (Page 48): Criteria, HFT, LoRA",
+    "columns": [
+      "Criteria",
+      "HFT",
+      "LoRA"
+    ],
+    "rows_count": 4,
+    "markdown": "|Criteria|HFT|LoRA|\n|---|---|---|\n|**Objective**|The goal is to retain the foun-<br>dational knowledge acquired dur-<br>ing pre-training while learning new<br>task-specific skills, thus balancing<br>between maintaining existing ca-<br>pabilities and acquiring new ones.|LoRA aims to reduce computa-<br>tional and memory requirements<br>during fine-tuning, making it more<br>efficient and feasible to train large<br>models on limited hardware re-<br>sources.|\n|**Approach**|HFT involves freezing half of the<br>model\u2019s parameters during each<br>fine-tuning round and updating<br>only the other half.|LoRA reduces the number of train-<br>able parameters by<br>introducing<br>low-rank decomposition into the<br>weight matrices of the neural net-<br>work. This involves injecting low-<br>rank matrices into the model\u2019s lay-<br>ers during fine-tuning.|\n|**Model Architecture**|HFT does not alter the model\u2019s ar-<br>chitecture or introduce new param-<br>eters, making it straightforward<br>to apply without additional struc-<br>tural changes.|LoRA<br>modifies<br>the<br>model<br>by<br>adding low-rank matrices, which<br>changes the training dynamics and<br>requires additional computations<br>for the low-rank updates.|\n|**Performance**|Research has shown that HFT<br>can restore forgotten basic knowl-<br>edge while maintaining high per-<br>formance in general abilities.|LoRA is designed to achieve com-<br>petitive performance with full fine-<br>tuning but with significantly fewer<br>trainable<br>parameters<br>and<br>lower<br>computational costs.|\n\n",
+    "row_facts": [
+      "Row 1: [Criteria] = Objective, [HFT] = The goal is to retain the foun- dational knowledge acquired dur- ing pre-training while learning new task-specific skills, thus balancing between maintaining existing ca- pabilities and acquiring new ones., [LoRA] = LoRA aims to reduce computa- tional and memory requirements during fine-tuning, making it more efficient and feasible to train large models on limited hardware re- sources.",
+      "Row 2: [Criteria] = Approach, [HFT] = HFT involves freezing half of the model\u2019s parameters during each fine-tuning round and updating only the other half., [LoRA] = LoRA reduces the number of train- able parameters by introducing low-rank decomposition into the weight matrices of the neural net- work. This involves injecting low- rank matrices into the model\u2019s lay- ers during fine-tuning.",
+      "Row 3: [Criteria] = Model Architecture, [HFT] = HFT does not alter the model\u2019s ar- chitecture or introduce new param- eters, making it straightforward to apply without additional struc- tural changes., [LoRA] = LoRA modifies the model by adding low-rank matrices, which changes the training dynamics and requires additional computations for the low-rank updates.",
+      "Row 4: [Criteria] = Performance, [HFT] = Research has shown that HFT can restore forgotten basic knowl- edge while maintaining high per- formance in general abilities., [LoRA] = LoRA is designed to achieve com- petitive performance with full fine- tuning but with signifciantly fewer trainable parameters and lower computational costs."
+    ],
+    "records": [
+      {
+        "Criteria": "Objective",
+        "HFT": "The goal is to retain the foun- dational knowledge acquired dur- ing pre-training while learning new task-specific skills, thus balancing between maintaining existing ca- pabilities and acquiring new ones.",
+        "LoRA": "LoRA aims to reduce computa- tional and memory requirements during fine-tuning, making it more efficient and feasible to train large models on limited hardware re- sources."
+      },
+      {
+        "Criteria": "Approach",
+        "HFT": "HFT involves freezing half of the model\u2019s parameters during each fine-tuning round and updating only the other half.",
+        "LoRA": "LoRA reduces the number of train- able parameters by introducing low-rank decomposition into the weight matrices of the neural net- work. This involves injecting low- rank matrices into the model\u2019s lay- ers during fine-tuning."
+      },
+      {
+        "Criteria": "Model Architecture",
+        "HFT": "HFT does not alter the model\u2019s ar- chitecture or introduce new param- eters, making it straightforward to apply without additional struc- tural changes.",
+        "LoRA": "LoRA modifies the model by adding low-rank matrices, which changes the training dynamics and requires additional computations for the low-rank updates."
+      },
+      {
+        "Criteria": "Performance",
+        "HFT": "Research has shown that HFT can restore forgotten basic knowl- edge while maintaining high per- formance in general abilities.",
+        "LoRA": "LoRA is designed to achieve com- petitive performance with full fine- tuning but with signifciantly fewer trainable parameters and lower computational costs."
+      }
+    ]
+  },
+  {
+    "table_id": "doc_f0fcef27b135_p63_t1",
+    "doc_id": "doc_f0fcef27b135",
+    "page": 63,
+    "title": "Table 1 (Page 63): Benchmark, Description, Reference URL",
+    "columns": [
+      "Benchmark",
+      "Description",
+      "Reference URL"
+    ],
+    "rows_count": 20,
+    "markdown": "|Benchmark|Description|Reference URL|\n|---|---|---|\n|GLUE|Provides a standardised set of diverse NLP tasks to<br>evaluate the effectiveness of different language mod-<br>els|Source|\n|SuperGLUE|Compares more challenging and diverse tasks with<br>GLUE, with comprehensive human baselines|Source|\n|HellaSwag|Evaluates how well an LLM can complete a sentence|Source|\n|TruthfulQA|Measures truthfulness of model responses|Source|\n|MMLU|Evaluates how well the LLM can multitask|Source|\n|IFEval|Tests a model\u2019s ability to follow explicit instructions,<br>focusing on formatting adherence|Source|\n|BBH (Big Bench Hard)|23 challenging tasks from the BigBench dataset to<br>evaluate LLMs using objective metrics|Source|\n|MATH|Compilation of high-school level competition prob-<br>lems formatted using LaTeX and Asymptote|Source|\n|GPQA|Challenging<br>knowledge<br>dataset<br>with<br>questions<br>crafted by PhD-level domain experts|Source|\n|MuSR|Dataset with complex problems requiring models to<br>integrate reasoning with long-range context parsing|Source|\n|MMLU-PRO|Refined version of MMLU with higher quality and<br>more challenging multiple-choice questions|Source|\n|ARC|Measures machine reasoning with a dataset of grade-<br>school science questions|Source|\n|COQA|A dataset for building conversational question-<br>answering systems|Source|\n|DROP|Evaluates the ability to perform discrete reasoning<br>over paragraphs of text|Source|\n|SQuAD|A reading comprehension dataset for evaluating<br>models\u2019 ability to answer questions based on pas-<br>sages of text|Source|\n|TREC|A benchmark for evaluating text retrieval method-<br>ologies|Source|\n|WMT|A dataset and benchmark for evaluating machine<br>translation models|Source|\n|XNLI|A dataset for evaluating cross-lingual language un-<br>derstanding|Source|\n|PiQA|A dataset for evaluating models\u2019 understanding of<br>physical interactions|Source|\n|Winogrande|A large-scale dataset for evaluating commonsense<br>reasoning|Source|\n\n",
+    "row_facts": [
+      "Row 1: [Benchmark] = GLUE, [Description] = Provides a standardised set of diverse NLP tasks to evaluate the effectiveness of different language mod- els, [Reference URL] = Source",
+      "Row 2: [Benchmark] = SuperGLUE, [Description] = Compares more challenging and diverse tasks with GLUE, with comprehensive human baselines, [Reference URL] = Source",
+      "Row 3: [Benchmark] = HellaSwag, [Description] = Evaluates how well an LLM can complete a sentence, [Reference URL] = Source",
+      "Row 4: [Benchmark] = TruthfulQA, [Description] = Measures truthfulness of model responses, [Reference URL] = Source",
+      "Row 5: [Benchmark] = MMLU, [Description] = Evaluates how well the LLM can multitask, [Reference URL] = Source",
+      "Row 6: [Benchmark] = IFEval, [Description] = Tests a model\u2019s ability to follow explicit instructions, focusing on formatting adherence, [Reference URL] = Source",
+      "Row 7: [Benchmark] = BBH (Big Bench Hard), [Description] = 23 challenging tasks from the BigBench dataset to evaluate LLMs using objective metrics, [Reference URL] = Source",
+      "Row 8: [Benchmark] = MATH, [Description] = Compilation of high-school level competition prob- lems formatted using LaTeX and Asymptote, [Reference URL] = Source",
+      "Row 9: [Benchmark] = GPQA, [Description] = Challenging knowledge dataset with questions crafted by PhD-level domain experts, [Reference URL] = Source",
+      "Row 10: [Benchmark] = MuSR, [Description] = Dataset with complex problems requiring models to integrate reasoning with long-range context parsing, [Reference URL] = Source",
+      "Row 11: [Benchmark] = MMLU-PRO, [Description] = Refined version of MMLU with higher quality and more challenging multiple-choice questions, [Reference URL] = Source",
+      "Row 12: [Benchmark] = ARC, [Description] = Measures machine reasoning with a dataset of grade- school science questions, [Reference URL] = Source",
+      "Row 13: [Benchmark] = COQA, [Description] = A dataset for building conversational question- answering systems, [Reference URL] = Source",
+      "Row 14: [Benchmark] = DROP, [Description] = Evaluates the ability to perform discrete reasoning over paragraphs of text, [Reference URL] = Source",
+      "Row 15: [Benchmark] = SQuAD, [Description] = A reading comprehension dataset for evaluating models\u2019 ability to answer questions based on pas- sages of text, [Reference URL] = Source",
+      "Row 16: [Benchmark] = TREC, [Description] = A benchmark for evaluating text retrieval method- ologies, [Reference URL] = Source",
+      "Row 17: [Benchmark] = WMT, [Description] = A dataset and benchmark for evaluating machine translation models, [Reference URL] = Source",
+      "Row 18: [Benchmark] = XNLI, [Description] = A dataset for evaluating cross-lingual language un- derstanding, [Reference URL] = Source",
+      "Row 19: [Benchmark] = PiQA, [Description] = A dataset for evaluating models\u2019 understanding of physical interactions, [Reference URL] = Source",
+      "Row 20: [Benchmark] = Winogrande, [Description] = A large-scale dataset for evaluating commonsense reasoning, [Reference URL] = Source"
+    ],
+    "records": [
+      {
+        "Benchmark": "GLUE",
+        "Description": "Provides a standardised set of diverse NLP tasks to evaluate the effectiveness of different language mod- els",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "SuperGLUE",
+        "Description": "Compares more challenging and diverse tasks with GLUE, with comprehensive human baselines",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "HellaSwag",
+        "Description": "Evaluates how well an LLM can complete a sentence",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "TruthfulQA",
+        "Description": "Measures truthfulness of model responses",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "MMLU",
+        "Description": "Evaluates how well the LLM can multitask",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "IFEval",
+        "Description": "Tests a model\u2019s ability to follow explicit instructions, focusing on formatting adherence",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "BBH (Big Bench Hard)",
+        "Description": "23 challenging tasks from the BigBench dataset to evaluate LLMs using objective metrics",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "MATH",
+        "Description": "Compilation of high-school level competition prob- lems formatted using LaTeX and Asymptote",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "GPQA",
+        "Description": "Challenging knowledge dataset with questions crafted by PhD-level domain experts",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "MuSR",
+        "Description": "Dataset with complex problems requiring models to integrate reasoning with long-range context parsing",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "MMLU-PRO",
+        "Description": "Refined version of MMLU with higher quality and more challenging multiple-choice questions",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "ARC",
+        "Description": "Measures machine reasoning with a dataset of grade- school science questions",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "COQA",
+        "Description": "A dataset for building conversational question- answering systems",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "DROP",
+        "Description": "Evaluates the ability to perform discrete reasoning over paragraphs of text",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "SQuAD",
+        "Description": "A reading comprehension dataset for evaluating models\u2019 ability to answer questions based on pas- sages of text",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "TREC",
+        "Description": "A benchmark for evaluating text retrieval method- ologies",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "WMT",
+        "Description": "A dataset and benchmark for evaluating machine translation models",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "XNLI",
+        "Description": "A dataset for evaluating cross-lingual language un- derstanding",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "PiQA",
+        "Description": "A dataset for evaluating models\u2019 understanding of physical interactions",
+        "Reference URL": "Source"
+      },
+      {
+        "Benchmark": "Winogrande",
+        "Description": "A large-scale dataset for evaluating commonsense reasoning",
+        "Reference URL": "Source"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_f0fcef27b135_p79_t1",
+    "doc_id": "doc_f0fcef27b135",
+    "page": 79,
+    "title": "Table 1 (Page 79): Parameter, NVIDIA NeMo, Hugging Face AutoTrain API, Amazon Bedrock",
+    "columns": [
+      "Parameter",
+      "NVIDIA NeMo",
+      "Hugging Face AutoTrain API",
+      "Amazon Bedrock",
+      "AWS Sage- Maker Jump- Start",
+      "Hugging Face Trainer API"
+    ],
+    "rows_count": 10,
+    "markdown": "|Parameter|NVIDIA<br>NeMo|Hugging Face<br>AutoTrain<br>API|Amazon<br>Bedrock|AWS Sage-<br>Maker Jump-<br>Start|Hugging Face<br>Trainer API|\n|---|---|---|---|---|---|\n|**Primary Use**<br>**Case**|Custom<br>fine-<br>tuning of LLMs<br>with<br>advanced<br>NVIDIA GPUs.|Fine-tuning<br>and deployment<br>of<br>LLMs<br>with<br>minimal code.|Fine-tuning and<br>deploying LLMs<br>on AWS infras-<br>tructure.|Simplified<br>fine-<br>tuning and de-<br>ployment within<br>the AWS ecosys-<br>tem.|Manual<br>fine-<br>tuning of LLMs<br>with<br>detailed<br>control<br>over<br>training<br>pro-<br>cesses.|\n|**Model Support**|Supports a vari-<br>ety of large, pre-<br>trained<br>models,<br>including Mega-<br>tron series.|Supports a wide<br>range<br>of<br>pre-<br>trained<br>models<br>from<br>the<br>Hug-<br>ging Face model<br>hub.|Supports<br>vari-<br>ous<br>LLMs<br>like<br>Amazon<br>Titan<br>and<br>third-party<br>models.|Pre-trained<br>models<br>from<br>AWS and part-<br>ners; integration<br>with<br>custom<br>models.|Supports a vast<br>array of models<br>from<br>the<br>Hug-<br>ging Face model<br>hub.|\n|**Data Handling**|Users<br>provide<br>task-specific<br>data<br>for<br>fine-<br>tuning,<br>pro-<br>cessed<br>using<br>NVIDIA\u2019s<br>in-<br>frastructure.|Uploads<br>datasets<br>via<br>a<br>simple<br>inter-<br>face; AutoTrain<br>handles<br>pre-<br>processing<br>and<br>model training.|Data is uploaded<br>and<br>managed<br>within the AWS<br>environment;<br>integrates<br>with<br>AWS data ser-<br>vices.|Uploads<br>and<br>processes<br>data<br>within<br>AWS;<br>supports various<br>data formats.|Users<br>manually<br>preprocess data<br>and<br>manage<br>training steps.|\n|**Customisation**<br>**Level**|High;<br>extensive<br>control<br>over<br>fine-tuning pro-<br>cess and model<br>parameters.|Moderate; auto-<br>mated<br>process<br>with<br>some<br>customisation<br>options.|High;<br>detailed<br>configuration<br>and<br>integration<br>with AWS ser-<br>vices.|Moderate;<br>pre-configured<br>settings<br>with<br>some customisa-<br>tion available.|Very<br>High;<br>detailed<br>con-<br>trol<br>over<br>every<br>aspect<br>of<br>fine-<br>tuning.|\n|**Scalability**|High;<br>leverages<br>NVIDIA\u2019s GPU<br>capabilities<br>for<br>efficient scaling.|High;<br>scalable<br>via<br>Hugging<br>Face\u2019s<br>cloud<br>infrastructure.|Very<br>High;<br>scalable<br>across<br>AWS\u2019s extensive<br>cloud infrastruc-<br>ture.|High;<br>scalable<br>within the AWS<br>cloud<br>ecosys-<br>tem.|High; scalability<br>depends on the<br>infrastructure<br>used (e.g., local<br>vs. cloud).|\n|**Deployment**<br>**Options**|On-premises<br>or<br>cloud<br>de-<br>ployment<br>via<br>NVIDIA infras-<br>tructure.|Deployed<br>via<br>Hugging<br>Face\u2019s<br>cloud or can be<br>exported for lo-<br>cal deployment.|Integrated<br>into<br>AWS<br>services,<br>easily<br>deploy-<br>able<br>across<br>AWS\u2019s<br>global<br>infrastructure.|AWS<br>cloud<br>deployment;<br>integrates<br>with<br>other AWS ser-<br>vices.|Deployable<br>lo-<br>cally,<br>in cloud,<br>or<br>exported<br>to<br>other platforms.|\n|**Integration with**<br>**Ecosystem**|Deep integration<br>with<br>NVIDIA<br>tools<br>(e.g.,<br>TensorRT)<br>and<br>GPU-based<br>workflows.|Integrates<br>well<br>with<br>the<br>Hugging<br>Face<br>ecosystem<br>and<br>other ML tools.|Seamless<br>inte-<br>gration<br>with<br>AWS<br>ser-<br>vices<br>(e.g.,<br>S3,<br>Lambda,<br>Sage-<br>Maker).|Strong<br>integra-<br>tion with AWS<br>services;<br>easy<br>to connect with<br>data<br>pipelines<br>and analytics.|Integrates<br>with<br>Hugging<br>Face<br>ecosystem<br>and<br>other<br>Python-<br>based ML tools.|\n|**Data Privacy**|Users<br>must<br>ensure<br>data<br>privacy<br>compli-<br>ance;<br>NVIDIA<br>handles<br>data<br>during<br>process-<br>ing.|Data<br>handled<br>within<br>Hugging<br>Face\u2019s<br>environ-<br>ment;<br>privacy<br>depends<br>on<br>data<br>handling<br>practices.|Strong<br>focus<br>on data privacy<br>within<br>AWS<br>environment;<br>compliant<br>with<br>various<br>stan-<br>dards.|Strong<br>AWS<br>privacy<br>and<br>security<br>mea-<br>sures; compliant<br>with<br>industry<br>standards.|User-managed;<br>depends<br>on<br>where the mod-<br>els and data are<br>hosted.|\n|**Target Users**|Enterprises and<br>developers need-<br>ing<br>advanced<br>customisation<br>and<br>perfor-<br>mance in LLM<br>fine-tuning.|Developers<br>and<br>businesses look-<br>ing<br>for<br>easy,<br>automated LLM<br>fine-tuning solu-<br>tions.|Businesses<br>and<br>developers inte-<br>grated<br>into<br>or<br>seeking to lever-<br>age AWS cloud<br>services.|Enterprises and<br>developers seek-<br>ing<br>streamlined<br>AI/ML solutions<br>within AWS.|Researchers,<br>developers,<br>and<br>ML<br>engineers<br>needing detailed<br>control<br>over<br>training.|\n|**Limitations**|High<br>resource<br>demand<br>and<br>potential<br>costs;<br>dependency<br>on<br>NVIDIA ecosys-<br>tem.|Less<br>control<br>over fine-tuning<br>specifics; cloud-<br>based,<br>may<br>not suit all on-<br>premises needs.|Dependency<br>on<br>AWS;<br>po-<br>tential<br>vendor<br>lock-in,<br>cost<br>management<br>complexity.|Limited<br>to<br>AWS<br>services;<br>pre-configured<br>options<br>may<br>limit deep cus-<br>tomisation.|Requires<br>tech-<br>nical<br>expertise;<br>more<br>complex<br>setup and man-<br>agement.|\n\n",
+    "row_facts": [
+      "Row 1: [Parameter] = Primary Use Case, [NVIDIA NeMo] = Custom fine- tuning of LLMs with advanced NVIDIA GPUs., [Hugging Face AutoTrain API] = Fine-tuning and deployment of LLMs with minimal code., [Amazon Bedrock] = Fine-tuning and deploying LLMs on AWS infras- tructure., [AWS Sage- Maker Jump- Start] = Simplified fine- tuning and de- ployment within the AWS ecosys- tem., [Hugging Face Trainer API] = Manual fine- tuning of LLMs with detailed control over training pro- cesses.",
+      "Row 2: [Parameter] = Model Support, [NVIDIA NeMo] = Supports a vari- ety of large, pre- trained models, including Mega- tron series., [Hugging Face AutoTrain API] = Supports a wide range of pre- trained models from the Hug- ging Face model hub., [Amazon Bedrock] = Supports vari- ous LLMs like Amazon Titan and third-party models., [AWS Sage- Maker Jump- Start] = Pre-trained models from AWS and part- ners; integration with custom models., [Hugging Face Trainer API] = Supports a vast array of models from the Hug- ging Face model hub.",
+      "Row 3: [Parameter] = Data Handling, [NVIDIA NeMo] = Users provide task-specific data for fine- tuning, pro- cessed using NVIDIA\u2019s in- frastructure., [Hugging Face AutoTrain API] = Uploads datasets via a simple inter- face; AutoTrain handles pre- processing and model training., [Amazon Bedrock] = Data is uploaded and managed within the AWS environment; integrates with AWS data ser- vices., [AWS Sage- Maker Jump- Start] = Uploads and processes data within AWS; supports various data formats., [Hugging Face Trainer API] = Users manually preprocess data and manage training steps.",
+      "Row 4: [Parameter] = Customisation Level, [NVIDIA NeMo] = High; extensive control over fine-tuning pro- cess and model parameters., [Hugging Face AutoTrain API] = Moderate; auto- mated process with some customisation options., [Amazon Bedrock] = High; detailed configuration and integration with AWS ser- vices., [AWS Sage- Maker Jump- Start] = Moderate; pre-configured settings with some customisa- tion available., [Hugging Face Trainer API] = Very High; detailed con- trol over every aspect of fine- tuning.",
+      "Row 5: [Parameter] = Scalability, [NVIDIA NeMo] = High; leverages NVIDIA\u2019s GPU capabilities for efficient scaling., [Hugging Face AutoTrain API] = High; scalable via Hugging Face\u2019s cloud infrastructure., [Amazon Bedrock] = Very High; scalable across AWS\u2019s extensive cloud infrastruc- ture., [AWS Sage- Maker Jump- Start] = High; scalable within the AWS cloud ecosys- tem., [Hugging Face Trainer API] = High; scalability depends on the infrastructure used (e.g., local vs. cloud).",
+      "Row 6: [Parameter] = Deployment Options, [NVIDIA NeMo] = On-premises or cloud de- ployment via NVIDIA infras- tructure., [Hugging Face AutoTrain API] = Deployed via Hugging Face\u2019s cloud or can be exported for lo- cal deployment., [Amazon Bedrock] = Integrated into AWS services, easily deploy- able across AWS\u2019s global infrastructure., [AWS Sage- Maker Jump- Start] = AWS cloud deployment; integrates with other AWS ser- vices., [Hugging Face Trainer API] = Deployable lo- cally, in cloud, or exported to other platforms.",
+      "Row 7: [Parameter] = Integration with Ecosystem, [NVIDIA NeMo] = Deep integration with NVIDIA tools (e.g., TensorRT) and GPU-based workflows., [Hugging Face AutoTrain API] = Integrates well with the Hugging Face ecosystem and other ML tools., [Amazon Bedrock] = Seamless inte- gration with AWS ser- vices (e.g., S3, Lambda, Sage- Maker)., [AWS Sage- Maker Jump- Start] = Strong integra- tion with AWS services; easy to connect with data pipelines and analytics., [Hugging Face Trainer API] = Integrates with Hugging Face ecosystem and other Python- based ML tools.",
+      "Row 8: [Parameter] = Data Privacy, [NVIDIA NeMo] = Users must ensure data privacy compli- ance; NVIDIA handles data during process- ing., [Hugging Face AutoTrain API] = Data handled within Hugging Face\u2019s environ- ment; privacy depends on data handling practices., [Amazon Bedrock] = Strong focus on data privacy within AWS environment; compliant with various stan- dards., [AWS Sage- Maker Jump- Start] = Strong AWS privacy and security mea- sures; compliant with industry standards., [Hugging Face Trainer API] = User-managed; depends on where the mod- els and data are hosted.",
+      "Row 9: [Parameter] = Target Users, [NVIDIA NeMo] = Enterprises and developers need- ing advanced customisation and perfor- mance in LLM fine-tuning., [Hugging Face AutoTrain API] = Developers and businesses look- ing for easy, automated LLM fine-tuning solu- tions., [Amazon Bedrock] = Businesses and developers inte- grated into or seeking to lever- age AWS cloud services., [AWS Sage- Maker Jump- Start] = Enterprises and developers seek- ing streamlined AI/ML solutions within AWS., [Hugging Face Trainer API] = Researchers, developers, and ML engineers needing detailed control over training.",
+      "Row 10: [Parameter] = Limitations, [NVIDIA NeMo] = High resource demand and potential costs; dependency on NVIDIA ecosys- tem., [Hugging Face AutoTrain API] = Less control over fine-tuning specifics; cloud- based, may not suit all on- premises needs., [Amazon Bedrock] = Dependency on AWS; po- tential vendor lock-in, cost management complexity., [AWS Sage- Maker Jump- Start] = Limited to AWS services; pre-configured options may limit deep cus- tomisation., [Hugging Face Trainer API] = Requires tech- nical expertise; more complex setup and man- agement."
+    ],
+    "records": [
+      {
+        "Parameter": "Primary Use Case",
+        "NVIDIA NeMo": "Custom fine- tuning of LLMs with advanced NVIDIA GPUs.",
+        "Hugging Face AutoTrain API": "Fine-tuning and deployment of LLMs with minimal code.",
+        "Amazon Bedrock": "Fine-tuning and deploying LLMs on AWS infras- tructure.",
+        "AWS Sage- Maker Jump- Start": "Simplified fine- tuning and de- ployment within the AWS ecosys- tem.",
+        "Hugging Face Trainer API": "Manual fine- tuning of LLMs with detailed control over training pro- cesses."
+      },
+      {
+        "Parameter": "Model Support",
+        "NVIDIA NeMo": "Supports a vari- ety of large, pre- trained models, including Mega- tron series.",
+        "Hugging Face AutoTrain API": "Supports a wide range of pre- trained models from the Hug- ging Face model hub.",
+        "Amazon Bedrock": "Supports vari- ous LLMs like Amazon Titan and third-party models.",
+        "AWS Sage- Maker Jump- Start": "Pre-trained models from AWS and part- ners; integration with custom models.",
+        "Hugging Face Trainer API": "Supports a vast array of models from the Hug- ging Face model hub."
+      },
+      {
+        "Parameter": "Data Handling",
+        "NVIDIA NeMo": "Users provide task-specific data for fine- tuning, pro- cessed using NVIDIA\u2019s in- frastructure.",
+        "Hugging Face AutoTrain API": "Uploads datasets via a simple inter- face; AutoTrain handles pre- processing and model training.",
+        "Amazon Bedrock": "Data is uploaded and managed within the AWS environment; integrates with AWS data ser- vices.",
+        "AWS Sage- Maker Jump- Start": "Uploads and processes data within AWS; supports various data formats.",
+        "Hugging Face Trainer API": "Users manually preprocess data and manage training steps."
+      },
+      {
+        "Parameter": "Customisation Level",
+        "NVIDIA NeMo": "High; extensive control over fine-tuning pro- cess and model parameters.",
+        "Hugging Face AutoTrain API": "Moderate; auto- mated process with some customisation options.",
+        "Amazon Bedrock": "High; detailed configuration and integration with AWS ser- vices.",
+        "AWS Sage- Maker Jump- Start": "Moderate; pre-configured settings with some customisa- tion available.",
+        "Hugging Face Trainer API": "Very High; detailed con- trol over every aspect of fine- tuning."
+      },
+      {
+        "Parameter": "Scalability",
+        "NVIDIA NeMo": "High; leverages NVIDIA\u2019s GPU capabilities for efficient scaling.",
+        "Hugging Face AutoTrain API": "High; scalable via Hugging Face\u2019s cloud infrastructure.",
+        "Amazon Bedrock": "Very High; scalable across AWS\u2019s extensive cloud infrastruc- ture.",
+        "AWS Sage- Maker Jump- Start": "High; scalable within the AWS cloud ecosys- tem.",
+        "Hugging Face Trainer API": "High; scalability depends on the infrastructure used (e.g., local vs. cloud)."
+      },
+      {
+        "Parameter": "Deployment Options",
+        "NVIDIA NeMo": "On-premises or cloud de- ployment via NVIDIA infras- tructure.",
+        "Hugging Face AutoTrain API": "Deployed via Hugging Face\u2019s cloud or can be exported for lo- cal deployment.",
+        "Amazon Bedrock": "Integrated into AWS services, easily deploy- able across AWS\u2019s global infrastructure.",
+        "AWS Sage- Maker Jump- Start": "AWS cloud deployment; integrates with other AWS ser- vices.",
+        "Hugging Face Trainer API": "Deployable lo- cally, in cloud, or exported to other platforms."
+      },
+      {
+        "Parameter": "Integration with Ecosystem",
+        "NVIDIA NeMo": "Deep integration with NVIDIA tools (e.g., TensorRT) and GPU-based workflows.",
+        "Hugging Face AutoTrain API": "Integrates well with the Hugging Face ecosystem and other ML tools.",
+        "Amazon Bedrock": "Seamless inte- gration with AWS ser- vices (e.g., S3, Lambda, Sage- Maker).",
+        "AWS Sage- Maker Jump- Start": "Strong integra- tion with AWS services; easy to connect with data pipelines and analytics.",
+        "Hugging Face Trainer API": "Integrates with Hugging Face ecosystem and other Python- based ML tools."
+      },
+      {
+        "Parameter": "Data Privacy",
+        "NVIDIA NeMo": "Users must ensure data privacy compli- ance; NVIDIA handles data during process- ing.",
+        "Hugging Face AutoTrain API": "Data handled within Hugging Face\u2019s environ- ment; privacy depends on data handling practices.",
+        "Amazon Bedrock": "Strong focus on data privacy within AWS environment; compliant with various stan- dards.",
+        "AWS Sage- Maker Jump- Start": "Strong AWS privacy and security mea- sures; compliant with industry standards.",
+        "Hugging Face Trainer API": "User-managed; depends on where the mod- els and data are hosted."
+      },
+      {
+        "Parameter": "Target Users",
+        "NVIDIA NeMo": "Enterprises and developers need- ing advanced customisation and perfor- mance in LLM fine-tuning.",
+        "Hugging Face AutoTrain API": "Developers and businesses look- ing for easy, automated LLM fine-tuning solu- tions.",
+        "Amazon Bedrock": "Businesses and developers inte- grated into or seeking to lever- age AWS cloud services.",
+        "AWS Sage- Maker Jump- Start": "Enterprises and developers seek- ing streamlined AI/ML solutions within AWS.",
+        "Hugging Face Trainer API": "Researchers, developers, and ML engineers needing detailed control over training."
+      },
+      {
+        "Parameter": "Limitations",
+        "NVIDIA NeMo": "High resource demand and potential costs; dependency on NVIDIA ecosys- tem.",
+        "Hugging Face AutoTrain API": "Less control over fine-tuning specifics; cloud- based, may not suit all on- premises needs.",
+        "Amazon Bedrock": "Dependency on AWS; po- tential vendor lock-in, cost management complexity.",
+        "AWS Sage- Maker Jump- Start": "Limited to AWS services; pre-configured options may limit deep cus- tomisation.",
+        "Hugging Face Trainer API": "Requires tech- nical expertise; more complex setup and man- agement."
+      }
+    ]
+  },
+  {
+    "table_id": "doc_f0fcef27b135_p80_t1",
+    "doc_id": "doc_f0fcef27b135",
+    "page": 80,
+    "title": "Table 1 (Page 80): Parameter, OpenAI Fine- Tuning API, Google Vertex AI Studio, Microsoft Azure AI Studio",
+    "columns": [
+      "Parameter",
+      "OpenAI Fine- Tuning API",
+      "Google Vertex AI Studio",
+      "Microsoft Azure AI Studio",
+      "LangChain"
+    ],
+    "rows_count": 10,
+    "markdown": "|Parameter|OpenAI Fine-<br>Tuning API|Google Vertex AI<br>Studio|Microsoft Azure<br>AI Studio|LangChain|\n|---|---|---|---|---|\n|**Primary Use**<br>**Case**|API-based<br>fine-<br>tuning<br>for<br>OpenAI<br>models with custom<br>datasets.|End-to-end<br>ML<br>model<br>development<br>and<br>deployment<br>within Google Cloud.|End-to-end AI devel-<br>opment,<br>fine-tuning,<br>and<br>deployment<br>on<br>Azure.|Building applications<br>using<br>LLMs<br>with<br>modular<br>and<br>cus-<br>tomisable workflows.|\n|**Model Support**|Limited<br>to<br>OpenAI<br>models<br>like<br>GPT-3<br>and GPT-4.|Supports<br>Google\u2019s<br>pre-trained<br>models<br>and<br>user-customised<br>models.|Supports Microsoft\u2019s<br>models<br>and<br>custom<br>models<br>fine-tuned<br>within Azure.|Supports integration<br>with<br>various<br>LLMs<br>and<br>AI<br>tools<br>(e.g.,<br>OpenAI, GPT-4, Co-<br>here).|\n|**Data Handling**|Users upload datasets<br>via<br>API;<br>OpenAI<br>handles<br>preprocess-<br>ing and fine-tuning.|Data managed within<br>Google Cloud;<br>sup-<br>ports<br>multiple<br>data<br>formats.|Data<br>integrated<br>within Azure ecosys-<br>tem; supports various<br>formats and sources.|Data handling is flex-<br>ible,<br>dependent<br>on<br>the specific LLM and<br>integration used.|\n|**Customisation**<br>**Level**|Moderate; focuses on<br>ease of use with lim-<br>ited deep customisa-<br>tion.|High;<br>offers custom<br>model<br>training<br>and<br>deployment with de-<br>tailed configuration.|High; extensive cus-<br>tomisation<br>options<br>through<br>Azure\u2019s<br>AI<br>tools.|Very High; allows de-<br>tailed<br>customisation<br>of workflows, models,<br>and data processing.|\n|**Scalability**|High;<br>scalable<br>through<br>OpenAI\u2019s<br>cloud infrastructure.|Very High; leverages<br>Google<br>Cloud\u2019s<br>in-<br>frastructure for scal-<br>ing.|Very High;<br>scalable<br>across Azure\u2019s global<br>infrastructure.|High; scalability de-<br>pends on the specific<br>infrastructure<br>and<br>models used.|\n|**Deployment**<br>**Options**|Deployed via API, in-<br>tegrated into applica-<br>tions using OpenAI\u2019s<br>cloud.|Deployed<br>within<br>Google<br>Cloud;<br>in-<br>tegrates<br>with<br>other<br>GCP services.|Deployed<br>within<br>Azure;<br>integrates<br>with Azure\u2019s suite of<br>services.|Deployed<br>within<br>custom<br>infrastruc-<br>ture; integrates with<br>various<br>cloud<br>and<br>on-premises services.|\n|**Integration with**<br>**Ecosystem**|Limited<br>to<br>OpenAI<br>ecosystem; integrates<br>well<br>with<br>apps<br>via<br>API.|Seamless<br>integration<br>with<br>Google<br>Cloud<br>services<br>(e.g.,<br>Big-<br>Query, AutoML).|Deep integration with<br>Azure\u2019s services (e.g.,<br>Data Factory, Power<br>BI).|Flexible<br>integration<br>with multiple tools,<br>APIs,<br>and<br>data<br>sources.|\n|**Data Privacy**|Managed by OpenAI;<br>users<br>must<br>consider<br>data transfer and pri-<br>vacy implications.|Strong<br>privacy<br>and<br>security<br>measures<br>within Google Cloud<br>environment.|Strong<br>privacy<br>and<br>security<br>measures<br>within<br>Azure<br>envi-<br>ronment.|Dependent on the in-<br>tegrations and infras-<br>tructure used;<br>users<br>manage privacy.|\n|**Target Users**|Developers<br>and<br>en-<br>terprises<br>looking<br>for<br>straightforward,<br>API-based<br>LLM<br>fine-tuning.|Developers and busi-<br>nesses integrated into<br>Google Cloud or seek-<br>ing to leverage GCP.|Enterprises<br>and<br>de-<br>velopers<br>integrated<br>into Azure or seeking<br>to<br>leverage<br>Azure\u2019s<br>AI tools.|Developers<br>needing<br>to<br>build<br>complex,<br>modular<br>LLM-based<br>applications<br>with<br>custom workflows.|\n|**Limitations**|Limited<br>customisa-<br>tion; dependency on<br>OpenAI\u2019s infrastruc-<br>ture; potential cost.|Limited<br>to<br>Google<br>Cloud ecosystem; po-<br>tential cost and ven-<br>dor lock-in.|Limited<br>to<br>Azure<br>ecosystem;<br>potential<br>cost<br>and<br>vendor<br>lock-in.|Complexity in chain-<br>ing multiple models<br>and data sources; re-<br>quires more setup.|\n\n",
+    "row_facts": [
+      "Row 1: [Parameter] = Primary Use Case, [OpenAI Fine- Tuning API] = API-based fine- tuning for OpenAI models with custom datasets., [Google Vertex AI Studio] = End-to-end ML model development and deployment within Google Cloud., [Microsoft Azure AI Studio] = End-to-end AI devel- opment, fine-tuning, and deployment on Azure., [LangChain] = Building applications using LLMs with modular and cus- tomisable workflows.",
+      "Row 2: [Parameter] = Model Support, [OpenAI Fine- Tuning API] = Limited to OpenAI models like GPT-3 and GPT-4., [Google Vertex AI Studio] = Supports Google\u2019s pre-trained models and user-customised models., [Microsoft Azure AI Studio] = Supports Microsoft\u2019s models and custom models fine-tuned within Azure., [LangChain] = Supports integration with various LLMs and AI tools (e.g., OpenAI, GPT-4, Co- here).",
+      "Row 3: [Parameter] = Data Handling, [OpenAI Fine- Tuning API] = Users upload datasets via API; OpenAI handles preprocess- ing and fine-tuning., [Google Vertex AI Studio] = Data managed within Google Cloud; sup- ports multiple data formats., [Microsoft Azure AI Studio] = Data integrated within Azure ecosys- tem; supports various formats and sources., [LangChain] = Data handling is flex- ible, dependent on the specific LLM and integration used.",
+      "Row 4: [Parameter] = Customisation Level, [OpenAI Fine- Tuning API] = Moderate; focuses on ease of use with lim- ited deep customisa- tion., [Google Vertex AI Studio] = High; offers custom model training and deployment with de- tailed configuration., [Microsoft Azure AI Studio] = High; extensive cus- tomisation options through Azure\u2019s AI tools., [LangChain] = Very High; allows de- tailed customisation of workflows, models, and data processing.",
+      "Row 5: [Parameter] = Scalability, [OpenAI Fine- Tuning API] = High; scalable through OpenAI\u2019s cloud infrastructure., [Google Vertex AI Studio] = Very High; leverages Google Cloud\u2019s in- frastructure for scal- ing., [Microsoft Azure AI Studio] = Very High; scalable across Azure\u2019s global infrastructure., [LangChain] = High; scalability de- pends on the specific infrastructure and models used.",
+      "Row 6: [Parameter] = Deployment Options, [OpenAI Fine- Tuning API] = Deployed via API, in- tegrated into applica- tions using OpenAI\u2019s cloud., [Google Vertex AI Studio] = Deployed within Google Cloud; in- tegrates with other GCP services., [Microsoft Azure AI Studio] = Deployed within Azure; integrates with Azure\u2019s suite of services., [LangChain] = Deployed within custom infrastruc- ture; integrates with various cloud and on-premises services.",
+      "Row 7: [Parameter] = Integration with Ecosystem, [OpenAI Fine- Tuning API] = Limited to OpenAI ecosystem; integrates well with apps via API., [Google Vertex AI Studio] = Seamless integration with Google Cloud services (e.g., Big- Query, AutoML)., [Microsoft Azure AI Studio] = Deep integration with Azure\u2019s services (e.g., Data Factory, Power BI)., [LangChain] = Flexible integration with multiple tools, APIs, and data sources.",
+      "Row 8: [Parameter] = Data Privacy, [OpenAI Fine- Tuning API] = Managed by OpenAI; users must consider data transfer and pri- vacy implications., [Google Vertex AI Studio] = Strong privacy and security measures within Google Cloud environment., [Microsoft Azure AI Studio] = Strong privacy and security measures within Azure envi- ronment., [LangChain] = Dependent on the in- tegrations and infras- tructure used; users manage privacy.",
+      "Row 9: [Parameter] = Target Users, [OpenAI Fine- Tuning API] = Developers and en- terprises looking for straightforward, API-based LLM fine-tuning., [Google Vertex AI Studio] = Developers and busi- nesses integrated into Google Cloud or seek- ing to leverage GCP., [Microsoft Azure AI Studio] = Enterprises and de- velopers integrated into Azure or seeking to leverage Azure\u2019s AI tools., [LangChain] = Developers needing to build complex, modular LLM-based applications with custom workflows.",
+      "Row 10: [Parameter] = Limitations, [OpenAI Fine- Tuning API] = Limited customisa- tion; dependency on OpenAI\u2019s infrastruc- ture; potential cost., [Google Vertex AI Studio] = Limited to Google Cloud ecosystem; po- tential cost and ven- dor lock-in., [Microsoft Azure AI Studio] = Limited to Azure ecosystem; potential cost and vendor lock-in., [LangChain] = Complexity in chain- ing multiple models and data sources; re- quires more setup."
+    ],
+    "records": [
+      {
+        "Parameter": "Primary Use Case",
+        "OpenAI Fine- Tuning API": "API-based fine- tuning for OpenAI models with custom datasets.",
+        "Google Vertex AI Studio": "End-to-end ML model development and deployment within Google Cloud.",
+        "Microsoft Azure AI Studio": "End-to-end AI devel- opment, fine-tuning, and deployment on Azure.",
+        "LangChain": "Building applications using LLMs with modular and cus- tomisable workflows."
+      },
+      {
+        "Parameter": "Model Support",
+        "OpenAI Fine- Tuning API": "Limited to OpenAI models like GPT-3 and GPT-4.",
+        "Google Vertex AI Studio": "Supports Google\u2019s pre-trained models and user-customised models.",
+        "Microsoft Azure AI Studio": "Supports Microsoft\u2019s models and custom models fine-tuned within Azure.",
+        "LangChain": "Supports integration with various LLMs and AI tools (e.g., OpenAI, GPT-4, Co- here)."
+      },
+      {
+        "Parameter": "Data Handling",
+        "OpenAI Fine- Tuning API": "Users upload datasets via API; OpenAI handles preprocess- ing and fine-tuning.",
+        "Google Vertex AI Studio": "Data managed within Google Cloud; sup- ports multiple data formats.",
+        "Microsoft Azure AI Studio": "Data integrated within Azure ecosys- tem; supports various formats and sources.",
+        "LangChain": "Data handling is flex- ible, dependent on the specific LLM and integration used."
+      },
+      {
+        "Parameter": "Customisation Level",
+        "OpenAI Fine- Tuning API": "Moderate; focuses on ease of use with lim- ited deep customisa- tion.",
+        "Google Vertex AI Studio": "High; offers custom model training and deployment with de- tailed configuration.",
+        "Microsoft Azure AI Studio": "High; extensive cus- tomisation options through Azure\u2019s AI tools.",
+        "LangChain": "Very High; allows de- tailed customisation of workflows, models, and data processing."
+      },
+      {
+        "Parameter": "Scalability",
+        "OpenAI Fine- Tuning API": "High; scalable through OpenAI\u2019s cloud infrastructure.",
+        "Google Vertex AI Studio": "Very High; leverages Google Cloud\u2019s in- frastructure for scal- ing.",
+        "Microsoft Azure AI Studio": "Very High; scalable across Azure\u2019s global infrastructure.",
+        "LangChain": "High; scalability de- pends on the specific infrastructure and models used."
+      },
+      {
+        "Parameter": "Deployment Options",
+        "OpenAI Fine- Tuning API": "Deployed via API, in- tegrated into applica- tions using OpenAI\u2019s cloud.",
+        "Google Vertex AI Studio": "Deployed within Google Cloud; in- tegrates with other GCP services.",
+        "Microsoft Azure AI Studio": "Deployed within Azure; integrates with Azure\u2019s suite of services.",
+        "LangChain": "Deployed within custom infrastruc- ture; integrates with various cloud and on-premises services."
+      },
+      {
+        "Parameter": "Integration with Ecosystem",
+        "OpenAI Fine- Tuning API": "Limited to OpenAI ecosystem; integrates well with apps via API.",
+        "Google Vertex AI Studio": "Seamless integration with Google Cloud services (e.g., Big- Query, AutoML).",
+        "Microsoft Azure AI Studio": "Deep integration with Azure\u2019s services (e.g., Data Factory, Power BI).",
+        "LangChain": "Flexible integration with multiple tools, APIs, and data sources."
+      },
+      {
+        "Parameter": "Data Privacy",
+        "OpenAI Fine- Tuning API": "Managed by OpenAI; users must consider data transfer and pri- vacy implications.",
+        "Google Vertex AI Studio": "Strong privacy and security measures within Google Cloud environment.",
+        "Microsoft Azure AI Studio": "Strong privacy and security measures within Azure envi- ronment.",
+        "LangChain": "Dependent on the in- tegrations and infras- tructure used; users manage privacy."
+      },
+      {
+        "Parameter": "Target Users",
+        "OpenAI Fine- Tuning API": "Developers and en- terprises looking for straightforward, API-based LLM fine-tuning.",
+        "Google Vertex AI Studio": "Developers and busi- nesses integrated into Google Cloud or seek- ing to leverage GCP.",
+        "Microsoft Azure AI Studio": "Enterprises and de- velopers integrated into Azure or seeking to leverage Azure\u2019s AI tools.",
+        "LangChain": "Developers needing to build complex, modular LLM-based applications with custom workflows."
+      },
+      {
+        "Parameter": "Limitations",
+        "OpenAI Fine- Tuning API": "Limited customisa- tion; dependency on OpenAI\u2019s infrastruc- ture; potential cost.",
+        "Google Vertex AI Studio": "Limited to Google Cloud ecosystem; po- tential cost and ven- dor lock-in.",
+        "Microsoft Azure AI Studio": "Limited to Azure ecosystem; potential cost and vendor lock-in.",
+        "LangChain": "Complexity in chain- ing multiple models and data sources; re- quires more setup."
+      }
+    ]
+  }
+]

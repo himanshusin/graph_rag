@@ -254,8 +254,30 @@ entities_df, relationships_df, nodes_df, community_df = load_graph_data()
 chroma_client, paper_collection = load_chroma_db()
 catalog_docs = vault.get_catalog()
 
+# Helper for Tabular & Quantitative Context Injection
+def append_table_context(query: str, context_lines: List[str], citations: List[Dict[str, Any]], top_k: int = 2):
+    """Retrieve matched structured tables and inject markdown tables & row facts into LLM context."""
+    matched_tables = vault.find_relevant_tables(query, top_k=top_k)
+    if matched_tables:
+        context_lines.append("\n### 📊 Verified Structured Tables & Quantitative Metric Data:")
+        for t in matched_tables:
+            context_lines.append(f"#### Table: {t.get('title', 'Extracted Table')} (Page {t.get('page', 1)})")
+            context_lines.append(t.get("markdown", ""))
+            if t.get("row_facts"):
+                context_lines.append("**Row Observations & Numerical Facts:**\n" + "\n".join(t["row_facts"][:8]))
+            
+            citations.append({
+                "index": len(citations) + 1,
+                "document_title": f"Structured Table: {t.get('title', 'Table')}",
+                "chunk_id": t.get("table_id", "tab_ref"),
+                "excerpt": f"Page {t.get('page', 1)} | {len(t.get('columns', []))} columns | {t.get('rows_count', 0)} rows: {', '.join(t.get('columns', [])[:4])}",
+                "relevance": "Verified Quantitative Table",
+                "is_table": True,
+                "table_markdown": t.get("markdown", "")
+            })
+
 # -----------------------------------------------------------------------------
-# 3. Query Reasoning Engines with Source Citations
+# 3. Query Reasoning Engines with Source Citations & Numerical Grounding
 # -----------------------------------------------------------------------------
 def query_graphrag_global(query: str, reports: pd.DataFrame, llm: ChatOpenAI) -> Tuple[str, str, List[Dict[str, Any]]]:
     context_lines = ["### Executive Thematic Domain Summaries:"]
@@ -267,24 +289,27 @@ def query_graphrag_global(query: str, reports: pd.DataFrame, llm: ChatOpenAI) ->
             "document_title": f"Thematic Domain: {row['title']}",
             "chunk_id": f"domain_{row['community']}",
             "excerpt": row['summary'],
-            "relevance": f"Rank: {row['rank']}"
+            "relevance": f"Rank: {row['rank']}",
+            "is_table": False
         })
     
+    append_table_context(query, context_lines, citations, top_k=2)
     context_text = "\n".join(context_lines)
     prompt = ChatPromptTemplate.from_template(
         "You are an Executive AI Strategic Advisor performing a Macro-Level Strategic Synthesis across business domains.\n"
-        "Synthesize an executive-level summary answering the inquiry across the domain reports below.\n"
-        "Include bracketed citation footnotes like [1], [2] referencing specific supporting domains.\n\n"
-        "Thematic Domain Reports:\n{context}\n\n"
+        "Synthesize an executive-level summary answering the inquiry across the domain reports and structured tables below.\n"
+        "When the inquiry involves numbers, metrics, evaluations, benchmark scores, or quantitative facts, quote the exact numerical values, percentages, units, and comparative results directly from the verified domain reports and structured tables.\n"
+        "Include bracketed citation footnotes like [1], [2] referencing specific supporting sources.\n\n"
+        "Thematic Domain Reports & Quantitative Data:\n{context}\n\n"
         "Executive Inquiry: {query}\n\n"
-        "Structure: Executive Summary, Strategic Analysis, Core Trade-offs, and Actionable Recommendations."
+        "Structure: Executive Summary, Strategic & Quantitative Analysis, Core Trade-offs, and Actionable Recommendations."
     )
     chain = prompt | llm | StrOutputParser()
     answer = chain.invoke({"context": context_text, "query": query})
     return answer, context_text, citations
 
 def query_graphrag_local(query: str, entities: pd.DataFrame, rels: pd.DataFrame, llm: ChatOpenAI, top_k: int = 15) -> Tuple[str, str, List[Dict[str, Any]]]:
-    context_lines = ["### Identified Concepts:"]
+    context_lines = ["### Identified Concepts & Metrics:"]
     citations = []
     for idx, row in entities.head(top_k).iterrows():
         context_lines.append(f"- [{idx + 1}] **{row['title']}** ({row['type']}): {row['description']}")
@@ -293,21 +318,24 @@ def query_graphrag_local(query: str, entities: pd.DataFrame, rels: pd.DataFrame,
             "document_title": f"Concept: {row['title']} ({row['type']})",
             "chunk_id": f"entity_{row['human_readable_id']}",
             "excerpt": row['description'],
-            "relevance": "Direct Graph Node"
+            "relevance": "Direct Graph Node",
+            "is_table": False
         })
     
-    context_lines.append("\n### Direct Relational Dependencies:")
+    context_lines.append("\n### Direct Relational Dependencies & Quantitative Measurements:")
     for _, row in rels.head(top_k).iterrows():
         context_lines.append(f"- **{row['source']}** ➔ **{row['target']}** (Strength: {row['weight']}/10): {row['description']}")
     
+    append_table_context(query, context_lines, citations, top_k=2)
     context_text = "\n".join(context_lines)
     prompt = ChatPromptTemplate.from_template(
         "You are an Executive AI Strategic Advisor performing Targeted Fact & Concept Lookup.\n"
-        "Provide a crisp, actionable business response grounded in the verified concept network below.\n"
+        "Provide a crisp, actionable business response grounded in the verified concept network and structured tables below.\n"
+        "When the inquiry involves numbers, metrics, evaluations, benchmark scores, or quantitative facts, quote the exact numerical values, percentages, units, and comparative results directly from the verified concept network and structured tables.\n"
         "Include citation footnotes like [1], [2] where relevant.\n\n"
-        "Verified Knowledge Network:\n{context}\n\n"
+        "Verified Knowledge Network & Tables:\n{context}\n\n"
         "Executive Question: {query}\n\n"
-        "Format with clear bullet points, strategic implications, and concise takeaways."
+        "Format with clear bullet points, quantitative facts, strategic implications, and concise takeaways."
     )
     chain = prompt | llm | StrOutputParser()
     answer = chain.invoke({"context": context_text, "query": query})
@@ -323,21 +351,24 @@ def query_graphrag_drift(query: str, reports: pd.DataFrame, rels: pd.DataFrame, 
             "document_title": row['title'],
             "chunk_id": f"report_{row['community']}",
             "excerpt": row['summary'],
-            "relevance": "Strategic Domain"
+            "relevance": "Strategic Domain",
+            "is_table": False
         })
     
-    context_lines.append("\n### Granular Cross-Functional Dependencies:")
+    context_lines.append("\n### Granular Cross-Functional Dependencies & Metrics:")
     for _, row in rels.head(20).iterrows():
         context_lines.append(f"- **{row['source']}** <-> **{row['target']}**: {row['description']}")
     
+    append_table_context(query, context_lines, citations, top_k=2)
     context_text = "\n".join(context_lines)
     prompt = ChatPromptTemplate.from_template(
         "You are an Executive AI Strategic Advisor performing a Deep-Dive Cross-Functional Analysis.\n"
         "Answer the business inquiry by connecting macro business strategy with granular operational and technological dependencies.\n"
-        "Include citation footnotes like [1], [2] referencing supporting strategic briefs.\n\n"
-        "Knowledge Context:\n{context}\n\n"
+        "When the inquiry involves numbers, metrics, evaluations, benchmark scores, or quantitative facts, quote the exact numerical values, percentages, units, and comparative results directly from the verified data.\n"
+        "Include citation footnotes like [1], [2] referencing supporting strategic briefs and tables.\n\n"
+        "Knowledge Context & Tables:\n{context}\n\n"
         "Executive Question: {query}\n\n"
-        "Provide a comprehensive, high-impact business analysis with clear structure, risk mitigation insights, and execution steps."
+        "Provide a comprehensive, high-impact business analysis with clear structure, exact numbers, risk mitigation insights, and execution steps."
     )
     chain = prompt | llm | StrOutputParser()
     answer = chain.invoke({"context": context_text, "query": query})
@@ -359,21 +390,48 @@ def query_chroma_rag(query: str, collection, llm: ChatOpenAI, num_results: int =
             "document_title": doc_name,
             "chunk_id": c_id,
             "excerpt": doc.strip(),
-            "relevance": "Direct Vector Match"
+            "relevance": "Direct Vector Match",
+            "is_table": False
         })
     
+    append_table_context(query, context_lines, citations, top_k=2)
     context_text = "\n".join(context_lines)
     prompt = ChatPromptTemplate.from_template(
         "You are an AI Analyst performing Standard Document Passage Retrieval.\n"
-        "Answer the business question strictly using the retrieved source passages below.\n"
+        "Answer the business question strictly using the retrieved source passages and structured tables below.\n"
+        "Quote exact numerical figures and measurements accurately.\n"
         "Include citation footnotes like [1], [2] directly in your text.\n\n"
-        "Source Passages:\n{context}\n\n"
+        "Source Passages & Tables:\n{context}\n\n"
         "Business Question: {query}\n\n"
         "Answer:"
     )
     chain = prompt | llm | StrOutputParser()
     answer = chain.invoke({"context": context_text, "query": query})
     return answer, context_text, citations
+
+def render_citations_drawer(citations: List[Dict[str, Any]]):
+    """Render interactive verified citation cards and structured tables in UI."""
+    if not citations:
+        return
+    with st.expander(f"📚 Verified Sources & Citations ({len(citations)} sources)"):
+        for c in citations:
+            if c.get("is_table") and c.get("table_markdown"):
+                st.markdown(f"""
+                <div class="citation-card" style="border-left: 3px solid #38BDF8;">
+                    <span class="citation-badge" style="background: rgba(56, 189, 248, 0.15); border-color: #38BDF8; color: #38BDF8;">📊 Table Citation {c['index']}</span>
+                    <span class="citation-title">{c['document_title']}</span>
+                    <div style="font-size: 0.76rem; color: #94A3B8; margin-top: 4px;">{c.get('excerpt', '')}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                st.markdown(c["table_markdown"])
+            else:
+                st.markdown(f"""
+                <div class="citation-card">
+                    <span class="citation-badge">Citation {c['index']}</span>
+                    <span class="citation-title">📄 {c['document_title']}</span>
+                    <div class="citation-snippet">{html.escape(c['excerpt'])}</div>
+                </div>
+                """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
 # 4. Enterprise Top Header & KPI Dashboard
@@ -394,15 +452,18 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# Metric Row
-col1, col2, col3, col4 = st.columns(4)
+# Metric Row (5 Core Enterprise Metrics)
+all_vault_tables = vault.get_tables()
+col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
     st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(entities_df)}</div><div class="app-stat-text">Indexed Concepts</div></div>', unsafe_allow_html=True)
 with col2:
     st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(relationships_df)}</div><div class="app-stat-text">Verified Links</div></div>', unsafe_allow_html=True)
 with col3:
-    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(catalog_docs)}</div><div class="app-stat-text">Retained Documents</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(catalog_docs)}</div><div class="app-stat-text">Retained Docs</div></div>', unsafe_allow_html=True)
 with col4:
+    st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{len(all_vault_tables)}</div><div class="app-stat-text">Structured Tables</div></div>', unsafe_allow_html=True)
+with col5:
     st.markdown(f'<div class="app-stat-card"><div class="app-stat-num">{paper_collection.count()}</div><div class="app-stat-text">Evidence Passages</div></div>', unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
@@ -506,15 +567,7 @@ with tab_search_chat:
             
             # Render Citations if present
             if msg.get("citations"):
-                with st.expander(f"📚 Verified Sources & Citations ({len(msg['citations'])} sources)"):
-                    for c in msg["citations"]:
-                        st.markdown(f"""
-                        <div class="citation-card">
-                            <span class="citation-badge">Citation {c['index']}</span>
-                            <span class="citation-title">📄 {c['document_title']}</span>
-                            <div class="citation-snippet">{html.escape(c['excerpt'])}</div>
-                        </div>
-                        """, unsafe_allow_html=True)
+                render_citations_drawer(msg["citations"])
             
             # Comparative Audit View
             if msg.get("comparison"):
@@ -549,61 +602,25 @@ with tab_search_chat:
                     if "Synthesis" in search_mode:
                         ans, ctx, cits = query_graphrag_global(user_input, community_df, llm)
                         st.markdown(ans)
-                        if cits:
-                            with st.expander(f"📚 Verified Sources & Citations ({len(cits)} sources)"):
-                                for c in cits:
-                                    st.markdown(f"""
-                                    <div class="citation-card">
-                                        <span class="citation-badge">Citation {c['index']}</span>
-                                        <span class="citation-title">📄 {c['document_title']}</span>
-                                        <div class="citation-snippet">{html.escape(c['excerpt'])}</div>
-                                    </div>
-                                    """, unsafe_allow_html=True)
+                        render_citations_drawer(cits)
                         st.session_state.messages.append({"role": "assistant", "content": ans, "mode": "Strategic Synthesis", "citations": cits})
                     
                     elif "Targeted" in search_mode:
                         ans, ctx, cits = query_graphrag_local(user_input, entities_df, relationships_df, llm)
                         st.markdown(ans)
-                        if cits:
-                            with st.expander(f"📚 Verified Sources & Citations ({len(cits)} sources)"):
-                                for c in cits:
-                                    st.markdown(f"""
-                                    <div class="citation-card">
-                                        <span class="citation-badge">Citation {c['index']}</span>
-                                        <span class="citation-title">📄 {c['document_title']}</span>
-                                        <div class="citation-snippet">{html.escape(c['excerpt'])}</div>
-                                    </div>
-                                    """, unsafe_allow_html=True)
+                        render_citations_drawer(cits)
                         st.session_state.messages.append({"role": "assistant", "content": ans, "mode": "Targeted Lookup", "citations": cits})
                     
                     elif "Deep-Dive" in search_mode:
                         ans, ctx, cits = query_graphrag_drift(user_input, community_df, relationships_df, llm)
                         st.markdown(ans)
-                        if cits:
-                            with st.expander(f"📚 Verified Sources & Citations ({len(cits)} sources)"):
-                                for c in cits:
-                                    st.markdown(f"""
-                                    <div class="citation-card">
-                                        <span class="citation-badge">Citation {c['index']}</span>
-                                        <span class="citation-title">📄 {c['document_title']}</span>
-                                        <div class="citation-snippet">{html.escape(c['excerpt'])}</div>
-                                    </div>
-                                    """, unsafe_allow_html=True)
+                        render_citations_drawer(cits)
                         st.session_state.messages.append({"role": "assistant", "content": ans, "mode": "Deep-Dive Analysis", "citations": cits})
                     
                     elif "Standard" in search_mode:
                         ans, ctx, cits = query_chroma_rag(user_input, paper_collection, llm, num_results=top_k_passages)
                         st.markdown(ans)
-                        if cits:
-                            with st.expander(f"📚 Verified Sources & Citations ({len(cits)} sources)"):
-                                for c in cits:
-                                    st.markdown(f"""
-                                    <div class="citation-card">
-                                        <span class="citation-badge">Citation {c['index']}</span>
-                                        <span class="citation-title">📄 {c['document_title']}</span>
-                                        <div class="citation-snippet">{html.escape(c['excerpt'])}</div>
-                                    </div>
-                                    """, unsafe_allow_html=True)
+                        render_citations_drawer(cits)
                         st.session_state.messages.append({"role": "assistant", "content": ans, "mode": "Standard Passage Search", "citations": cits})
                     
                     else: # Comparative Audit
@@ -691,6 +708,7 @@ with tab_vault_ui:
                 "Format": d["source_type"],
                 "Size (KB)": d["file_size_kb"],
                 "Pages/Sections": d["page_count"],
+                "Structured Tables": d.get("table_count", 0),
                 "Uploaded At": d["uploaded_at"],
                 "Status": d["status"]
             })
@@ -700,14 +718,29 @@ with tab_vault_ui:
         selected_doc_id = st.selectbox("Inspect Document in Vault:", [d["id"] for d in current_catalog], format_func=lambda x: f"{x} - {next((d['title'] for d in current_catalog if d['id'] == x), '')}")
         doc_details = vault.get_document(selected_doc_id)
         if doc_details:
-            c1, c2, c3 = st.columns(3)
+            c1, c2, c3, c4 = st.columns(4)
             with c1:
-                st.info(f"**SHA-256 Hash:** `{doc_details['sha256'][:16]}...`")
+                st.info(f"**SHA-256 Hash:** `{doc_details['sha256'][:14]}...`")
             with c2:
-                st.info(f"**Storage Path:** `{doc_details['storage_path']}`")
+                st.info(f"**Storage Path:** `{Path(doc_details['storage_path']).name}`")
             with c3:
                 st.info(f"**Character Count:** `{doc_details['char_count']:,}`")
+            with c4:
+                st.info(f"**Extracted Tables:** `{doc_details.get('table_count', 0)}`")
             
+            # Show Extracted Structured Tables if present
+            doc_tables = vault.get_tables(selected_doc_id)
+            if doc_tables:
+                with st.expander(f"📊 Extracted Structured Tables & Numerical Data ({len(doc_tables)} tables detected)", expanded=True):
+                    for tab_info in doc_tables:
+                        st.markdown(f"##### 📌 {tab_info.get('title', 'Table')}")
+                        st.markdown(tab_info.get("markdown", ""))
+                        if tab_info.get("row_facts"):
+                            with st.expander("Show Extracted Row Metrics & Facts"):
+                                for rf in tab_info["row_facts"]:
+                                    st.markdown(f"- `{rf}`")
+                        st.divider()
+
             if st.button("🗑️ Delete Document from Vault", key=f"del_{selected_doc_id}"):
                 vault.delete_document(selected_doc_id)
                 st.success("Deleted document from vault.")

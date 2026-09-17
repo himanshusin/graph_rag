@@ -28,20 +28,49 @@ import pymupdf
 # -----------------------------------------------------------------------------
 # 1. Document Ingestor
 # -----------------------------------------------------------------------------
+# 1. Document Ingestor (Table-Aware)
+# -----------------------------------------------------------------------------
 class DocumentIngestor:
-    """Handles multi-format document text extraction (PDF, TXT, Markdown, Raw String)."""
+    """Handles multi-format document text and structured table extraction (PDF, TXT, Markdown)."""
 
     @staticmethod
     def extract_from_pdf_bytes(pdf_bytes: bytes) -> str:
+        """Extract pages and structured tables from PDF bytes using PyMuPDF table finder."""
         doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
-        pages_text = [page.get_text() for page in doc]
-        return "\n".join(pages_text)
+        pages_content = []
+        for p_idx, page in enumerate(doc):
+            page_num = p_idx + 1
+            blocks = []
+            try:
+                tabs = page.find_tables()
+                if tabs and tabs.tables:
+                    for t_idx, tab in enumerate(tabs.tables):
+                        df = tab.to_pandas()
+                        if not df.empty and len(df.columns) >= 2:
+                            df = df.map(lambda x: str(x).replace("\n", " ").strip() if pd.notna(x) else "")
+                            df.columns = [str(c).replace("\n", " ").strip() for c in df.columns]
+                            md_tab = tab.to_markdown()
+                            row_facts = []
+                            for r_idx, row in df.iterrows():
+                                items = [f"[{col}] = {val}" for col, val in row.items() if val and str(val).lower() not in ["none", "nan", ""]]
+                                if items:
+                                    row_facts.append(f"Row {r_idx + 1}: " + ", ".join(items))
+                            blocks.append(
+                                f"\n[STRUCTURED_TABLE Page {page_num}]\n{md_tab}\n"
+                                f"**Structured Metric Facts:**\n" + "\n".join(row_facts) + "\n[/STRUCTURED_TABLE]\n"
+                            )
+            except Exception:
+                pass
+            text = page.get_text().strip()
+            if text:
+                blocks.append(text)
+            pages_content.append("\n\n".join(blocks))
+        return "\n\n--- PAGE BREAK ---\n\n".join(pages_content)
 
     @staticmethod
     def extract_from_pdf_file(file_path: str) -> str:
-        doc = pymupdf.open(file_path)
-        pages_text = [page.get_text() for page in doc]
-        return "\n".join(pages_text)
+        with open(file_path, "rb") as f:
+            return DocumentIngestor.extract_from_pdf_bytes(f.read())
 
     @staticmethod
     def extract_from_text(text: str) -> str:
@@ -49,10 +78,10 @@ class DocumentIngestor:
 
 
 # -----------------------------------------------------------------------------
-# 2. Text Chunker
+# 2. Text Chunker (Table-Preserving)
 # -----------------------------------------------------------------------------
 class TextChunker:
-    """Splits document text into manageable token chunks with overlap."""
+    """Splits document text into manageable token chunks with overlap while keeping tables intact."""
 
     def __init__(self, chunk_size: int = 1200, chunk_overlap: int = 100):
         self.chunk_size = chunk_size
@@ -63,31 +92,53 @@ class TextChunker:
         )
 
     def split(self, text: str) -> List[str]:
+        if "[STRUCTURED_TABLE" in text:
+            chunks = []
+            parts = re.split(r'(\[STRUCTURED_TABLE.*?\[/STRUCTURED_TABLE\])', text, flags=re.DOTALL)
+            for part in parts:
+                part = part.strip()
+                if not part:
+                    continue
+                if part.startswith("[STRUCTURED_TABLE"):
+                    if len(part) < self.chunk_size * 4:
+                        chunks.append(part)
+                    else:
+                        chunks.extend(self.splitter.split_text(part))
+                else:
+                    chunks.extend(self.splitter.split_text(part))
+            return [c for c in chunks if c.strip()]
         return self.splitter.split_text(text)
 
 
 # -----------------------------------------------------------------------------
-# 3. Entity & Relationship Extractor
+# 3. Numeric & Semantic Entity & Relationship Extractor
 # -----------------------------------------------------------------------------
 EXTRACTION_PROMPT = """
 -Goal-
-Given a text document, identify all entities and relationships between them.
+Given a text document, identify all entities, quantitative metrics, numerical values, and relationships between them.
 
 -Steps-
-1. Identify all entities. For each entity, extract:
+1. Identify all entities. Categories include:
+- CONCEPT, METHOD, TOOL, ORGANIZATION, TECHNIQUE
+- METRIC: Key metrics or properties being evaluated (e.g., MMLU ACCURACY, LATENCY, REVENUE, PERPLEXITY, LOSS, THROUGHPUT, PARAMETERS)
+- BENCHMARK: Datasets, testbeds, or evaluation settings (e.g., GSM8K, HUMANEVAL, GLUE, SQUAD, Q3 FY2024, 5-SHOT)
+- QUANTITY: Exact quantitative figures, measurements, percentages, or values when significant (e.g., 89.2%, 14.5 MS, $4.2 BILLION, 7B PARAMETERS, 128K TOKENS)
+- TIMEFRAME: Fiscal periods, dates, or quarters (e.g., Q3 2024, 2023, ANNUAL)
+
+For each entity, extract:
 - entity_name: Name of the entity, capitalized
-- entity_type: Category of the entity (e.g., CONCEPT, METHOD, TOOL, ORGANIZATION, TECHNIQUE, METRIC)
-- entity_description: Comprehensive description of the entity's attributes and role
+- entity_type: Category (from the list above)
+- entity_description: Comprehensive description including any exact numbers, units, scope, and technical context
 Format: ("entity"<|delimiter|><entity_name><|delimiter|><entity_type><|delimiter|><entity_description>)
 
-2. Identify all relationships directly mentioned between entities. For each relationship, extract:
-- source_entity: name of the source entity
-- target_entity: name of the target entity
-- relationship_description: explanation of why the entities are related
-- relationship_strength: integer score between 1 and 10 representing relationship strength
+2. Identify all relationships directly mentioned between entities, paying special attention to quantitative, comparative, and evaluative relationships:
+- source_entity: name of the source entity (e.g., "LLAMA-3-8B", "SALES DIVISION")
+- target_entity: name of the target entity (e.g., "MMLU ACCURACY", "GSM8K", "89.2%", "REVENUE")
+- relationship_description: explanation of why the entities are related. CRITICAL: ALWAYS preserve exact numbers, percentages, dollar amounts, performance scores, and comparative deltas in this description.
+- relationship_strength: integer score between 1 and 10 representing relationship strength/confidence
 Format: ("relationship"<|delimiter|><source_entity><|delimiter|><target_entity><|delimiter|><relationship_description><|delimiter|><relationship_strength>)
 
-3. Return output strictly in the format above, one item per line.
+3. Return output strictly in the format above, one item per line. Do not output anything else.
 
 Input Text:
 {input_text}

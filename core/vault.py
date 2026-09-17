@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import time
 import hashlib
@@ -6,21 +7,25 @@ import shutil
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
+import pandas as pd
 import pymupdf
 
 
 class DocumentVault:
     """
     Enterprise Document Retention & Vault Manager.
-    Persists uploaded files, tracks metadata catalog, and generates verified source citations.
+    Persists uploaded files, extracts structured tables & text, tracks metadata catalog,
+    and generates verified source citations with table provenance.
     """
 
     def __init__(self, vault_dir: str = "./vault"):
         self.vault_dir = Path(vault_dir)
         self.docs_dir = self.vault_dir / "documents"
+        self.tables_dir = self.vault_dir / "tables"
         self.catalog_file = self.vault_dir / "catalog.json"
 
         self.docs_dir.mkdir(parents=True, exist_ok=True)
+        self.tables_dir.mkdir(parents=True, exist_ok=True)
         if not self.catalog_file.exists():
             self._save_catalog([])
 
@@ -47,6 +52,124 @@ class DocumentVault:
                 return doc
         return None
 
+    # -------------------------------------------------------------------------
+    # Structured Table Extraction
+    # -------------------------------------------------------------------------
+    def _extract_tables_from_pdf(self, doc_id: str, content_bytes: bytes) -> Tuple[str, List[Dict[str, Any]], int]:
+        """
+        Extract pages text and structured tables from PDF bytes using PyMuPDF table finder.
+        Returns: (augmented_text_with_tables, extracted_tables_list, page_count)
+        """
+        pdf_doc = pymupdf.open(stream=content_bytes, filetype="pdf")
+        page_count = len(pdf_doc)
+        pages_content = []
+        extracted_tables = []
+
+        for p_idx, page in enumerate(pdf_doc):
+            page_num = p_idx + 1
+            page_blocks = []
+            
+            # 1. Search for structured tables on this page
+            try:
+                tabs = page.find_tables()
+                if tabs and tabs.tables:
+                    for t_idx, tab in enumerate(tabs.tables):
+                        df = tab.to_pandas()
+                        if df.empty or len(df.columns) < 2:
+                            continue
+                        
+                        # Clean cell newlines and spaces
+                        df = df.map(lambda x: str(x).replace("\n", " ").strip() if pd.notna(x) else "")
+                        df.columns = [str(c).replace("\n", " ").strip() for c in df.columns]
+                        
+                        table_id = f"{doc_id}_p{page_num}_t{t_idx + 1}"
+                        md_table = tab.to_markdown()
+
+                        # Synthesize explicit row-level facts linking headers to values
+                        row_facts = []
+                        for r_idx, row in df.iterrows():
+                            items = [f"[{col}] = {val}" for col, val in row.items() if val and str(val).lower() not in ["none", "nan", ""]]
+                            if items:
+                                row_facts.append(f"Row {r_idx + 1}: " + ", ".join(items))
+                        
+                        row_facts_text = "\n".join(row_facts)
+                        table_title = f"Table {t_idx + 1} (Page {page_num}): {', '.join(df.columns[:4])}"
+
+                        # Augmented block for semantic LLM chunking
+                        table_repr = (
+                            f"\n\n[STRUCTURED_TABLE_START id='{table_id}' page='{page_num}']\n"
+                            f"**Table: {table_title}**\n\n"
+                            f"{md_table}\n\n"
+                            f"**Explicit Numerical & Relational Facts:**\n"
+                            f"{row_facts_text}\n"
+                            f"[STRUCTURED_TABLE_END]\n\n"
+                        )
+                        page_blocks.append(table_repr)
+
+                        extracted_tables.append({
+                            "table_id": table_id,
+                            "doc_id": doc_id,
+                            "page": page_num,
+                            "title": table_title,
+                            "columns": [str(c) for c in df.columns],
+                            "rows_count": len(df),
+                            "markdown": md_table,
+                            "row_facts": row_facts,
+                            "records": df.to_dict(orient="records")
+                        })
+            except Exception:
+                pass
+
+            # 2. Append narrative page text
+            page_text = page.get_text().strip()
+            if page_text:
+                page_blocks.append(page_text)
+
+            pages_content.append("\n\n".join(page_blocks))
+
+        return "\n\n--- PAGE BREAK ---\n\n".join(pages_content), extracted_tables, page_count
+
+    def _extract_tables_from_text(self, doc_id: str, text: str) -> Tuple[str, List[Dict[str, Any]], int]:
+        """Detect Markdown tables in raw text and extract structured representations."""
+        lines = text.splitlines()
+        page_count = max(1, len(lines) // 50)
+        extracted_tables = []
+        
+        table_lines = []
+        t_counter = 1
+        
+        for line in lines:
+            if "|" in line and line.strip().startswith("|") and line.strip().endswith("|"):
+                table_lines.append(line)
+            else:
+                if len(table_lines) >= 3:
+                    # Parse markdown table
+                    try:
+                        table_str = "\n".join(table_lines)
+                        header_line = table_lines[0]
+                        headers = [h.strip() for h in header_line.split("|")[1:-1]]
+                        table_id = f"{doc_id}_txt_t{t_counter}"
+                        t_counter += 1
+                        
+                        extracted_tables.append({
+                            "table_id": table_id,
+                            "doc_id": doc_id,
+                            "page": 1,
+                            "title": f"Structured Table {t_counter - 1} ({', '.join(headers[:3])})",
+                            "columns": headers,
+                            "rows_count": len(table_lines) - 2,
+                            "markdown": table_str,
+                            "records": []
+                        })
+                    except Exception:
+                        pass
+                table_lines = []
+                
+        return text, extracted_tables, page_count
+
+    # -------------------------------------------------------------------------
+    # Document Ingestion
+    # -------------------------------------------------------------------------
     def store_document(
         self,
         filename: str,
@@ -55,7 +178,8 @@ class DocumentVault:
         metadata: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
-        Persist document bytes to vault, compute SHA-256, extract text, and update catalog.
+        Persist document bytes to vault, compute SHA-256, extract structured tables and text,
+        and update catalog.
         """
         doc_hash = hashlib.sha256(content_bytes).hexdigest()
         doc_id = f"doc_{doc_hash[:12]}"
@@ -66,23 +190,26 @@ class DocumentVault:
         with open(target_path, "wb") as f:
             f.write(content_bytes)
 
-        # Extract text based on file format
+        # Extract text & structured tables based on file format
         if clean_filename.lower().endswith(".pdf") or source_type.lower() == "pdf":
             try:
-                pdf_doc = pymupdf.open(stream=content_bytes, filetype="pdf")
-                pages_text = [page.get_text() for page in pdf_doc]
-                raw_text = "\n".join(pages_text)
-                page_count = len(pdf_doc)
+                raw_text, tables, page_count = self._extract_tables_from_pdf(doc_id, content_bytes)
             except Exception:
                 raw_text = content_bytes.decode("utf-8", errors="ignore")
+                tables = []
                 page_count = 1
         else:
-            raw_text = content_bytes.decode("utf-8", errors="ignore")
-            page_count = max(1, len(raw_text.splitlines()) // 50)
+            decoded = content_bytes.decode("utf-8", errors="ignore")
+            raw_text, tables, page_count = self._extract_tables_from_text(doc_id, decoded)
+
+        # Persist extracted tables JSON
+        if tables:
+            tables_file = self.tables_dir / f"{doc_id}_tables.json"
+            with open(tables_file, "w", encoding="utf-8") as f:
+                json.dump(tables, f, indent=2)
 
         # Update metadata catalog
         catalog = self._load_catalog()
-        # Remove existing if duplicate
         catalog = [d for d in catalog if d["id"] != doc_id]
 
         entry = {
@@ -96,6 +223,7 @@ class DocumentVault:
             "source_type": source_type.upper(),
             "page_count": page_count,
             "char_count": len(raw_text),
+            "table_count": len(tables),
             "uploaded_at": time.strftime("%Y-%m-%d %H:%M:%S"),
             "status": "Indexed in Vault",
             "metadata": metadata or {}
@@ -104,10 +232,11 @@ class DocumentVault:
         self._save_catalog(catalog)
 
         entry["extracted_text"] = raw_text
+        entry["tables"] = tables
         return entry
 
     def delete_document(self, doc_id: str) -> bool:
-        """Remove a document from the vault."""
+        """Remove a document and its extracted tables from the vault."""
         catalog = self._load_catalog()
         doc_to_delete = None
         for doc in catalog:
@@ -119,31 +248,82 @@ class DocumentVault:
             file_path = Path(doc_to_delete["storage_path"])
             if file_path.exists():
                 file_path.unlink()
+            
+            # Delete tables file if exists
+            tables_file = self.tables_dir / f"{doc_id}_tables.json"
+            if tables_file.exists():
+                tables_file.unlink()
+
             catalog = [d for d in catalog if d["id"] != doc_id]
             self._save_catalog(catalog)
             return True
         return False
 
+    def get_tables(self, doc_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Return all structured tables from vault or for a specific document."""
+        all_tables = []
+        if doc_id:
+            tables_file = self.tables_dir / f"{doc_id}_tables.json"
+            if tables_file.exists():
+                try:
+                    with open(tables_file, "r", encoding="utf-8") as f:
+                        return json.load(f)
+                except Exception:
+                    return []
+            return []
+        
+        for p in self.tables_dir.glob("*_tables.json"):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    all_tables.extend(json.load(f))
+            except Exception:
+                continue
+        return all_tables
+
+    def find_relevant_tables(self, query: str, top_k: int = 3) -> List[Dict[str, Any]]:
+        """Find tables whose titles, columns, or cell facts match query keywords."""
+        tables = self.get_tables()
+        if not tables:
+            return []
+
+        q_terms = set(re.findall(r"\w+", query.lower()))
+        if not q_terms:
+            return []
+
+        scored = []
+        for tab in tables:
+            score = 0
+            title_terms = set(re.findall(r"\w+", tab.get("title", "").lower()))
+            score += len(q_terms.intersection(title_terms)) * 3
+
+            cols_text = " ".join(tab.get("columns", [])).lower()
+            cols_terms = set(re.findall(r"\w+", cols_text))
+            score += len(q_terms.intersection(cols_terms)) * 2
+
+            facts_text = tab.get("markdown", "").lower()
+            facts_terms = set(re.findall(r"\w+", facts_text))
+            score += len(q_terms.intersection(facts_terms))
+
+            if score > 0:
+                scored.append((score, tab))
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [item[1] for item in scored[:top_k]]
+
     @staticmethod
-    def format_citations(
-        sources: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    def format_citations(sources: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Format source excerpts into verified citation cards with direct links.
         """
         citations = []
         for idx, src in enumerate(sources, 1):
-            doc_name = src.get("document_title", src.get("title", "Enterprise Document"))
-            chunk_id = src.get("chunk_id", f"chunk_{idx}")
-            excerpt = src.get("excerpt", src.get("text", ""))
-            relevance = src.get("relevance", "High Confidence")
-            
             citations.append({
                 "index": idx,
-                "citation_tag": f"[{idx}]",
-                "document_title": doc_name,
-                "chunk_id": chunk_id,
-                "excerpt": excerpt,
-                "relevance": relevance
+                "document_title": src.get("document_title", "Enterprise Knowledge Vault"),
+                "chunk_id": src.get("chunk_id", f"chunk_{idx}"),
+                "excerpt": src.get("excerpt", "").strip(),
+                "relevance": src.get("relevance", "Verified Grounding"),
+                "is_table": src.get("is_table", False),
+                "table_markdown": src.get("table_markdown", "")
             })
         return citations

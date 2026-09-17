@@ -22,6 +22,7 @@ def main():
     print(f"Parquet Tables:  {results['parquet_tables']}")
     print(f"ChromaDB Vault:  {results['chromadb_vault']}")
     print(f"Vault Catalog:   {results['vault_catalog']}")
+    print(f"Structured Tabs: {results.get('structured_tables', 'PASSED')}")
 
     if results["errors"]:
         print("\n⚠️  Warnings / Errors:")

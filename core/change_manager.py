@@ -185,6 +185,7 @@ GraphRAG-Breakdown/
             "parquet_tables": "PASSED",
             "chromadb_vault": "PASSED",
             "vault_catalog": "PASSED",
+            "structured_tables": "PASSED",
             "errors": []
         }
 
@@ -206,10 +207,17 @@ GraphRAG-Breakdown/
                 results["parquet_tables"] = "WARNING (Missing)"
                 results["errors"].append(f"Missing {p.name}")
 
-        # 3. Document Vault Catalog Check
+        # 3. Document Vault Catalog & Structured Tables Check
         catalog_path = self.root_dir / "vault/catalog.json"
         if not catalog_path.exists():
             results["vault_catalog"] = "INITIALIZED"
+        
+        tables_dir = self.root_dir / "vault/tables"
+        if tables_dir.exists():
+            table_files = list(tables_dir.glob("*.json"))
+            results["structured_tables"] = f"PASSED ({len(table_files)} document table sets)"
+        else:
+            results["structured_tables"] = "INITIALIZED"
         
         results["passed"] = (results["syntax_check"] == "PASSED")
         return results

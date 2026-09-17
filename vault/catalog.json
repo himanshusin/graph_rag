@@ -26,11 +26,10 @@
     "sha256": "f0fcef27b1358c51ac7daafd26ddb7b459d644ada7b7adb197dbaadf369c04ca",
     "source_type": "PDF",
     "page_count": 115,
-    "char_count": 320859,
-    "uploaded_at": "2026-09-17 10:06:50",
+    "char_count": 370822,
+    "table_count": 10,
+    "uploaded_at": "2026-09-17 10:49:58",
     "status": "Indexed in Vault",
-    "metadata": {
-      "origin": "arXiv Preprint"
-    }
+    "metadata": {}
   }
 ]
