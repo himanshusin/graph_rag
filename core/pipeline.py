@@ -1,14 +1,25 @@
+"""GraphRAG indexing pipeline: chunking, extraction, clustering, community reports.
+
+The engine builds the whole knowledge base from a set of documents so that the
+graph, the community reports, the vector store and the concept map always
+describe the same corpus. Rebuilding is cumulative over the vault rather than
+per upload, which is what lets several documents share one graph.
+"""
+
 import os
 import re
-import html
 import json
 import time
 import uuid
+from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List, Dict, Any, Tuple, Optional, Callable
 
 import pandas as pd
 import networkx as nx
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from pyvis.network import Network
 from dotenv import load_dotenv
@@ -24,18 +35,36 @@ truststore.inject_into_ssl()
 
 import pymupdf
 
+CHROMA_COLLECTION = "paper_collection"
+
+# Community palette from the developer guide §2, in order.
+COMMUNITY_PALETTE = [
+    "#3056D3", "#1F8A5B", "#B7791F", "#8A8A83",
+    "#B03A2E", "#6B4FBB", "#2A8FA8", "#C25E9A",
+]
+
+ENTITY_COLUMNS = ["id", "human_readable_id", "title", "type", "description", "text_unit_ids"]
+RELATIONSHIP_COLUMNS = [
+    "id", "human_readable_id", "source", "target", "type", "description",
+    "weight", "combined_degree", "text_unit_ids",
+]
+NODE_COLUMNS = ["id", "human_readable_id", "title", "community", "level", "degree", "x", "y"]
+REPORT_COLUMNS = [
+    "id", "human_readable_id", "community", "parent", "level", "title", "summary",
+    "full_content", "rank", "rank_explanation", "findings", "full_content_json",
+    "period", "size",
+]
+
 
 # -----------------------------------------------------------------------------
-# 1. Document Ingestor
-# -----------------------------------------------------------------------------
-# 1. Document Ingestor (Table-Aware)
+# 1. Document ingestor
 # -----------------------------------------------------------------------------
 class DocumentIngestor:
-    """Handles multi-format document text and structured table extraction (PDF, TXT, Markdown)."""
+    """Multi-format text and structured table extraction (PDF, TXT, Markdown)."""
 
     @staticmethod
     def extract_from_pdf_bytes(pdf_bytes: bytes) -> str:
-        """Extract pages and structured tables from PDF bytes using PyMuPDF table finder."""
+        """Extract pages and structured tables from PDF bytes using the PyMuPDF table finder."""
         doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
         pages_content = []
         for p_idx, page in enumerate(doc):
@@ -44,7 +73,7 @@ class DocumentIngestor:
             try:
                 tabs = page.find_tables()
                 if tabs and tabs.tables:
-                    for t_idx, tab in enumerate(tabs.tables):
+                    for tab in tabs.tables:
                         df = tab.to_pandas()
                         if not df.empty and len(df.columns) >= 2:
                             df = df.map(lambda x: str(x).replace("\n", " ").strip() if pd.notna(x) else "")
@@ -52,7 +81,10 @@ class DocumentIngestor:
                             md_tab = tab.to_markdown()
                             row_facts = []
                             for r_idx, row in df.iterrows():
-                                items = [f"[{col}] = {val}" for col, val in row.items() if val and str(val).lower() not in ["none", "nan", ""]]
+                                items = [
+                                    f"[{col}] = {val}" for col, val in row.items()
+                                    if val and str(val).lower() not in ["none", "nan", ""]
+                                ]
                                 if items:
                                     row_facts.append(f"Row {r_idx + 1}: " + ", ".join(items))
                             blocks.append(
@@ -78,18 +110,15 @@ class DocumentIngestor:
 
 
 # -----------------------------------------------------------------------------
-# 2. Text Chunker (Table-Preserving)
+# 2. Text chunker (table preserving)
 # -----------------------------------------------------------------------------
 class TextChunker:
-    """Splits document text into manageable token chunks with overlap while keeping tables intact."""
+    """Splits document text into token chunks with overlap while keeping tables intact."""
 
     def __init__(self, chunk_size: int = 1200, chunk_overlap: int = 100):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.splitter = TokenTextSplitter(
-            chunk_size=chunk_size,
-            chunk_overlap=chunk_overlap
-        )
+        self.splitter = TokenTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
 
     def split(self, text: str) -> List[str]:
         if "[STRUCTURED_TABLE" in text:
@@ -111,7 +140,7 @@ class TextChunker:
 
 
 # -----------------------------------------------------------------------------
-# 3. Numeric & Semantic Entity & Relationship Extractor
+# 3. Entity & relationship extractor
 # -----------------------------------------------------------------------------
 EXTRACTION_PROMPT = """
 -Goal-
@@ -134,9 +163,10 @@ Format: ("entity"<|delimiter|><entity_name><|delimiter|><entity_type><|delimiter
 2. Identify all relationships directly mentioned between entities, paying special attention to quantitative, comparative, and evaluative relationships:
 - source_entity: name of the source entity (e.g., "LLAMA-3-8B", "SALES DIVISION")
 - target_entity: name of the target entity (e.g., "MMLU ACCURACY", "GSM8K", "89.2%", "REVENUE")
+- relationship_type: one lower-case verb or short verb phrase naming the link, with no spaces around it (e.g., extends, reduces, measured by, alternative to, requires, improves, part of, evaluated on)
 - relationship_description: explanation of why the entities are related. CRITICAL: ALWAYS preserve exact numbers, percentages, dollar amounts, performance scores, and comparative deltas in this description.
 - relationship_strength: integer score between 1 and 10 representing relationship strength/confidence
-Format: ("relationship"<|delimiter|><source_entity><|delimiter|><target_entity><|delimiter|><relationship_description><|delimiter|><relationship_strength>)
+Format: ("relationship"<|delimiter|><source_entity><|delimiter|><target_entity><|delimiter|><relationship_type><|delimiter|><relationship_description><|delimiter|><relationship_strength>)
 
 3. Return output strictly in the format above, one item per line. Do not output anything else.
 
@@ -144,8 +174,9 @@ Input Text:
 {input_text}
 """
 
+
 class EntityRelationshipExtractor:
-    """Extracts entities and relationships from chunks using OpenAI LLM."""
+    """Extracts entities and relationships from chunks using an OpenAI chat model."""
 
     def __init__(self, model_name: str = "gpt-4o-mini", temperature: float = 0.0, api_key: Optional[str] = None):
         self.llm = ChatOpenAI(
@@ -195,13 +226,19 @@ class EntityRelationshipExtractor:
                         "chunk_id": chunk_id
                     })
                 elif kind == "relationship" and len(parts) >= 5:
-                    digits = re.findall(r"\d+", parts[4])
+                    # The typed form has 6 fields; tolerate the untyped 5-field form.
+                    if len(parts) >= 6:
+                        rel_type, description, strength = parts[3], parts[4], parts[5]
+                    else:
+                        rel_type, description, strength = "", parts[3], parts[4]
+                    digits = re.findall(r"\d+", strength)
                     weight = float(digits[0]) if digits else 1.0
                     relationships.append({
                         "source": parts[1].upper(),
                         "target": parts[2].upper(),
-                        "description": parts[3],
-                        "weight": weight,
+                        "type": (rel_type or "related").strip().lower()[:40],
+                        "description": description,
+                        "weight": max(1.0, min(10.0, weight)),
                         "chunk_id": chunk_id
                     })
 
@@ -209,19 +246,139 @@ class EntityRelationshipExtractor:
 
 
 # -----------------------------------------------------------------------------
-# 4. Master GraphRAG Engine
+# 4. Community report synthesizer
+# -----------------------------------------------------------------------------
+REPORT_PROMPT = """You are an analyst writing a report about one community of related
+concepts extracted from a document corpus.
+
+Write the report as strict JSON with exactly these keys:
+- "title": a short specific noun phrase naming the theme of this community (no
+  "Community N" prefixes, no numbering, 3-8 words)
+- "summary": 2-4 sentences describing what this community covers, the concrete
+  relationships inside it, and any exact numbers, percentages or units that
+  appear in the source descriptions. Preserve figures verbatim.
+- "findings": a list of 2-4 objects, each {{"summary": "<short claim>", "explanation": "<2-3 sentences with supporting detail and exact figures>"}}
+- "rating": a number from 1 to 10 for how important this community is for
+  understanding the corpus, where 10 means central and 1 means peripheral
+- "rating_explanation": one sentence justifying the rating
+
+Base every statement only on the entities and relationships given below. Do not
+invent facts and do not add numbers that are not present.
+
+Entities in this community:
+{entities}
+
+Relationships inside this community:
+{relationships}
+
+Return only the JSON object.
+"""
+
+
+class CommunityReportSynthesizer:
+    """Generates community reports with an LLM, mirroring GraphRAG's report step."""
+
+    def __init__(self, model_name: str = "gpt-4o-mini", temperature: float = 0.2, api_key: Optional[str] = None):
+        self.llm = ChatOpenAI(
+            model=model_name,
+            temperature=temperature,
+            api_key=api_key or os.getenv("OPENAI_API_KEY")
+        )
+        self.chain = ChatPromptTemplate.from_template(REPORT_PROMPT) | self.llm | StrOutputParser()
+
+    def synthesize(
+        self,
+        entity_rows: List[Dict[str, Any]],
+        relationship_rows: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        """Return title, summary, findings, rating and rating_explanation for a community."""
+        entities_text = "\n".join(
+            f"- {r['title']} ({r['type']}): {_clip(r.get('description', ''), 400)}"
+            for r in entity_rows
+        ) or "- (none)"
+        relationships_text = "\n".join(
+            f"- {r['source']} {r.get('type') or 'relates to'} {r['target']} "
+            f"(strength {r['weight']:.0f}/10): {_clip(r.get('description', ''), 300)}"
+            for r in relationship_rows
+        ) or "- (no relationships inside this community)"
+
+        raw = self.chain.invoke({"entities": entities_text, "relationships": relationships_text})
+        return self._parse(raw)
+
+    @staticmethod
+    def _parse(raw: str) -> Dict[str, Any]:
+        """Parse the model's JSON, tolerating code fences and surrounding prose."""
+        text = raw.strip()
+        if text.startswith("```"):
+            text = re.sub(r"^```[a-zA-Z]*\s*", "", text)
+            text = re.sub(r"\s*```$", "", text)
+        start, end = text.find("{"), text.rfind("}")
+        if start != -1 and end > start:
+            text = text[start:end + 1]
+        data = json.loads(text)
+
+        findings = []
+        for item in data.get("findings") or []:
+            if isinstance(item, dict):
+                findings.append({
+                    "summary": str(item.get("summary", "")).strip(),
+                    "explanation": str(item.get("explanation", "")).strip(),
+                })
+            elif isinstance(item, str):
+                findings.append({"summary": item.strip(), "explanation": ""})
+
+        rating = data.get("rating")
+        try:
+            rating = round(float(rating), 1)
+        except (TypeError, ValueError):
+            rating = None
+        if rating is not None:
+            rating = max(1.0, min(10.0, rating))
+
+        return {
+            "title": str(data.get("title", "")).strip(),
+            "summary": str(data.get("summary", "")).strip(),
+            "findings": findings,
+            "rating": rating,
+            "rating_explanation": str(data.get("rating_explanation", "")).strip(),
+        }
+
+
+def _clip(text: Any, limit: int) -> str:
+    cleaned = " ".join(str(text or "").split())
+    return cleaned if len(cleaned) <= limit else cleaned[:limit].rstrip() + "…"
+
+
+def _fallback_rank(entity_count: int, internal_edges: int, max_entities: int) -> Tuple[float, str]:
+    """Derive an importance rank from graph structure when the LLM rating is unusable."""
+    if max_entities <= 0:
+        return 1.0, "Empty community."
+    size_share = entity_count / max_entities
+    density = internal_edges / max(1, entity_count)
+    score = 1.0 + 9.0 * min(1.0, 0.6 * size_share + 0.4 * min(1.0, density / 2.0))
+    return (
+        round(score, 1),
+        f"Derived from {entity_count} concepts and {internal_edges} internal relationships.",
+    )
+
+
+# -----------------------------------------------------------------------------
+# 5. GraphRAG engine
 # -----------------------------------------------------------------------------
 class GraphRAGEngine:
     """
-    Complete, industry-grade GraphRAG Pipeline:
+    Builds the knowledge base from a set of documents:
     1. Chunking
-    2. Entity/Relationship Extraction
-    3. Deduplication & Graph Network Construction
-    4. Louvain Community Detection
-    5. Hierarchical Community Report Generation
-    6. ChromaDB Vector Store Ingestion
-    7. Parquet & PyVis Export
+    2. Entity / relationship extraction
+    3. Deduplication and graph construction
+    4. Louvain community detection
+    5. LLM community report synthesis
+    6. ChromaDB vector ingestion
+    7. Parquet and concept-map export
     """
+
+    STEPS = ["Chunk documents", "Extract concepts", "Cluster communities",
+             "Write reports", "Sync vectors", "Draw concept map"]
 
     def __init__(
         self,
@@ -229,154 +386,365 @@ class GraphRAGEngine:
         chroma_dir: str = "./notebook/chromadb",
         notebook_dir: str = "./notebook",
         model_name: str = "gpt-4o-mini",
-        temperature: float = 0.0
+        temperature: float = 0.0,
+        max_workers: int = 4,
     ):
         self.output_dir = Path(output_dir)
         self.chroma_dir = Path(chroma_dir)
         self.notebook_dir = Path(notebook_dir)
         self.model_name = model_name
         self.temperature = temperature
+        self.max_workers = max_workers
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.chroma_dir.mkdir(parents=True, exist_ok=True)
         self.notebook_dir.mkdir(parents=True, exist_ok=True)
 
+    # -- public API ----------------------------------------------------------
     def build_from_text(
         self,
         document_text: str,
-        document_title: str = "Enterprise Document",
+        document_title: str = "Document",
+        document_id: Optional[str] = None,
         max_chunks: Optional[int] = 10,
         chunk_size: int = 1200,
         chunk_overlap: int = 100,
-        progress_callback: Optional[Callable[[float, str, Dict[str, Any]], None]] = None
+        progress_callback: Optional[Callable[[float, str, Dict[str, Any]], None]] = None,
     ) -> Dict[str, Any]:
+        """Build the knowledge base from a single document."""
+        return self.build_from_documents(
+            [{
+                "id": document_id or "doc_adhoc",
+                "title": document_title,
+                "text": document_text,
+            }],
+            max_chunks_per_doc=max_chunks,
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            progress_callback=progress_callback,
+        )
+
+    def build_from_documents(
+        self,
+        documents: List[Dict[str, Any]],
+        max_chunks_per_doc: Optional[int] = 10,
+        chunk_size: int = 1200,
+        chunk_overlap: int = 100,
+        progress_callback: Optional[Callable[[float, str, Dict[str, Any]], None]] = None,
+    ) -> Dict[str, Any]:
+        """Rebuild the whole knowledge base from the given documents.
+
+        Each document is a mapping with ``id``, ``title`` and ``text``. Chunk ids
+        are namespaced by document id so the vector store stays deletable per
+        document and every citation can be traced back to its source file.
+        """
         start_time = time.perf_counter()
-        
+
         def notify(progress: float, message: str, stats: Optional[Dict[str, Any]] = None):
             if progress_callback:
                 progress_callback(progress, message, stats or {})
 
-        # Step 1: Chunking
-        notify(0.05, "Splitting document into semantic token chunks...")
+        # Step 1: chunking, per document
+        notify(0.04, "Splitting documents into token chunks", {"step": "Chunk documents"})
         chunker = TextChunker(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-        all_chunks = chunker.split(document_text)
+        units: List[Dict[str, Any]] = []
+        per_document: Dict[str, Dict[str, Any]] = {}
 
-        chunks_to_process = all_chunks[:max_chunks] if (max_chunks and max_chunks > 0) else all_chunks
+        for doc in documents:
+            doc_id = str(doc.get("id") or "doc_unknown")
+            title = str(doc.get("title") or doc_id)
+            text = str(doc.get("text") or "")
+            all_chunks = chunker.split(text) if text.strip() else []
+            selected = all_chunks[:max_chunks_per_doc] if (max_chunks_per_doc and max_chunks_per_doc > 0) else all_chunks
+            per_document[doc_id] = {
+                "document_id": doc_id,
+                "document_title": title,
+                "chunks_total": len(all_chunks),
+                "chunks_indexed": len(selected),
+            }
+            for local_idx, chunk_text in enumerate(selected):
+                units.append({
+                    "chunk_id": f"{doc_id}::chunk_{local_idx}",
+                    "document_id": doc_id,
+                    "document_title": title,
+                    "chunk_index": local_idx,
+                    "text": chunk_text,
+                })
 
-        notify(0.12, f"Prepared {len(chunks_to_process)} chunks for knowledge extraction.", {
-            "total_chunks": len(all_chunks),
-            "processed_chunks": len(chunks_to_process)
+        total_units = len(units)
+        notify(0.10, f"Prepared {total_units} chunks across {len(documents)} documents", {
+            "step": "Chunk documents",
+            "chunk_total": total_units,
+            "documents": len(documents),
         })
 
-        # Step 2: Extraction
+        if total_units == 0:
+            raise ValueError("No text could be chunked from the supplied documents.")
+
+        # Step 2: extraction, parallel across chunks
         extractor = EntityRelationshipExtractor(model_name=self.model_name, temperature=self.temperature)
-        all_entities_raw = []
-        all_relationships_raw = []
+        all_entities_raw: List[Dict[str, Any]] = []
+        all_relationships_raw: List[Dict[str, Any]] = []
+        completed = 0
 
-        total_chunks = len(chunks_to_process)
-        for i, chunk_text in enumerate(chunks_to_process):
-            chunk_id = f"chunk_{i}"
-            step_progress = 0.15 + (0.45 * ((i + 1) / total_chunks))
-            notify(step_progress, f"Extracting entities & relations from chunk {i + 1}/{total_chunks}...", {
-                "chunk_current": i + 1,
-                "chunk_total": total_chunks,
-                "raw_entities": len(all_entities_raw),
-                "raw_relationships": len(all_relationships_raw)
-            })
+        def extract(unit: Dict[str, Any]):
+            return extractor.extract_chunk(unit["text"], unit["chunk_id"])
 
-            e_list, r_list = extractor.extract_chunk(chunk_text, chunk_id)
-            all_entities_raw.extend(e_list)
-            all_relationships_raw.extend(r_list)
+        with ThreadPoolExecutor(max_workers=min(self.max_workers, total_units)) as pool:
+            for entities, relationships in pool.map(extract, units):
+                all_entities_raw.extend(entities)
+                all_relationships_raw.extend(relationships)
+                completed += 1
+                notify(
+                    0.12 + 0.43 * (completed / total_units),
+                    f"Extracting concepts from chunk {completed} of {total_units}",
+                    {
+                        "step": "Extract concepts",
+                        "chunk_current": completed,
+                        "chunk_total": total_units,
+                        "raw_entities": len(all_entities_raw),
+                        "raw_relationships": len(all_relationships_raw),
+                    },
+                )
 
-        # Step 3: Deduplication
-        notify(0.65, "Deduplicating entities and merging relationship weights...")
-        entity_groups = {}
-        for e in all_entities_raw:
-            key = (e["title"], e["type"])
-            if key not in entity_groups:
-                entity_groups[key] = {"descriptions": [], "chunk_ids": set()}
-            entity_groups[key]["descriptions"].append(e["description"])
-            entity_groups[key]["chunk_ids"].add(e["chunk_id"])
+        # Step 3: deduplication
+        notify(0.58, "Deduplicating concepts and merging relationship weights", {"step": "Cluster communities"})
+        df_entities = self._build_entities(all_entities_raw)
+        df_relationships = self._build_relationships(all_relationships_raw, set(df_entities["title"]))
 
-        entities_rows = []
-        for h_id, ((title, ent_type), data) in enumerate(entity_groups.items()):
-            entities_rows.append({
+        # Step 4: community detection and layout
+        notify(0.64, "Detecting communities with Louvain clustering", {"step": "Cluster communities"})
+        graph = nx.Graph()
+        for _, row in df_entities.iterrows():
+            graph.add_node(row["title"], type=row["type"], description=row["description"])
+        for _, row in df_relationships.iterrows():
+            if graph.has_node(row["source"]) and graph.has_node(row["target"]):
+                graph.add_edge(row["source"], row["target"], weight=row["weight"], description=row["description"])
+
+        communities = (
+            list(nx.algorithms.community.louvain_communities(graph, weight="weight", seed=42))
+            if graph.number_of_nodes() else []
+        )
+        communities.sort(key=len, reverse=True)
+        community_of = {
+            node: comm_id
+            for comm_id, members in enumerate(communities)
+            for node in members
+        }
+
+        positions = nx.spring_layout(graph, seed=42) if graph.number_of_nodes() else {}
+        degrees = dict(graph.degree())
+        df_nodes = self._build_nodes(df_entities, community_of, degrees, positions)
+
+        # Step 5: community reports
+        notify(0.70, f"Writing reports for {len(communities)} communities", {"step": "Write reports"})
+        df_reports = self._build_reports(
+            communities, df_entities, df_relationships, graph, notify
+        )
+
+        # attach the report rank back onto the nodes so the map can size by rank
+        rank_by_community = (
+            dict(zip(df_reports["community"], df_reports["rank"])) if not df_reports.empty else {}
+        )
+        df_nodes["community_rank"] = df_nodes["community"].map(rank_by_community).fillna(0.0).astype(float)
+
+        # Step 6: persist parquet
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        df_entities.to_parquet(self.output_dir / "create_final_entities.parquet")
+        df_relationships.to_parquet(self.output_dir / "create_final_relationships.parquet")
+        df_nodes.to_parquet(self.output_dir / "create_final_nodes.parquet")
+        df_reports.to_parquet(self.output_dir / "create_final_community_reports.parquet")
+
+        # Step 7: vector sync
+        notify(0.90, "Syncing chunks with the vector store", {"step": "Sync vectors"})
+        self._sync_chroma(units)
+
+        # Step 8: concept map
+        notify(0.96, "Drawing the concept map", {"step": "Draw concept map"})
+        self._generate_visualizations(df_nodes, df_relationships)
+
+        elapsed = round(time.perf_counter() - start_time, 2)
+        result = {
+            "elapsed_seconds": elapsed,
+            "entities_count": len(df_entities),
+            "relationships_count": len(df_relationships),
+            "nodes_count": len(df_nodes),
+            "communities_count": len(communities),
+            "chunks_count": total_units,
+            "documents": list(per_document.values()),
+            "entities_df": df_entities,
+            "relationships_df": df_relationships,
+            "nodes_df": df_nodes,
+            "community_reports_df": df_reports,
+        }
+        notify(1.0, f"Indexed {len(df_entities)} concepts in {elapsed}s", {
+            "step": "Draw concept map",
+            "elapsed_seconds": elapsed,
+            "entities": len(df_entities),
+            "relationships": len(df_relationships),
+            "communities": len(communities),
+            "vector_chunks": total_units,
+        })
+        return result
+
+    # -- frame builders ------------------------------------------------------
+    @staticmethod
+    def _build_entities(raw: List[Dict[str, Any]]) -> pd.DataFrame:
+        groups: Dict[Tuple[str, str], Dict[str, Any]] = {}
+        for item in raw:
+            key = (item["title"], item["type"])
+            bucket = groups.setdefault(key, {"descriptions": [], "chunk_ids": set()})
+            bucket["descriptions"].append(item["description"])
+            bucket["chunk_ids"].add(item["chunk_id"])
+
+        rows = []
+        for h_id, ((title, ent_type), data) in enumerate(groups.items()):
+            unique = list(dict.fromkeys(d.strip() for d in data["descriptions"] if d and d.strip()))
+            rows.append({
                 "id": str(uuid.uuid4()),
                 "human_readable_id": h_id,
                 "title": title,
                 "type": ent_type,
-                "description": " ".join(list(dict.fromkeys(data["descriptions"]))),
-                "text_unit_ids": list(data["chunk_ids"])
+                "description": _clip(" ".join(unique), 1200),
+                "text_unit_ids": sorted(data["chunk_ids"]),
             })
-        df_entities = pd.DataFrame(entities_rows) if entities_rows else pd.DataFrame(columns=["id", "human_readable_id", "title", "type", "description", "text_unit_ids"])
+        return pd.DataFrame(rows) if rows else pd.DataFrame(columns=ENTITY_COLUMNS)
 
-        rel_groups = {}
-        for r in all_relationships_raw:
-            key = (r["source"], r["target"])
-            if key not in rel_groups:
-                rel_groups[key] = {"descriptions": [], "weights": [], "chunk_ids": set()}
-            rel_groups[key]["descriptions"].append(r["description"])
-            rel_groups[key]["weights"].append(r["weight"])
-            rel_groups[key]["chunk_ids"].add(r["chunk_id"])
+    @staticmethod
+    def _build_relationships(raw: List[Dict[str, Any]], known_titles: set) -> pd.DataFrame:
+        groups: Dict[Tuple[str, str], Dict[str, Any]] = {}
+        for item in raw:
+            # Keep only relationships whose endpoints were also extracted as entities,
+            # so the graph, the catalog and the concept map agree on the node set.
+            if item["source"] not in known_titles or item["target"] not in known_titles:
+                continue
+            if item["source"] == item["target"]:
+                continue
+            key = tuple(sorted((item["source"], item["target"])))
+            bucket = groups.setdefault(
+                key, {"descriptions": [], "weights": [], "types": [], "chunk_ids": set()}
+            )
+            bucket["descriptions"].append(item["description"])
+            bucket["weights"].append(item["weight"])
+            bucket["types"].append(item.get("type") or "related")
+            bucket["chunk_ids"].add(item["chunk_id"])
 
-        rel_rows = []
-        for h_id, ((src, tgt), data) in enumerate(rel_groups.items()):
-            rel_rows.append({
+        rows = []
+        for h_id, ((src, tgt), data) in enumerate(groups.items()):
+            unique = list(dict.fromkeys(d.strip() for d in data["descriptions"] if d and d.strip()))
+            # Several chunks can describe the same pair; keep the most frequent label.
+            rel_type = Counter(data["types"]).most_common(1)[0][0]
+            rows.append({
                 "id": str(uuid.uuid4()),
                 "human_readable_id": h_id,
                 "source": src,
                 "target": tgt,
-                "description": " ".join(list(dict.fromkeys(data["descriptions"]))),
-                "weight": float(sum(data["weights"]) / len(data["weights"])),
-                "combined_degree": len(data["weights"]),
-                "text_unit_ids": list(data["chunk_ids"])
+                "type": rel_type,
+                "description": _clip(" ".join(unique), 800),
+                "weight": round(float(sum(data["weights"]) / len(data["weights"])), 1),
+                "combined_degree": len(data["chunk_ids"]),
+                "text_unit_ids": sorted(data["chunk_ids"]),
             })
-        df_relationships = pd.DataFrame(rel_rows) if rel_rows else pd.DataFrame(columns=["id", "human_readable_id", "source", "target", "description", "weight", "combined_degree", "text_unit_ids"])
+        return pd.DataFrame(rows) if rows else pd.DataFrame(columns=RELATIONSHIP_COLUMNS)
 
-        # Step 4: Community Clustering & Graph Layout
-        notify(0.75, "Running Louvain community clustering & graph layout...")
-        G = nx.Graph()
+    @staticmethod
+    def _build_nodes(
+        df_entities: pd.DataFrame,
+        community_of: Dict[str, int],
+        degrees: Dict[str, int],
+        positions: Dict[str, Any],
+    ) -> pd.DataFrame:
+        rows = []
         for _, row in df_entities.iterrows():
-            G.add_node(row["title"], type=row["type"], description=row["description"], id=row["id"], human_readable_id=row["human_readable_id"])
-
-        for _, row in df_relationships.iterrows():
-            if G.has_node(row["source"]) and G.has_node(row["target"]):
-                G.add_edge(row["source"], row["target"], weight=row["weight"], description=row["description"])
-
-        communities = list(nx.algorithms.community.louvain_communities(G, weight="weight", seed=42)) if len(G.nodes) > 0 else []
-        node_community_map = {}
-        for comm_id, comm in enumerate(communities):
-            for node_name in comm:
-                node_community_map[node_name] = comm_id
-
-        pos = nx.spring_layout(G, seed=42) if len(G.nodes) > 0 else {}
-        degrees = dict(G.degree())
-
-        nodes_rows = []
-        for _, row in df_entities.iterrows():
-            node_name = row["title"]
-            nodes_rows.append({
+            title = row["title"]
+            point = positions.get(title, [0.0, 0.0])
+            rows.append({
                 "id": row["id"],
                 "human_readable_id": row["human_readable_id"],
-                "title": node_name,
-                "community": node_community_map.get(node_name, 0),
+                "title": title,
+                "community": int(community_of.get(title, 0)),
                 "level": 0,
-                "degree": degrees.get(node_name, 0),
-                "x": float(pos.get(node_name, [0.0, 0.0])[0]),
-                "y": float(pos.get(node_name, [0.0, 0.0])[1])
+                "degree": int(degrees.get(title, 0)),
+                "x": float(point[0]),
+                "y": float(point[1]),
             })
-        df_nodes = pd.DataFrame(nodes_rows) if nodes_rows else pd.DataFrame(columns=["id", "human_readable_id", "title", "community", "level", "degree", "x", "y"])
+        return pd.DataFrame(rows) if rows else pd.DataFrame(columns=NODE_COLUMNS)
 
-        # Step 5: Community Reports
-        notify(0.85, "Synthesizing hierarchical community reports & summaries...")
-        comm_reports_rows = []
-        for comm_id, comm_nodes in enumerate(communities):
-            comm_entities = list(comm_nodes)
-            title = f"Domain {comm_id}: " + ", ".join(comm_entities[:4])
-            summary = f"This strategic domain encompasses {len(comm_entities)} key entities: " + ", ".join(comm_entities)
-            full_content = f"# {title}\n\n## Strategic Overview\n{summary}\n\n## Key Strategic Concepts\n" + "\n".join([f"- **{e}**" for e in comm_entities])
-            
-            comm_reports_rows.append({
+    def _build_reports(
+        self,
+        communities: List[set],
+        df_entities: pd.DataFrame,
+        df_relationships: pd.DataFrame,
+        graph: nx.Graph,
+        notify: Callable[..., None],
+    ) -> pd.DataFrame:
+        if not communities:
+            return pd.DataFrame(columns=REPORT_COLUMNS)
+
+        entities_by_title = {row["title"]: row for row in df_entities.to_dict("records")}
+        relationship_records = df_relationships.to_dict("records")
+        max_size = max(len(c) for c in communities)
+        synthesizer = CommunityReportSynthesizer(model_name=self.model_name, temperature=0.2)
+        period = time.strftime("%Y-%m-%d")
+
+        def build_one(indexed: Tuple[int, set]) -> Dict[str, Any]:
+            comm_id, members = indexed
+            member_rows = [entities_by_title[t] for t in members if t in entities_by_title]
+            member_rows.sort(key=lambda r: graph.degree(r["title"]) if graph.has_node(r["title"]) else 0, reverse=True)
+            internal = [
+                r for r in relationship_records
+                if r["source"] in members and r["target"] in members
+            ]
+            internal.sort(key=lambda r: r["weight"], reverse=True)
+
+            fallback_rank, fallback_reason = _fallback_rank(len(member_rows), len(internal), max_size)
+            top_names = [r["title"] for r in member_rows[:4]]
+
+            report = None
+            try:
+                report = synthesizer.synthesize(member_rows[:30], internal[:40])
+            except Exception as exc:  # keep indexing resilient to a single bad response
+                notify(0.0, f"Report synthesis fell back for community {comm_id}: {exc}",
+                       {"step": "Write reports", "community": comm_id})
+
+            if report and report.get("title") and report.get("summary"):
+                title = report["title"]
+                summary = report["summary"]
+                findings = report["findings"] or [{"summary": title, "explanation": summary}]
+                rank = report["rating"] if report["rating"] is not None else fallback_rank
+                rank_explanation = report["rating_explanation"] or fallback_reason
+            else:
+                title = ", ".join(top_names) if top_names else f"Community {comm_id}"
+                summary = (
+                    f"{len(member_rows)} related concepts including {', '.join(top_names)}, "
+                    f"connected by {len(internal)} relationships."
+                )
+                findings = [{"summary": title, "explanation": summary}]
+                rank = fallback_rank
+                rank_explanation = fallback_reason
+
+            body_lines = [f"# {title}", "", "## Summary", summary, ""]
+            for finding in findings:
+                body_lines.append(f"## {finding['summary']}")
+                if finding["explanation"]:
+                    body_lines.append(finding["explanation"])
+                body_lines.append("")
+            body_lines.append("## Concepts in this community")
+            body_lines.extend(
+                f"- **{r['title']}** ({r['type']}) · degree "
+                f"{graph.degree(r['title']) if graph.has_node(r['title']) else 0}"
+                for r in member_rows
+            )
+            if internal:
+                body_lines.extend(["", "## Relationships"])
+                body_lines.extend(
+                    f"- {r['source']} → {r['target']} · {r.get('type') or 'related'} "
+                    f"({r['weight']:.0f}/10): {r['description']}"
+                    for r in internal[:20]
+                )
+            full_content = "\n".join(body_lines)
+
+            return {
                 "id": str(uuid.uuid4()),
                 "human_readable_id": comm_id,
                 "community": comm_id,
@@ -385,130 +753,198 @@ class GraphRAGEngine:
                 "title": title,
                 "summary": summary,
                 "full_content": full_content,
-                "rank": 7.5,
-                "rank_explanation": "Based on graph connectivity and node centrality",
-                "findings": json.dumps([{"explanation": summary}]),
-                "full_content_json": json.dumps({"title": title, "summary": summary}),
-                "period": time.strftime("%Y-%m-%d"),
-                "size": len(comm_entities)
-            })
-        df_community_reports = pd.DataFrame(comm_reports_rows) if comm_reports_rows else pd.DataFrame(columns=["id", "human_readable_id", "community", "parent", "level", "title", "summary", "full_content", "rank", "rank_explanation", "findings", "full_content_json", "period", "size"])
+                "rank": float(rank),
+                "rank_explanation": rank_explanation,
+                "findings": json.dumps(findings),
+                "full_content_json": json.dumps({
+                    "title": title,
+                    "summary": summary,
+                    "findings": findings,
+                    "rating": float(rank),
+                    "rating_explanation": rank_explanation,
+                }),
+                "period": period,
+                "size": len(member_rows),
+            }
 
-        # Save all 4 Parquet files
-        df_entities.to_parquet(self.output_dir / "create_final_entities.parquet")
-        df_relationships.to_parquet(self.output_dir / "create_final_relationships.parquet")
-        df_nodes.to_parquet(self.output_dir / "create_final_nodes.parquet")
-        df_community_reports.to_parquet(self.output_dir / "create_final_community_reports.parquet")
-
-        # Step 6: ChromaDB Vector Sync
-        notify(0.92, "Syncing document chunks with ChromaDB vector store...")
-        chroma_client = chromadb.PersistentClient(path=str(self.chroma_dir))
-        try:
-            chroma_client.delete_collection("paper_collection")
-        except Exception:
-            pass
-        collection = chroma_client.get_or_create_collection(name="paper_collection")
-
-        for idx, text in enumerate(chunks_to_process):
-            collection.add(
-                documents=[text],
-                metadatas=[{"document_title": document_title, "chunk_index": idx, "chunk_id": f"chunk_{idx}"}],
-                ids=[f"chunk_{idx}"]
-            )
-
-        # Step 7: Visualizations
-        notify(0.97, "Generating interactive concept map visualization...")
-        self._generate_visualizations(df_nodes, df_relationships)
-
-        elapsed = round(time.perf_counter() - start_time, 2)
-        notify(1.0, f"✅ Knowledge Engine built successfully in {elapsed}s!", {
-            "elapsed_seconds": elapsed,
-            "entities": len(df_entities),
-            "relationships": len(df_relationships),
-            "communities": len(communities),
-            "vector_chunks": len(chunks_to_process)
-        })
-
-        return {
-            "elapsed_seconds": elapsed,
-            "entities_count": len(df_entities),
-            "relationships_count": len(df_relationships),
-            "nodes_count": len(df_nodes),
-            "communities_count": len(communities),
-            "chunks_count": len(chunks_to_process),
-            "entities_df": df_entities,
-            "relationships_df": df_relationships,
-            "nodes_df": df_nodes,
-            "community_reports_df": df_community_reports
-        }
-
-    def _generate_visualizations(self, nodes_df: pd.DataFrame, relationships_df: pd.DataFrame):
-        colors = ['#3056D3', '#1F8A5B', '#B7791F', '#8A8A83', '#B03A2E', '#6B4FBB', '#2A8FA8', '#C25E9A']
-
-        # Interactive PyVis Graph (Developer Guide §2 & §5 specs)
-        net = Network(height='640px', width='100%', bgcolor='#FFFFFF', font_color='#111110', notebook=True, cdn_resources='in_line')
-        
-        for _, row in nodes_df.iterrows():
-            comm = int(row['community'])
-            color = colors[comm % len(colors)]
-            degree = int(row.get('degree', 1))
-            title_text = str(row['title'])
-            net.add_node(
-                title_text,
-                label=title_text,
-                title=f"Concept: {title_text}<br>Community: {comm}<br>Centrality: {degree}",
-                color={
-                    "background": color,
-                    "border": "#111110",
-                    "highlight": {"background": "#3056D3", "border": "#111110"},
-                    "hover": {"background": color, "border": "#3056D3"}
-                },
-                borderWidth=1,
-                borderWidthSelected=2,
-                font={"face": "Geist, system-ui, sans-serif", "size": 12, "color": "#111110"},
-                size=14 + min(degree * 3, 30)
-            )
-
-        for _, row in relationships_df.iterrows():
-            src, tgt = str(row['source']), str(row['target'])
-            if src in net.get_nodes() and tgt in net.get_nodes():
-                weight = float(row.get('weight', 1.0))
-                net.add_edge(
-                    src,
-                    tgt,
-                    value=weight,
-                    color={"color": "#D6D6D0", "highlight": "#3056D3", "hover": "#3056D3"},
-                    title=f"Strength: {weight}/10<br>{row.get('description', '')}"
+        rows: List[Dict[str, Any]] = []
+        indexed = list(enumerate(communities))
+        done = 0
+        with ThreadPoolExecutor(max_workers=min(self.max_workers, len(indexed))) as pool:
+            for row in pool.map(build_one, indexed):
+                rows.append(row)
+                done += 1
+                notify(
+                    0.70 + 0.18 * (done / len(indexed)),
+                    f"Wrote report {done} of {len(indexed)}",
+                    {"step": "Write reports", "report_current": done, "report_total": len(indexed)},
                 )
 
-        html_path = self.notebook_dir / "interactive_graph.html"
-        net.write_html(str(html_path))
+        rows.sort(key=lambda r: r["community"])
+        return pd.DataFrame(rows)
 
-        # Matplotlib Static Graph
-        if len(nodes_df) > 0:
-            fig, ax = plt.subplots(figsize=(14, 9), facecolor='#FFFFFF')
-            ax.set_facecolor('#FFFFFF')
+    # -- sinks ---------------------------------------------------------------
+    def _sync_chroma(self, units: List[Dict[str, Any]]):
+        """Replace the collection with the current chunk set, carrying provenance metadata."""
+        client = chromadb.PersistentClient(path=str(self.chroma_dir))
+        try:
+            client.delete_collection(CHROMA_COLLECTION)
+        except Exception:
+            pass
+        collection = client.get_or_create_collection(name=CHROMA_COLLECTION)
 
-            G = nx.Graph()
-            for _, row in nodes_df.iterrows():
-                G.add_node(row['title'], community=int(row['community']), degree=int(row.get('degree', 1)))
+        batch = 64
+        for start in range(0, len(units), batch):
+            window = units[start:start + batch]
+            collection.add(
+                documents=[u["text"] for u in window],
+                metadatas=[{
+                    "document_id": u["document_id"],
+                    "document_title": u["document_title"],
+                    "chunk_index": u["chunk_index"],
+                    "chunk_id": u["chunk_id"],
+                } for u in window],
+                ids=[u["chunk_id"] for u in window],
+            )
 
-            for _, row in relationships_df.iterrows():
-                if G.has_node(row['source']) and G.has_node(row['target']):
-                    G.add_edge(row['source'], row['target'], weight=float(row['weight']))
+    def _generate_visualizations(self, nodes_df: pd.DataFrame, relationships_df: pd.DataFrame):
+        write_concept_map(
+            nodes_df,
+            relationships_df,
+            self.notebook_dir / "interactive_graph.html",
+        )
 
-            pos = nx.spring_layout(G, seed=42, k=0.55)
-            node_colors = [colors[G.nodes[n]['community'] % len(colors)] for n in G.nodes]
-            node_sizes = [350 + G.nodes[n]['degree'] * 120 for n in G.nodes]
+        if nodes_df.empty:
+            return
 
-            nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=node_sizes, alpha=0.92, ax=ax)
-            nx.draw_networkx_edges(G, pos, edge_color='#D6D6D0', alpha=0.9, width=1.2, ax=ax)
-            nx.draw_networkx_labels(G, pos, font_size=8, font_color='#111110', font_weight='bold', ax=ax)
+        fig, ax = plt.subplots(figsize=(14, 9), facecolor="#FFFFFF")
+        ax.set_facecolor("#FFFFFF")
+        graph = nx.Graph()
+        for _, row in nodes_df.iterrows():
+            graph.add_node(row["title"], community=int(row["community"]), degree=int(row.get("degree", 1)))
+        for _, row in relationships_df.iterrows():
+            if graph.has_node(row["source"]) and graph.has_node(row["target"]):
+                graph.add_edge(row["source"], row["target"], weight=float(row["weight"]))
 
-            plt.title('Concept map · thematic domains', color='#111110', fontsize=14, pad=15)
-            plt.axis('off')
-            plt.tight_layout()
+        positions = nx.spring_layout(graph, seed=42, k=0.55)
+        node_colors = [COMMUNITY_PALETTE[graph.nodes[n]["community"] % len(COMMUNITY_PALETTE)] for n in graph.nodes]
+        node_sizes = [350 + graph.nodes[n]["degree"] * 120 for n in graph.nodes]
 
-            img_path = self.notebook_dir / "knowledge_graph.png"
-            plt.savefig(img_path, dpi=150, facecolor=fig.get_facecolor(), edgecolor='none')
-            plt.close(fig)
+        nx.draw_networkx_nodes(graph, positions, node_color=node_colors, node_size=node_sizes, alpha=0.92, ax=ax)
+        nx.draw_networkx_edges(graph, positions, edge_color="#D6D6D0", alpha=0.9, width=1.2, ax=ax)
+        nx.draw_networkx_labels(graph, positions, font_size=8, font_color="#111110", ax=ax)
+
+        ax.set_title("Concept map · thematic domains", color="#111110", fontsize=14, pad=15)
+        ax.axis("off")
+        fig.tight_layout()
+        fig.savefig(self.notebook_dir / "knowledge_graph.png", dpi=150,
+                    facecolor=fig.get_facecolor(), edgecolor="none")
+        plt.close(fig)
+
+
+# -----------------------------------------------------------------------------
+# 6. Concept map rendering
+# -----------------------------------------------------------------------------
+def write_concept_map(
+    nodes_df: pd.DataFrame,
+    relationships_df: pd.DataFrame,
+    target_path: Path,
+    size_by: str = "degree",
+    communities: Optional[List[int]] = None,
+    selected: Optional[str] = None,
+    height: int = 620,
+) -> Path:
+    """Write the PyVis concept map with the guide's light palette.
+
+    ``size_by`` is ``degree`` or ``rank``; ``communities`` restricts the drawing
+    to those community ids; ``selected`` highlights one node.
+    """
+    target_path = Path(target_path)
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+
+    frame = nodes_df.copy()
+    if communities:
+        frame = frame[frame["community"].astype(int).isin([int(c) for c in communities])]
+
+    net = Network(
+        height=f"{height}px", width="100%", bgcolor="#FFFFFF", font_color="#111110",
+        cdn_resources="in_line", directed=False,
+    )
+    net.set_options(json.dumps({
+        "physics": {
+            "enabled": True,
+            "barnesHut": {"gravitationalConstant": -12000, "springLength": 130, "springConstant": 0.02},
+            "stabilization": {"iterations": 180},
+        },
+        "interaction": {"hover": True, "tooltipDelay": 120, "navigationButtons": True, "keyboard": True},
+        "nodes": {"borderWidth": 1, "borderWidthSelected": 2,
+                  "font": {"face": "Geist, system-ui, sans-serif", "size": 12, "color": "#111110"}},
+        "edges": {"color": {"color": "#D6D6D0", "highlight": "#3056D3", "hover": "#3056D3"},
+                  "smooth": {"enabled": True, "type": "continuous"}, "width": 1},
+    }))
+
+    if "community_rank" not in frame.columns:
+        frame["community_rank"] = 0.0
+
+    for _, row in frame.iterrows():
+        community = int(row["community"])
+        color = COMMUNITY_PALETTE[community % len(COMMUNITY_PALETTE)]
+        degree = int(row.get("degree", 0) or 0)
+        rank = float(row.get("community_rank", 0) or 0)
+        title_text = str(row["title"])
+        magnitude = rank * 2.2 if size_by == "rank" else degree * 3.0
+        is_selected = selected is not None and title_text == selected
+        net.add_node(
+            title_text,
+            label=title_text,
+            title=f"{title_text}\nCommunity {community} · degree {degree}",
+            color={
+                "background": color,
+                "border": "#111110" if is_selected else color,
+                "highlight": {"background": color, "border": "#111110"},
+                "hover": {"background": color, "border": "#3056D3"},
+            },
+            borderWidth=3 if is_selected else 1,
+            size=12 + min(magnitude, 30),
+        )
+
+    present = set(net.get_nodes())
+    for _, row in relationships_df.iterrows():
+        source, target = str(row["source"]), str(row["target"])
+        if source in present and target in present:
+            weight = float(row.get("weight", 1.0) or 1.0)
+            net.add_edge(
+                source, target,
+                value=weight,
+                title=f"{source} → {target} · strength {weight:.0f}/10",
+            )
+
+    net.write_html(str(target_path), notebook=False, open_browser=False)
+
+    # Node clicks ask the host page to open the concept in the inspector. Streamlit
+    # sandboxes component iframes, so the parent-navigation attempt can be refused;
+    # the "Find node" select box in the top bar is the guaranteed selection path.
+    handler = """
+<script type="text/javascript">
+(function () {
+  if (typeof network === "undefined") { return; }
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    network.setOptions({ physics: { enabled: false } });
+  }
+  network.on("selectNode", function (params) {
+    if (!params.nodes || !params.nodes.length) { return; }
+    var node = params.nodes[0];
+    var search = "?screen=concepts&node=" + encodeURIComponent(node);
+    try { window.parent.postMessage({ type: "graphrag:selectNode", node: node }, "*"); } catch (e) {}
+    try { window.top.location.search = search; return; } catch (e) {}
+    var link = document.createElement("a");
+    link.href = search; link.target = "_top";
+    document.body.appendChild(link); link.click();
+  });
+})();
+</script>
+"""
+    html = target_path.read_text(encoding="utf-8")
+    html = html.replace("</body>", f"{handler}</body>") if "</body>" in html else html + handler
+    target_path.write_text(html, encoding="utf-8")
+    return target_path

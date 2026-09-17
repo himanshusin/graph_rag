@@ -1,8 +1,13 @@
-"""
-Core enterprise services for GraphRAG Knowledge Platform.
-"""
-from .vault import DocumentVault
-from .pipeline import DocumentIngestor, GraphRAGEngine
-from .change_manager import ChangeManagementAgent
+"""Core services: document vault, indexing pipeline, reasoning, change management."""
 
-__all__ = ["DocumentVault", "DocumentIngestor", "GraphRAGEngine", "ChangeManagementAgent"]
+from .change_manager import ChangeManagementAgent
+from .pipeline import DocumentIngestor, GraphRAGEngine, write_concept_map
+from .vault import DocumentVault
+
+__all__ = [
+    "ChangeManagementAgent",
+    "DocumentIngestor",
+    "DocumentVault",
+    "GraphRAGEngine",
+    "write_concept_map",
+]

@@ -1,9 +1,7 @@
-import os
 import re
 import json
 import time
 import hashlib
-import shutil
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
@@ -129,43 +127,59 @@ class DocumentVault:
 
         return "\n\n--- PAGE BREAK ---\n\n".join(pages_content), extracted_tables, page_count
 
-    def _extract_tables_from_text(self, doc_id: str, text: str) -> Tuple[str, List[Dict[str, Any]], int]:
-        """Detect Markdown tables in raw text and extract structured representations."""
+    def _extract_tables_from_text(self, doc_id: str, text: str) -> Tuple[str, List[Dict[str, Any]], Optional[int]]:
+        """Detect Markdown tables in raw text and extract structured representations.
+
+        Plain text has no pagination, so the page count is reported as ``None``
+        rather than estimated from line counts.
+        """
         lines = text.splitlines()
-        page_count = max(1, len(lines) // 50)
-        extracted_tables = []
-        
-        table_lines = []
-        t_counter = 1
-        
+        extracted_tables: List[Dict[str, Any]] = []
+        table_lines: List[str] = []
+        t_counter = 0
+
+        def flush(buffer: List[str]):
+            nonlocal t_counter
+            if len(buffer) < 3:
+                return
+            try:
+                headers = [h.strip() for h in buffer[0].split("|")[1:-1]]
+                if not headers:
+                    return
+                t_counter += 1
+                records = []
+                for body_line in buffer[2:]:
+                    cells = [c.strip() for c in body_line.split("|")[1:-1]]
+                    if len(cells) == len(headers):
+                        records.append(dict(zip(headers, cells)))
+                row_facts = [
+                    f"Row {i + 1}: " + ", ".join(f"[{k}] = {v}" for k, v in rec.items() if v)
+                    for i, rec in enumerate(records)
+                ]
+                extracted_tables.append({
+                    "table_id": f"{doc_id}_txt_t{t_counter}",
+                    "doc_id": doc_id,
+                    "page": 1,
+                    "title": f"{', '.join(headers[:4])}",
+                    "columns": headers,
+                    "rows_count": len(records),
+                    "markdown": "\n".join(buffer),
+                    "row_facts": row_facts,
+                    "records": records,
+                })
+            except Exception:
+                pass
+
         for line in lines:
-            if "|" in line and line.strip().startswith("|") and line.strip().endswith("|"):
+            stripped = line.strip()
+            if "|" in stripped and stripped.startswith("|") and stripped.endswith("|"):
                 table_lines.append(line)
             else:
-                if len(table_lines) >= 3:
-                    # Parse markdown table
-                    try:
-                        table_str = "\n".join(table_lines)
-                        header_line = table_lines[0]
-                        headers = [h.strip() for h in header_line.split("|")[1:-1]]
-                        table_id = f"{doc_id}_txt_t{t_counter}"
-                        t_counter += 1
-                        
-                        extracted_tables.append({
-                            "table_id": table_id,
-                            "doc_id": doc_id,
-                            "page": 1,
-                            "title": f"Structured Table {t_counter - 1} ({', '.join(headers[:3])})",
-                            "columns": headers,
-                            "rows_count": len(table_lines) - 2,
-                            "markdown": table_str,
-                            "records": []
-                        })
-                    except Exception:
-                        pass
+                flush(table_lines)
                 table_lines = []
-                
-        return text, extracted_tables, page_count
+        flush(table_lines)
+
+        return text, extracted_tables, None
 
     # -------------------------------------------------------------------------
     # Document Ingestion
@@ -225,7 +239,10 @@ class DocumentVault:
             "char_count": len(raw_text),
             "table_count": len(tables),
             "uploaded_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-            "status": "Indexed in Vault",
+            "status": "Not indexed",
+            "chunks_total": 0,
+            "chunks_indexed": 0,
+            "indexed_at": None,
             "metadata": metadata or {}
         }
         catalog.append(entry)
@@ -235,29 +252,99 @@ class DocumentVault:
         entry["tables"] = tables
         return entry
 
-    def delete_document(self, doc_id: str) -> bool:
-        """Remove a document and its extracted tables from the vault."""
+    # -------------------------------------------------------------------------
+    # Index state
+    # -------------------------------------------------------------------------
+    def get_document_text(self, doc_id: str) -> str:
+        """Re-extract the text of a stored document from disk.
+
+        Extracted text is not cached in the catalog, so a cumulative rebuild
+        reads every retained file back through the same extractor that ran at
+        upload time.
+        """
+        document = self.get_document(doc_id)
+        if not document:
+            return ""
+        path = Path(document["storage_path"])
+        if not path.exists():
+            return ""
+        content = path.read_bytes()
+        if str(document.get("source_type", "")).lower() == "pdf" or path.suffix.lower() == ".pdf":
+            try:
+                text, _tables, _pages = self._extract_tables_from_pdf(doc_id, content)
+                return text
+            except Exception:
+                return content.decode("utf-8", errors="ignore")
+        return content.decode("utf-8", errors="ignore")
+
+    def mark_indexed(self, doc_id: str, chunks_indexed: int, chunks_total: int) -> None:
+        """Record that a document's chunks are represented in the graph."""
         catalog = self._load_catalog()
-        doc_to_delete = None
-        for doc in catalog:
-            if doc["id"] == doc_id:
-                doc_to_delete = doc
-                break
+        for document in catalog:
+            if document["id"] == doc_id:
+                document["chunks_indexed"] = int(chunks_indexed)
+                document["chunks_total"] = int(chunks_total)
+                document["indexed_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+                document["status"] = "Indexed" if chunks_indexed else "Not indexed"
+        self._save_catalog(catalog)
 
-        if doc_to_delete:
-            file_path = Path(doc_to_delete["storage_path"])
-            if file_path.exists():
-                file_path.unlink()
-            
-            # Delete tables file if exists
-            tables_file = self.tables_dir / f"{doc_id}_tables.json"
-            if tables_file.exists():
-                tables_file.unlink()
+    def mark_needs_reindex(self, doc_id: Optional[str] = None) -> None:
+        """Flag one document, or all of them, as out of step with the graph."""
+        catalog = self._load_catalog()
+        for document in catalog:
+            if doc_id is None or document["id"] == doc_id:
+                if document.get("chunks_indexed"):
+                    document["status"] = "Needs re-index"
+        self._save_catalog(catalog)
 
-            catalog = [d for d in catalog if d["id"] != doc_id]
-            self._save_catalog(catalog)
-            return True
-        return False
+    def delete_document(self, doc_id: str, chroma_dir: Optional[str] = None) -> bool:
+        """Remove a document, its tables, its catalog entry and its vectors."""
+        catalog = self._load_catalog()
+        doc_to_delete = next((d for d in catalog if d["id"] == doc_id), None)
+        if not doc_to_delete:
+            return False
+
+        file_path = Path(doc_to_delete["storage_path"])
+        if file_path.exists():
+            file_path.unlink()
+
+        tables_file = self.tables_dir / f"{doc_id}_tables.json"
+        if tables_file.exists():
+            tables_file.unlink()
+
+        if chroma_dir:
+            self.purge_vectors(doc_id, chroma_dir)
+
+        self._save_catalog([d for d in catalog if d["id"] != doc_id])
+        return True
+
+    @staticmethod
+    def purge_vectors(doc_id: str, chroma_dir: str, collection_name: str = "paper_collection") -> int:
+        """Delete a document's chunks from the vector store. Returns rows removed."""
+        try:
+            import chromadb
+            client = chromadb.PersistentClient(path=str(chroma_dir))
+            collection = client.get_or_create_collection(name=collection_name)
+            existing = collection.get(where={"document_id": doc_id})
+            ids = existing.get("ids") or []
+            if ids:
+                collection.delete(ids=ids)
+            return len(ids)
+        except Exception:
+            return 0
+
+    def verify_integrity(self) -> List[Dict[str, Any]]:
+        """Re-hash every retained file and report SHA-256 mismatches or missing files."""
+        issues = []
+        for document in self._load_catalog():
+            path = Path(document.get("storage_path", ""))
+            if not path.exists():
+                issues.append({"id": document["id"], "problem": "file missing", "path": str(path)})
+                continue
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            if digest != document.get("sha256"):
+                issues.append({"id": document["id"], "problem": "sha256 mismatch", "path": str(path)})
+        return issues
 
     def get_tables(self, doc_id: Optional[str] = None) -> List[Dict[str, Any]]:
         """Return all structured tables from vault or for a specific document."""
@@ -309,21 +396,3 @@ class DocumentVault:
 
         scored.sort(key=lambda x: x[0], reverse=True)
         return [item[1] for item in scored[:top_k]]
-
-    @staticmethod
-    def format_citations(sources: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """
-        Format source excerpts into verified citation cards with direct links.
-        """
-        citations = []
-        for idx, src in enumerate(sources, 1):
-            citations.append({
-                "index": idx,
-                "document_title": src.get("document_title", "Enterprise Knowledge Vault"),
-                "chunk_id": src.get("chunk_id", f"chunk_{idx}"),
-                "excerpt": src.get("excerpt", "").strip(),
-                "relevance": src.get("relevance", "Verified Grounding"),
-                "is_table": src.get("is_table", False),
-                "table_markdown": src.get("table_markdown", "")
-            })
-        return citations

@@ -11,10 +11,13 @@
     "page_count": 121,
     "char_count": 320859,
     "uploaded_at": "2026-09-17 10:06:50",
-    "status": "Indexed in Vault",
+    "status": "Not indexed",
     "metadata": {
       "origin": "CeADAR Research Paper"
-    }
+    },
+    "chunks_total": 0,
+    "chunks_indexed": 0,
+    "indexed_at": null
   },
   {
     "id": "doc_f0fcef27b135",
@@ -29,7 +32,10 @@
     "char_count": 370822,
     "table_count": 10,
     "uploaded_at": "2026-09-17 10:49:58",
-    "status": "Indexed in Vault",
-    "metadata": {}
+    "status": "Not indexed",
+    "metadata": {},
+    "chunks_total": 0,
+    "chunks_indexed": 0,
+    "indexed_at": null
   }
 ]
