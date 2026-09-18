@@ -53,6 +53,18 @@ STOPWORDS = {
     "you", "he", "she", "they", "my", "our", "your", "if", "not", "no", "but", "so",
 }
 
+# Context budget. A table's markdown is the only unbounded field that reaches a
+# prompt, so it is clipped to the same discipline as entity descriptions.
+MAX_TABLE_CHARS = 1500
+MAX_ROW_FACTS = 5
+
+
+def clip_text(text: Any, limit: int) -> str:
+    """Collapse whitespace and cut to a character budget, marking the cut."""
+    cleaned = " ".join(str(text or "").split())
+    return cleaned if len(cleaned) <= limit else cleaned[:limit].rstrip() + " …[clipped]"
+
+
 # Vector hits further than this are treated as unrelated. ChromaDB's default
 # embedding uses squared L2 distance, where unrelated sentence pairs land well
 # above 1.8 and related ones typically below 1.4.
@@ -173,9 +185,16 @@ def _table_citations(
             f"#### [{index}] Table: {table.get('title', 'Extracted table')} "
             f"(page {table.get('page', 1)})"
         )
-        context_lines.append(table.get("markdown", ""))
+        # A wide table is unbounded text: one 60-row table would otherwise inject
+        # thousands of tokens into every query whose words happen to match it.
+        # Entity and relationship descriptions are already clipped upstream; this
+        # keeps the table path to the same discipline.
+        context_lines.append(clip_text(table.get("markdown", ""), MAX_TABLE_CHARS))
         if table.get("row_facts"):
-            context_lines.append("Row facts:\n" + "\n".join(table["row_facts"][:8]))
+            context_lines.append(
+                "Row facts:\n"
+                + "\n".join(clip_text(f, 220) for f in table["row_facts"][:MAX_ROW_FACTS])
+            )
         citations.append({
             "index": index,
             "kind": "Table",
@@ -236,11 +255,21 @@ def retrieve_global(
 
     counts["tables"] = _table_citations(query, vault, citations, context_lines, allowed)
     exhausted = not citations
+    notes: List[str] = []
     if exhausted:
         context_lines.append("No domain reports are available for this corpus.")
+        if not data.entities.empty:
+            # The graph is written before the report stage, so this is the
+            # signature of a run that stopped part-way through.
+            notes.append(
+                "The graph is indexed but its domain reports were never written, "
+                "so there is nothing for a corpus-level synthesis to read. "
+                "Re-index from the Vault to finish the run, or use Local lookup."
+            )
 
     return Retrieval(
         mode="global",
+        notes=notes,
         query=query,
         context="\n".join(context_lines),
         citations=citations,
@@ -471,11 +500,19 @@ def retrieve_drift(
 
     counts["tables"] = _table_citations(query, vault, citations, context_lines, allowed)
     exhausted = not citations
+    notes: List[str] = []
     if exhausted:
         context_lines.append("No graph artifacts are available for this corpus.")
+        if not data.entities.empty:
+            notes.append(
+                "The graph is indexed but its domain reports were never written, "
+                "so the first DRIFT stage has nothing to select from. "
+                "Re-index from the Vault to finish the run, or use Local lookup."
+            )
 
     return Retrieval(
         mode="drift",
+        notes=notes,
         query=query,
         context="\n".join(context_lines),
         citations=citations,
@@ -627,6 +664,9 @@ def _exhausted_message(retrieval: Retrieval) -> str:
     if retrieval.mode == "vector":
         note = retrieval.notes[0] if retrieval.notes else "No passages matched."
         return f"{note} Try Global synthesis for a corpus-level answer."
+    if retrieval.notes:
+        # e.g. concepts exist but the report stage never finished
+        return " ".join(retrieval.notes)
     return (
         "The knowledge graph has not been built yet, so there is nothing to reason over. "
         "Add a document in the Vault and index it to start."

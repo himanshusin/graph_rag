@@ -9,6 +9,7 @@ No test calls an LLM, so the suite is free to run and deterministic.
 """
 
 import json
+import os
 import re
 import sys
 import tempfile
@@ -26,8 +27,9 @@ from core import rag
 from core.change_manager import ChangeManagementAgent
 from core.pipeline import (
     COMMUNITY_PALETTE, CommunityReportSynthesizer, EntityRelationshipExtractor,
-    GraphRAGEngine, _fallback_rank, write_concept_map,
+    GraphRAGEngine, ProgressRelay, _fallback_rank, write_concept_map,
 )
+from core.runlog import COMPLETE, FAILED, INTERRUPTED, RUNNING, IndexRunLog
 from core.vault import DocumentVault
 from ui import components as c
 from ui import tokens
@@ -866,8 +868,8 @@ class UIQAAgent:
             assert 'Extracting {stats.get' in screen, "progress row lacks the k / n label"
             assert screen.count("STEPS = [") == 1
             from screens.vault import STEPS, format_size, format_uploaded
-            assert STEPS == ["Persist", "Extract text", "Extract tables",
-                            "Build graph", "Sync vectors"], STEPS
+            assert STEPS == ["Persist", "Extract text", "Build graph",
+                             "Sync vectors", "Write reports"], STEPS
             assert format_size(15974) == "15.6 MB", format_size(15974)
             assert format_size(315) == "315 KB"
             assert format_size(None) == "—"
@@ -885,6 +887,214 @@ class UIQAAgent:
             ("Ingest progress row", ingest_progress_row),
         ]:
             self.check("Vault", name, fn)
+
+    # -------------------------------------------------------------------------
+    # 5b. Index run durability
+    # -------------------------------------------------------------------------
+    def audit_index_runs(self):
+        print("\n--- 5b. Index run durability ---")
+
+        def run_log_lifecycle():
+            with tempfile.TemporaryDirectory() as tmp:
+                log = IndexRunLog(vault_dir=tmp)
+                assert log.latest() is None
+                docs = [{"id": "doc_a", "title": "A.pdf"}, {"id": "doc_b", "title": "B.pdf"}]
+                run_id = log.start(docs, chunk_limit=4)
+
+                run = log.latest()
+                assert run["status"] == RUNNING, run
+                assert run["pid"] == os.getpid()
+                assert [d["id"] for d in run["documents"]] == ["doc_a", "doc_b"]
+                assert run["chunk_limit"] == 4
+                assert log.active()["id"] == run_id, "the owning process should see its own run"
+
+                log.update(run_id, "Extract concepts", 0.3, {"chunk_total": 8})
+                run = log.latest()
+                assert run["stage"] == "Extract concepts" and run["progress"] == 0.3
+                assert run["stats"]["chunk_total"] == 8
+
+                log.finish(run_id, {"entities": 20})
+                run = log.latest()
+                assert run["status"] == COMPLETE and run["progress"] == 1.0
+                assert run["finished_at"] and run["stats"]["entities"] == 20
+                assert log.active() is None
+            return "start, update and finish are all persisted to disk"
+
+        def run_log_records_failure():
+            with tempfile.TemporaryDirectory() as tmp:
+                log = IndexRunLog(vault_dir=tmp)
+                run_id = log.start([{"id": "doc_a", "title": "A"}], 4)
+                log.fail(run_id, "RuntimeError: the model refused")
+                run = log.latest()
+                assert run["status"] == FAILED
+                assert "RuntimeError" in run["error"]
+                assert run["finished_at"]
+            return "a failed run keeps its error text"
+
+        def reap_stale_runs():
+            """A run left by a dead process must become visible, not vanish."""
+            with tempfile.TemporaryDirectory() as tmp:
+                log = IndexRunLog(vault_dir=tmp)
+                run_id = log.start([{"id": "doc_a", "title": "A"}], 4)
+                log.update(run_id, "Extract concepts", 0.4)
+
+                # Runs owned by this live process are left alone.
+                assert log.reap_stale() == [], "a live run was wrongly condemned"
+                assert log.latest()["status"] == RUNNING
+
+                # Now pretend the owning process is gone.
+                runs = json.loads((Path(tmp) / "index_runs.json").read_text())
+                runs[0]["pid"] = 999999
+                (Path(tmp) / "index_runs.json").write_text(json.dumps(runs))
+
+                reaped = log.reap_stale()
+                assert len(reaped) == 1, reaped
+                run = log.latest()
+                assert run["status"] == INTERRUPTED
+                assert "Extract concepts" in run["error"], run["error"]
+                assert log.reap_stale() == [], "reaping twice must be idempotent"
+            return "a run from a dead process is marked interrupted, once"
+
+        def text_cache_avoids_reparsing():
+            with tempfile.TemporaryDirectory() as tmp:
+                vault = DocumentVault(vault_dir=tmp)
+                stored = vault.store_document(
+                    "note.md", b"# Title\n\nSome text about LoRA.", source_type="txt"
+                )
+                cache = Path(tmp) / "text" / f"{stored['id']}.txt"
+                assert cache.exists(), "text was not cached at upload"
+                assert "LoRA" in cache.read_text(encoding="utf-8")
+
+                # Deleting the source must not break reads while the cache holds.
+                Path(stored["storage_path"]).unlink()
+                assert "LoRA" in vault.get_document_text(stored["id"]), \
+                    "cached text was not used"
+
+                # Back-fill: no cache, source present.
+                cache.unlink()
+                Path(stored["storage_path"]).write_bytes(b"rebuilt body")
+                assert vault.get_document_text(stored["id"]) == "rebuilt body"
+                assert cache.exists(), "cache was not back-filled on read"
+
+                vault.delete_document(stored["id"])
+                assert not cache.exists(), "delete left the cached text behind"
+            return "text cached on upload, back-filled on read, removed on delete"
+
+        def status_distinguishes_outcomes():
+            with tempfile.TemporaryDirectory() as tmp:
+                vault = DocumentVault(vault_dir=tmp)
+                fresh = vault.store_document("a.md", b"| a | b |\n| - | - |\n| 1 | 2 |",
+                                             source_type="txt")
+                assert fresh["status"] == vault.NOT_INDEXED
+
+                # Never indexed: stays "Not indexed", it is absent rather than stale.
+                vault.mark_needs_reindex()
+                assert vault.get_document(fresh["id"])["status"] == vault.NOT_INDEXED, \
+                    "a never-indexed document must not be reported as stale"
+
+                # Interrupted: distinct from never-indexed, carries the reason.
+                vault.mark_index_outcome([fresh["id"]], vault.INTERRUPTED, "stopped during Extract")
+                document = vault.get_document(fresh["id"])
+                assert document["status"] == vault.INTERRUPTED
+                assert "Extract" in document["status_detail"]
+
+                # Once indexed, a later failure leaves the rows and marks it stale.
+                vault.mark_indexed(fresh["id"], 3, 9)
+                assert vault.get_document(fresh["id"])["status"] == vault.INDEXED
+                assert "status_detail" not in vault.get_document(fresh["id"])
+                vault.mark_index_outcome([fresh["id"]], vault.FAILED, "boom")
+                assert vault.get_document(fresh["id"])["status"] == vault.NEEDS_REINDEX, \
+                    "an already-indexed document should degrade to stale, not failed"
+            return "never-indexed, interrupted, failed and stale are four distinct states"
+
+        def progress_relay_is_thread_safe():
+            """Worker-thread progress must reach the owning thread, not vanish."""
+            seen = []
+            relay = ProgressRelay(lambda f, m, s: seen.append(m))
+            from concurrent.futures import ThreadPoolExecutor
+
+            with ThreadPoolExecutor(max_workers=3) as pool:
+                list(pool.map(lambda i: relay(0.5, f"worker {i}", {}), range(3)))
+            assert seen == [], "worker messages should queue, not emit from the worker"
+
+            relay(0.6, "owner", {})     # an owner call drains the queue first
+            relay.flush()
+            assert "owner" in seen
+            for i in range(3):
+                assert f"worker {i}" in seen, f"worker {i} message was dropped: {seen}"
+            assert seen.index("worker 0") < seen.index("owner"), \
+                "queued messages should flush before the owner's own message"
+            return f"{len(seen)} messages delivered in order, none dropped"
+
+        def relay_survives_callback_errors():
+            relay = ProgressRelay(lambda f, m, s: (_ for _ in ()).throw(RuntimeError("ui gone")))
+            relay(0.1, "x", {})   # must not raise
+            relay.flush()
+            assert ProgressRelay(None)(0.1, "y", {}) is None
+            return "a broken progress callback cannot take the build down"
+
+        def incremental_write_order():
+            """The graph must be written before the slow report stage."""
+            source = (self.root_dir / "core/pipeline.py").read_text(encoding="utf-8")
+            graph_write = source.index('create_final_nodes.parquet')
+            reports_build = source.index('df_reports = self._build_reports')
+            assert graph_write < reports_build, \
+                "nodes parquet is written after report synthesis; an interrupted " \
+                "report stage would leave no graph at all"
+            assert GraphRAGEngine.STEPS[-1] == "Write reports", GraphRAGEngine.STEPS
+            assert GraphRAGEngine.STEPS.index("Write graph") < \
+                   GraphRAGEngine.STEPS.index("Sync vectors")
+            screen = (self.root_dir / "screens/vault.py").read_text(encoding="utf-8")
+            assert "run_log.start(" in screen and "run_log.fail(" in screen \
+                and "run_log.finish(" in screen, "the ingest does not record its run"
+            return "graph, vectors and map persist before reports; runs are recorded"
+
+        def parquet_list_cells_are_counted():
+            """Arrow list columns come back as numpy arrays, not lists."""
+            import numpy as np
+            from screens.concept_map import cell_length
+
+            assert cell_length(np.array(["a", "b", "c"])) == 3
+            assert cell_length(np.array([])) == 0, "an empty array must count as 0"
+            assert cell_length(None) == 0
+            assert cell_length(float("nan")) == 0, "a missing cell must not raise"
+            assert cell_length(["x"]) == 1
+            # The pattern this replaced raised on any multi-element array.
+            try:
+                bool(np.array(["a", "b"]))
+                raised = False
+            except ValueError:
+                raised = True
+            assert raised, "numpy truthiness no longer raises; the guard may be moot"
+            screen = (self.root_dir / "screens/concept_map.py").read_text(encoding="utf-8")
+            assert 'text_unit_ids") or []' not in screen, \
+                "the ambiguous-truthiness pattern is back"
+            return "numpy, empty, None and NaN list cells all count without raising"
+
+        def chunk_limit_default_is_modest():
+            screen = (self.root_dir / "screens/vault.py").read_text(encoding="utf-8")
+            match = re.search(r'"Chunk limit per document".*?\bvalue=(\d+)\s*,',
+                              screen, re.DOTALL)
+            assert match, "chunk limit slider not found"
+            assert int(match.group(1)) <= 4, f"default chunk limit is {match.group(1)}"
+            app = (self.root_dir / "app.py").read_text(encoding="utf-8")
+            assert 'setdefault("chunk_limit", 4)' in app, "session default not lowered"
+            assert "_estimate_minutes" in screen, "no runtime estimate shown before indexing"
+            return f"default {match.group(1)} chunks per document, with a runtime estimate"
+
+        for name, fn in [
+            ("Run log lifecycle", run_log_lifecycle),
+            ("Run log records failure", run_log_records_failure),
+            ("Stale runs are reaped", reap_stale_runs),
+            ("Extracted text is cached", text_cache_avoids_reparsing),
+            ("Index status distinguishes outcomes", status_distinguishes_outcomes),
+            ("Progress relay is thread safe", progress_relay_is_thread_safe),
+            ("Progress relay survives callback errors", relay_survives_callback_errors),
+            ("Graph persists before reports", incremental_write_order),
+            ("Parquet list cells are counted safely", parquet_list_cells_are_counted),
+            ("Chunk limit default", chunk_limit_default_is_modest),
+        ]:
+            self.check("Indexing", name, fn)
 
     # -------------------------------------------------------------------------
     # 6. Governance
@@ -995,6 +1205,7 @@ class UIQAAgent:
         self.audit_retrieval()
         self.audit_pipeline()
         self.audit_vault()
+        self.audit_index_runs()
         self.audit_governance()
         self.report_live_state()
 

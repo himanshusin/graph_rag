@@ -11,13 +11,13 @@
     "page_count": 121,
     "char_count": 320859,
     "uploaded_at": "2026-09-17 10:06:50",
-    "status": "Not indexed",
+    "status": "Indexed",
     "metadata": {
       "origin": "CeADAR Research Paper"
     },
-    "chunks_total": 0,
-    "chunks_indexed": 0,
-    "indexed_at": null
+    "chunks_total": 72,
+    "chunks_indexed": 8,
+    "indexed_at": "2026-09-17 18:09:59"
   },
   {
     "id": "doc_f0fcef27b135",
@@ -32,10 +32,31 @@
     "char_count": 370822,
     "table_count": 10,
     "uploaded_at": "2026-09-17 10:49:58",
-    "status": "Not indexed",
+    "status": "Indexed",
     "metadata": {},
-    "chunks_total": 0,
-    "chunks_indexed": 0,
-    "indexed_at": null
+    "chunks_total": 86,
+    "chunks_indexed": 8,
+    "indexed_at": "2026-09-17 18:09:59"
+  },
+  {
+    "id": "doc_5fe04c543a56",
+    "title": "2025 Global Cobrand Acquisition Testing Playbook.pdf",
+    "filename": "2025 Global Cobrand Acquisition Testing Playbook.pdf",
+    "storage_path": "/Users/hsinh016/Documents/GraphRAG-Breakdown/vault/documents/doc_5fe04c543a56_2025 Global Cobrand Acquisition Testing Playbook.pdf",
+    "file_size_bytes": 3229674,
+    "file_size_kb": 3154.0,
+    "sha256": "5fe04c543a56c97db7457e2e3e437ab721a0136d3e5beb64ab10ce63c7e59a27",
+    "source_type": "PDF",
+    "page_count": 54,
+    "char_count": 115936,
+    "table_count": 23,
+    "uploaded_at": "2026-09-17 17:59:01",
+    "status": "Indexed",
+    "chunks_total": 37,
+    "chunks_indexed": 8,
+    "indexed_at": "2026-09-17 18:09:59",
+    "metadata": {
+      "origin": "User upload"
+    }
   }
 ]

@@ -1,0 +1,2118 @@
+[
+  {
+    "table_id": "doc_5fe04c543a56_p5_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 5,
+    "title": "Table 1 (Page 5): Duration, Depends on Test Content, 1-2 months, 2-6 months",
+    "columns": [
+      "Duration",
+      "Depends on Test Content",
+      "1-2 months",
+      "2-6 months",
+      "1-4 weeks",
+      "2-3 weeks"
+    ],
+    "rows_count": 3,
+    "markdown": "|Duration|Depends on Test Content|1-2 months|2-6 months|1-4 weeks|2-3 weeks|\n|---|---|---|---|---|---|\n|**Steps**<br>**Involved**|\u2022<br>Business Need<br>\u2022<br>Bank / Channel<br>Requirements<br>\u2022<br>Learnings (or Follow-<br>ups) from Past Tests<br>\u2022<br>Test Prioritization|\u2022<br>Audience Sizing & Test<br>Duration<br>\u2022<br>Tentative Test Period<br>(Launch & End Dates)<br>\u2022<br>Audience Strategy<br>\u2022<br>Success Metrics<br>\u2022<br>Measurement Plan<br>\u2022<br>Decision to Run A/B Test<br>or Directly Deploy|\u2022<br>Test Recipe<br>Development<br>\u2022<br>Launch Plan Finalization<br>\u2022<br>Audience Preparation<br>\u2022<br>Bank Approval<br>\u2022<br>Test Launch|\u2022<br>Post-Launch Monitoring<br>\u2022<br>Early Read<br>\u2022<br>Data Pulls / Sanity Check<br>\u2022<br>Test Analysis<br>\u2022<br>Insight Development|\u2022<br>Test Results &<br>Recommendations<br>Readouts<br>\u2022<br>Decision to Roll-out / No<br>Roll-out or Follow-up<br>with Additional Testing<br>\u2022<br>Roll-out Planning|\n|**MI Core**<br>**Teams**|\u2022<br>Cobrand/Continents<br>\u2022<br>Digital/Channel Partners|\u2022<br>Card/Digital Intelligence|\u2022<br>Digital/Channel Partners<br>\u2022<br>Orchestration<br>\u2022<br>Cobrand/Continents<br>\u2022<br>ADS<br>\u2022<br>Creative Agency|\u2022<br>Card/Digital Intelligence|\u2022<br>Cobrand/Continents<br>\u2022<br>Digital/Channel Partners<br>\u2022<br>Card/Digital Intelligence|\n|**MI Support**<br>**Teams**|\u2022<br>Card Intelligence<br>\u2022<br>ADS|\u2022<br>Cobrand/Continents<br>\u2022<br>ADS<br>\u2022<br>Digital/Channel Partners|\u2022<br>Card Intelligence<br>\u2022<br>Data Strategy|\u2022<br>Digital/Channel Partners<br>\u2022<br>ADS<br>\u2022<br>Data Strategy|\u2022<br>ADS|\n\n",
+    "row_facts": [
+      "Row 1: [Duration] = Steps Involved, [Depends on Test Content] = \u2022 Business Need \u2022 Bank / Channel Requirements \u2022 Learnings (or Follow- ups) from Past Tests \u2022 Test Prioritization, [1-2 months] = \u2022 Audience Sizing & Test Duration \u2022 Tentative Test Period (Launch & End Dates) \u2022 Audience Strategy \u2022 Success Metrics \u2022 Measurement Plan \u2022 Decision to Run A/B Test or Directly Deploy, [2-6 months] = \u2022 Test Recipe Development \u2022 Launch Plan Finalization \u2022 Audience Preparation \u2022 Bank Approval \u2022 Test Launch, [1-4 weeks] = \u2022 Post-Launch Monitoring \u2022 Early Read \u2022 Data Pulls / Sanity Check \u2022 Test Analysis \u2022 Insight Development, [2-3 weeks] = \u2022 Test Results & Recommendations Readouts \u2022 Decision to Roll-out / No Roll-out or Follow-up with Additional Testing \u2022 Roll-out Planning",
+      "Row 2: [Duration] = MI Core Teams, [Depends on Test Content] = \u2022 Cobrand/Continents \u2022 Digital/Channel Partners, [1-2 months] = \u2022 Card/Digital Intelligence, [2-6 months] = \u2022 Digital/Channel Partners \u2022 Orchestration \u2022 Cobrand/Continents \u2022 ADS \u2022 Creative Agency, [1-4 weeks] = \u2022 Card/Digital Intelligence, [2-3 weeks] = \u2022 Cobrand/Continents \u2022 Digital/Channel Partners \u2022 Card/Digital Intelligence",
+      "Row 3: [Duration] = MI Support Teams, [Depends on Test Content] = \u2022 Card Intelligence \u2022 ADS, [1-2 months] = \u2022 Cobrand/Continents \u2022 ADS \u2022 Digital/Channel Partners, [2-6 months] = \u2022 Card Intelligence \u2022 Data Strategy, [1-4 weeks] = \u2022 Digital/Channel Partners \u2022 ADS \u2022 Data Strategy, [2-3 weeks] = \u2022 ADS"
+    ],
+    "records": [
+      {
+        "Duration": "Steps Involved",
+        "Depends on Test Content": "\u2022 Business Need \u2022 Bank / Channel Requirements \u2022 Learnings (or Follow- ups) from Past Tests \u2022 Test Prioritization",
+        "1-2 months": "\u2022 Audience Sizing & Test Duration \u2022 Tentative Test Period (Launch & End Dates) \u2022 Audience Strategy \u2022 Success Metrics \u2022 Measurement Plan \u2022 Decision to Run A/B Test or Directly Deploy",
+        "2-6 months": "\u2022 Test Recipe Development \u2022 Launch Plan Finalization \u2022 Audience Preparation \u2022 Bank Approval \u2022 Test Launch",
+        "1-4 weeks": "\u2022 Post-Launch Monitoring \u2022 Early Read \u2022 Data Pulls / Sanity Check \u2022 Test Analysis \u2022 Insight Development",
+        "2-3 weeks": "\u2022 Test Results & Recommendations Readouts \u2022 Decision to Roll-out / No Roll-out or Follow-up with Additional Testing \u2022 Roll-out Planning"
+      },
+      {
+        "Duration": "MI Core Teams",
+        "Depends on Test Content": "\u2022 Cobrand/Continents \u2022 Digital/Channel Partners",
+        "1-2 months": "\u2022 Card/Digital Intelligence",
+        "2-6 months": "\u2022 Digital/Channel Partners \u2022 Orchestration \u2022 Cobrand/Continents \u2022 ADS \u2022 Creative Agency",
+        "1-4 weeks": "\u2022 Card/Digital Intelligence",
+        "2-3 weeks": "\u2022 Cobrand/Continents \u2022 Digital/Channel Partners \u2022 Card/Digital Intelligence"
+      },
+      {
+        "Duration": "MI Support Teams",
+        "Depends on Test Content": "\u2022 Card Intelligence \u2022 ADS",
+        "1-2 months": "\u2022 Cobrand/Continents \u2022 ADS \u2022 Digital/Channel Partners",
+        "2-6 months": "\u2022 Card Intelligence \u2022 Data Strategy",
+        "1-4 weeks": "\u2022 Digital/Channel Partners \u2022 ADS \u2022 Data Strategy",
+        "2-3 weeks": "\u2022 ADS"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p6_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 6,
+    "title": "Table 1 (Page 6): A/B Test Initiatives, Status",
+    "columns": [
+      "A/B Test Initiatives",
+      "Status"
+    ],
+    "rows_count": 10,
+    "markdown": "|A/B Test Initiatives|Status|\n|---|---|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n\n",
+    "row_facts": [
+      "Row 1: [Status] = Complete",
+      "Row 2: [Status] = Complete",
+      "Row 3: [Status] = Complete",
+      "Row 4: [Status] = Complete",
+      "Row 5: [Status] = Complete",
+      "Row 6: [Status] = Complete",
+      "Row 7: [Status] = Complete",
+      "Row 8: [Status] = Complete",
+      "Row 9: [Status] = Complete",
+      "Row 10: [Status] = Complete"
+    ],
+    "records": [
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p6_t2",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 6,
+    "title": "Table 2 (Page 6): Deployed Initiatives, Status",
+    "columns": [
+      "Deployed Initiatives",
+      "Status"
+    ],
+    "rows_count": 26,
+    "markdown": "|Deployed Initiatives|Status|\n|---|---|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|<br>Deployed|\n|**Deployed Initiatives**|Deployed|\n|**Deployed Initiatives**|Deployed|\n\n",
+    "row_facts": [
+      "Row 1: [Status] = Deployed",
+      "Row 2: [Status] = Deployed",
+      "Row 3: [Status] = Deployed",
+      "Row 4: [Status] = Deployed",
+      "Row 5: [Status] = Deployed",
+      "Row 6: [Status] = Deployed",
+      "Row 7: [Status] = Deployed",
+      "Row 8: [Status] = Deployed",
+      "Row 9: [Status] = Deployed",
+      "Row 10: [Status] = Deployed",
+      "Row 11: [Status] = Deployed",
+      "Row 12: [Status] = Deployed",
+      "Row 13: [Status] = Deployed",
+      "Row 14: [Status] = Deployed",
+      "Row 15: [Status] = Deployed",
+      "Row 16: [Status] = Deployed",
+      "Row 17: [Status] = Deployed",
+      "Row 18: [Status] = Deployed",
+      "Row 19: [Status] = Deployed",
+      "Row 20: [Status] = Deployed",
+      "Row 21: [Status] = Deployed",
+      "Row 22: [Status] = Deployed",
+      "Row 23: [Status] = Deployed",
+      "Row 24: [Status] = Deployed",
+      "Row 25: [Status] = Deployed",
+      "Row 26: [Status] = Deployed"
+    ],
+    "records": [
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Deployed Initiatives": "",
+        "Status": "Deployed"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p7_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 7,
+    "title": "Table 1 (Page 7): Market, Initiative, Objective, Launch Period",
+    "columns": [
+      "Market",
+      "Initiative",
+      "Objective",
+      "Launch Period"
+    ],
+    "rows_count": 15,
+    "markdown": "|Market|Initiative|Objective|Launch<br>Period|\n|---|---|---|---|\n|US||||\n|US||||\n|US|US | BLP | Exist modal Pre/Post Analysis|Analyze the effectiveness of adding a Exist Modal on BLP page|Analyze the effectiveness of adding a Exist Modal on BLP page|\n|US|US | Web | See Details CTA Test|Test effectiveness of the new \u2018See Details\u2019 design vs. \u2018Learn More\u2019 CTA|Test effectiveness of the new \u2018See Details\u2019 design vs. \u2018Learn More\u2019 CTA|\n|US|US | Res Path | Boundless | Offer Test|Test effectiveness of 3 different offers on Res Path|Test effectiveness of 3 different offers on Res Path|\n|US|US | App Non Res Path | Boundless |  Airline Credits Creative Test|Test effectiveness of mentioning airline credits on offer creative|Test effectiveness of mentioning airline credits on offer creative|\n|US|US | FOC | Bottom Section Design Update Test|Test effectiveness of the new FOC button placement design|Test effectiveness of the new FOC button placement design|\n|US||||\n|INTL||||\n|INTL|Japan | Amex | FOC | Anonymous | Hero vs. Non-Hero A/B Test|Test effectiveness of hero on Japan FOC page for anonymous users|Test effectiveness of hero on Japan FOC page for anonymous users|\n|INTL|Indonesia | Mandiri | FOC|Launch a new Indonesia FOC page|Launch a new Indonesia FOC page|\n|INTL|Brazil | Bradesco | FOC|Launch a new Brazil FOC page with card comparison chart/function|Launch a new Brazil FOC page with card comparison chart/function|\n|INTL|S. Korea | Samsung | FOC|Enhance Korea FOC page to include the new card|Enhance Korea FOC page to include the new card|\n|INTL|Canada | Amex | Small Business Card | Email | SBO Targeting A/B Test|Incorporate 3rd party data for small business owners to enhance email targeting|Incorporate 3rd party data for small business owners to enhance email targeting|\n|INTL||||\n\n",
+    "row_facts": [
+      "Row 1: [Market] = US",
+      "Row 3: [Initiative] = US | BLP | Exist modal Pre/Post Analysis, [Objective] = Analyze the effectiveness of adding a Exist Modal on BLP page",
+      "Row 4: [Initiative] = US | Web | See Details CTA Test, [Objective] = Test effectiveness of the new \u2018See Details\u2019 design vs. \u2018Learn More\u2019 CTA",
+      "Row 5: [Initiative] = US | Res Path | Boundless | Offer Test, [Objective] = Test effectiveness of 3 different offers on Res Path",
+      "Row 6: [Initiative] = US | App Non Res Path | Boundless | Airline Credits Creative Test, [Objective] = Test effectiveness of mentioning airline credits on offer creative",
+      "Row 7: [Initiative] = US | FOC | Bottom Section Design Update Test, [Objective] = Test effectiveness of the new FOC button placement design",
+      "Row 9: [Market] = INTL",
+      "Row 10: [Initiative] = Japan | Amex | FOC | Anonymous | Hero vs. Non-Hero A/B Test, [Objective] = Test effectiveness of hero on Japan FOC page for anonymous users",
+      "Row 11: [Initiative] = Indonesia | Mandiri | FOC, [Objective] = Launch a new Indonesia FOC page",
+      "Row 12: [Initiative] = Brazil | Bradesco | FOC, [Objective] = Launch a new Brazil FOC page with card comparison chart/function",
+      "Row 13: [Initiative] = S. Korea | Samsung | FOC, [Objective] = Enhance Korea FOC page to include the new card",
+      "Row 14: [Initiative] = Canada | Amex | Small Business Card | Email | SBO Targeting A/B Test, [Objective] = Incorporate 3rd party data for small business owners to enhance email targeting"
+    ],
+    "records": [
+      {
+        "Market": "US",
+        "Initiative": "",
+        "Objective": "",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "",
+        "Objective": "",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "US | BLP | Exist modal Pre/Post Analysis",
+        "Objective": "Analyze the effectiveness of adding a Exist Modal on BLP page",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "US | Web | See Details CTA Test",
+        "Objective": "Test effectiveness of the new \u2018See Details\u2019 design vs. \u2018Learn More\u2019 CTA",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "US | Res Path | Boundless | Offer Test",
+        "Objective": "Test effectiveness of 3 different offers on Res Path",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "US | App Non Res Path | Boundless | Airline Credits Creative Test",
+        "Objective": "Test effectiveness of mentioning airline credits on offer creative",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "US | FOC | Bottom Section Design Update Test",
+        "Objective": "Test effectiveness of the new FOC button placement design",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "",
+        "Objective": "",
+        "Launch Period": ""
+      },
+      {
+        "Market": "INTL",
+        "Initiative": "",
+        "Objective": "",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "Japan | Amex | FOC | Anonymous | Hero vs. Non-Hero A/B Test",
+        "Objective": "Test effectiveness of hero on Japan FOC page for anonymous users",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "Indonesia | Mandiri | FOC",
+        "Objective": "Launch a new Indonesia FOC page",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "Brazil | Bradesco | FOC",
+        "Objective": "Launch a new Brazil FOC page with card comparison chart/function",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "S. Korea | Samsung | FOC",
+        "Objective": "Enhance Korea FOC page to include the new card",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "Canada | Amex | Small Business Card | Email | SBO Targeting A/B Test",
+        "Objective": "Incorporate 3rd party data for small business owners to enhance email targeting",
+        "Launch Period": ""
+      },
+      {
+        "Market": "",
+        "Initiative": "",
+        "Objective": "",
+        "Launch Period": ""
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p8_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 8,
+    "title": "Table 1 (Page 8): US CARDS, Col1, INTERNATIONAL CARDS, Col3",
+    "columns": [
+      "US CARDS",
+      "Col1",
+      "INTERNATIONAL CARDS",
+      "Col3"
+    ],
+    "rows_count": 3,
+    "markdown": "|US CARDS|Col1|INTERNATIONAL CARDS|Col3|\n|---|---|---|---|\n|**DIGITAL WEB**<br>1.<br>US | Chase | Boundless | Other Digital | Property Wi-Fi Modal Back-test<br>2.<br>US | Web FOC | FOC Comparison Page A/B Test<br>3.<br>US | Web FOC | Two-cards design A/B Test<br>4.<br>US | Web Res Path | Review Details Anonymous A/B/C Test<br>5.<br>US | Web Res Path | Rate List Menu (RLM) Reactivation A/B Test II<br>6.<br>US | Chase | Digital | Chase landing page A/B/C Test (Launched by Chase)<br>7.<br>US | Amex | FOC | SMB Comparison Page Pre vs Post<br>8.<br>US | FOC | 5-Card Top Banner Design A/B Test<br>9.<br>US | Web | HWS Banner Redesign A/B Test<br>10.<br>US | Web Res Path | Res Confo Modal Redesign A/B/C Test<br>11.<br>US | Web | Chase BLP Hero with Offer A/B test||**DIGITAL WEB**<br>1.<br>Canada | Amex | Web | On Property GRE QR Code Campaign<br>2.<br>Int\u2019l | LTO & New Cards | Web | On Property Wi-Fi Portal Small Banner/Modal Campaign<br>3.<br>Int\u2019l | Web | Review Details placement for Non-eGift/Stmt Credit offers||\n|**DIGITAL APP**<br>1.<br>US | Chase | Boundless | App Non-Res Path | Combo App LP A/B Test<br>2.<br>US | App Non-Res Path | Home Screen Benefit Expansion A/B Test (Round 1)<br>3.<br>US | App Non-Res Path | Home Screen Benefit Expansion A/B Test (Round 2)<br>4.<br>US | App Res Path | RRD Animation A/B Test<br>5.<br>US | App | Q1 Home Screen Takeover Modal (AJO) Campaigns||**DIGITAL APP**<br>1.<br>Int\u2019l | LTO & New Cards | App | Home Screen Takeover Modal (AJO) Campaign||\n|**EMAIL/DM**<br>1.<br>US | Amex | Business | Email | Dual vs Solo LTO offer creative A/B Test<br>2.<br>US | Chase | Boundless | DM | LTO creative Test<br>3.<br>US | Amex | Email | Points Math Creative Test||||\n\n",
+    "row_facts": [
+      "Row 1: [US CARDS] = DIGITAL WEB 1. US | Chase | Boundless | Other Digital | Property Wi-Fi Modal Back-test 2. US | Web FOC | FOC Comparison Page A/B Test 3. US | Web FOC | Two-cards design A/B Test 4. US | Web Res Path | Review Details Anonymous A/B/C Test 5. US | Web Res Path | Rate List Menu (RLM) Reactivation A/B Test II 6. US | Chase | Digital | Chase landing page A/B/C Test (Launched by Chase) 7. US | Amex | FOC | SMB Comparison Page Pre vs Post 8. US | FOC | 5-Card Top Banner Design A/B Test 9. US | Web | HWS Banner Redesign A/B Test 10. US | Web Res Path | Res Confo Modal Redesign A/B/C Test 11. US | Web | Chase BLP Hero with Offer A/B test, [INTERNATIONAL CARDS] = DIGITAL WEB 1. Canada | Amex | Web | On Property GRE QR Code Campaign 2. Int\u2019l | LTO & New Cards | Web | On Property Wi-Fi Portal Small Banner/Modal Campaign 3. Int\u2019l | Web | Review Details placement for Non-eGift/Stmt Credit offers",
+      "Row 2: [US CARDS] = DIGITAL APP 1. US | Chase | Boundless | App Non-Res Path | Combo App LP A/B Test 2. US | App Non-Res Path | Home Screen Benefit Expansion A/B Test (Round 1) 3. US | App Non-Res Path | Home Screen Benefit Expansion A/B Test (Round 2) 4. US | App Res Path | RRD Animation A/B Test 5. US | App | Q1 Home Screen Takeover Modal (AJO) Campaigns, [INTERNATIONAL CARDS] = DIGITAL APP 1. Int\u2019l | LTO & New Cards | App | Home Screen Takeover Modal (AJO) Campaign",
+      "Row 3: [US CARDS] = EMAIL/DM 1. US | Amex | Business | Email | Dual vs Solo LTO offer creative A/B Test 2. US | Chase | Boundless | DM | LTO creative Test 3. US | Amex | Email | Points Math Creative Test"
+    ],
+    "records": [
+      {
+        "US CARDS": "DIGITAL WEB 1. US | Chase | Boundless | Other Digital | Property Wi-Fi Modal Back-test 2. US | Web FOC | FOC Comparison Page A/B Test 3. US | Web FOC | Two-cards design A/B Test 4. US | Web Res Path | Review Details Anonymous A/B/C Test 5. US | Web Res Path | Rate List Menu (RLM) Reactivation A/B Test II 6. US | Chase | Digital | Chase landing page A/B/C Test (Launched by Chase) 7. US | Amex | FOC | SMB Comparison Page Pre vs Post 8. US | FOC | 5-Card Top Banner Design A/B Test 9. US | Web | HWS Banner Redesign A/B Test 10. US | Web Res Path | Res Confo Modal Redesign A/B/C Test 11. US | Web | Chase BLP Hero with Offer A/B test",
+        "Col1": "",
+        "INTERNATIONAL CARDS": "DIGITAL WEB 1. Canada | Amex | Web | On Property GRE QR Code Campaign 2. Int\u2019l | LTO & New Cards | Web | On Property Wi-Fi Portal Small Banner/Modal Campaign 3. Int\u2019l | Web | Review Details placement for Non-eGift/Stmt Credit offers",
+        "Col3": ""
+      },
+      {
+        "US CARDS": "DIGITAL APP 1. US | Chase | Boundless | App Non-Res Path | Combo App LP A/B Test 2. US | App Non-Res Path | Home Screen Benefit Expansion A/B Test (Round 1) 3. US | App Non-Res Path | Home Screen Benefit Expansion A/B Test (Round 2) 4. US | App Res Path | RRD Animation A/B Test 5. US | App | Q1 Home Screen Takeover Modal (AJO) Campaigns",
+        "Col1": "",
+        "INTERNATIONAL CARDS": "DIGITAL APP 1. Int\u2019l | LTO & New Cards | App | Home Screen Takeover Modal (AJO) Campaign",
+        "Col3": ""
+      },
+      {
+        "US CARDS": "EMAIL/DM 1. US | Amex | Business | Email | Dual vs Solo LTO offer creative A/B Test 2. US | Chase | Boundless | DM | LTO creative Test 3. US | Amex | Email | Points Math Creative Test",
+        "Col1": "",
+        "INTERNATIONAL CARDS": "",
+        "Col3": ""
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p9_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 9,
+    "title": "Table 1 (Page 9): US CARDS, Col1, INTERNATIONAL CARDS, Col3",
+    "columns": [
+      "US CARDS",
+      "Col1",
+      "INTERNATIONAL CARDS",
+      "Col3"
+    ],
+    "rows_count": 3,
+    "markdown": "|US CARDS|Col1|INTERNATIONAL CARDS|Col3|\n|---|---|---|---|\n|**DIGITAL WEB & APP**<br>1.<br>US | Chase | Boundless | Web & App | 3FN vs 1+2FN BAU Offer A/B Test<br>2.<br>US | Chase | Boundless | Web & App Res Path | eGC offer A/B/C Test||**DIGITAL WEB & APP**<br>N/A as of Q2 '25||\n|**EMAIL**<br>1.<br>US | Chase | Boundless | Email | 3FN vs 1+2FN BAU Offer A/B Test<br>A black chain link<br>AI-generated<br>content may be<br>incorrect.||||\n|||||\n\n",
+    "row_facts": [
+      "Row 1: [US CARDS] = DIGITAL WEB & APP 1. US | Chase | Boundless | Web & App | 3FN vs 1+2FN BAU Offer A/B Test 2. US | Chase | Boundless | Web & App Res Path | eGC offer A/B/C Test, [INTERNATIONAL CARDS] = DIGITAL WEB & APP N/A as of Q2 '25",
+      "Row 2: [US CARDS] = EMAIL 1AAcino Icb-nogl ta reercnnekect c trm..hata aei ynd b li en k US | Chase | Boundless | Email | 3FN vs 1+2FN BAU Offer A/B Test"
+    ],
+    "records": [
+      {
+        "US CARDS": "DIGITAL WEB & APP 1. US | Chase | Boundless | Web & App | 3FN vs 1+2FN BAU Offer A/B Test 2. US | Chase | Boundless | Web & App Res Path | eGC offer A/B/C Test",
+        "Col1": "",
+        "INTERNATIONAL CARDS": "DIGITAL WEB & APP N/A as of Q2 '25",
+        "Col3": ""
+      },
+      {
+        "US CARDS": "EMAIL 1AAcino Icb-nogl ta reercnnekect c trm..hata aei ynd b li en k US | Chase | Boundless | Email | 3FN vs 1+2FN BAU Offer A/B Test",
+        "Col1": "",
+        "INTERNATIONAL CARDS": "",
+        "Col3": ""
+      },
+      {
+        "US CARDS": "",
+        "Col1": "",
+        "INTERNATIONAL CARDS": "",
+        "Col3": ""
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p10_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 10,
+    "title": "Table 1 (Page 10): US CARDS, Col1, INTERNATIONAL CARDS, Col3",
+    "columns": [
+      "US CARDS",
+      "Col1",
+      "INTERNATIONAL CARDS",
+      "Col3"
+    ],
+    "rows_count": 3,
+    "markdown": "|US CARDS|Col1|INTERNATIONAL CARDS|Col3|\n|---|---|---|---|\n|**MEMBER AUDIENCES**<br>1.<br>US | Chase | Boundless | LTO | Email | Passion Email Test<br>2.<br>US | Amex | Business | LTO | Email | SBO Audience A/B Test (High Level Result)||**MEMBER AUDIENCES**<br>N/A as of Q2 '25||\n|||||\n|||||\n\n",
+    "row_facts": [
+      "Row 1: [US CARDS] = MEMBER AUDIENCES 1. US | Chase | Boundless | LTO | Email | Passion Email Test 2. US | Amex | Business | LTO | Email | SBO Audience A/B Test (High Level Result), [INTERNATIONAL CARDS] = MEMBER AUDIENCES N/A as of Q2 '25"
+    ],
+    "records": [
+      {
+        "US CARDS": "MEMBER AUDIENCES 1. US | Chase | Boundless | LTO | Email | Passion Email Test 2. US | Amex | Business | LTO | Email | SBO Audience A/B Test (High Level Result)",
+        "Col1": "",
+        "INTERNATIONAL CARDS": "MEMBER AUDIENCES N/A as of Q2 '25",
+        "Col3": ""
+      },
+      {
+        "US CARDS": "",
+        "Col1": "",
+        "INTERNATIONAL CARDS": "",
+        "Col3": ""
+      },
+      {
+        "US CARDS": "",
+        "Col1": "",
+        "INTERNATIONAL CARDS": "",
+        "Col3": ""
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p11_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 11,
+    "title": "Table 1 (Page 11): US CARDS, Col1, INTERNATIONAL CARDS, Col3",
+    "columns": [
+      "US CARDS",
+      "Col1",
+      "INTERNATIONAL CARDS",
+      "Col3"
+    ],
+    "rows_count": 2,
+    "markdown": "|US CARDS|Col1|INTERNATIONAL CARDS|Col3|\n|---|---|---|---|\n|**MOBILE PUSH**<br>1.<br>US | Push | MAPA ACQ Pre-arrival Push Campaign<br>**DIGITAL**<br>1.<br>US | Digital | MAPA ACQ Near Level Campaigns||**MOBILE PUSH**<br>1.<br>China | CITIC | MAPA ACQ Pre-arrival Push Campaign during LTOs||\n|**EMAIL**<br>1.<br>US | Email | MAPA Near Level Campaigns<br>2.<br>US | Email | MAPA Abandoned App Retargeting Campaign<br>3.<br>US | Chase | Email | Zeta 3rd party Marketing Email Campaign||||\n\n",
+    "row_facts": [
+      "Row 1: [US CARDS] = MOBILE PUSH 1. US | Push | MAPA ACQ Pre-arrival Push Campaign DIGITAL 1. US | Digital | MAPA ACQ Near Level Campaigns, [INTERNATIONAL CARDS] = MOBILE PUSH 1. China | CITIC | MAPA ACQ Pre-arrival Push Campaign during LTOs",
+      "Row 2: [US CARDS] = EMAIL 1. US | Email | MAPA Near Level Campaigns 2. US | Email | MAPA Abandoned App Retargeting Campaign 3. US | Chase | Email | Zeta 3rd party Marketing Email Campaign"
+    ],
+    "records": [
+      {
+        "US CARDS": "MOBILE PUSH 1. US | Push | MAPA ACQ Pre-arrival Push Campaign DIGITAL 1. US | Digital | MAPA ACQ Near Level Campaigns",
+        "Col1": "",
+        "INTERNATIONAL CARDS": "MOBILE PUSH 1. China | CITIC | MAPA ACQ Pre-arrival Push Campaign during LTOs",
+        "Col3": ""
+      },
+      {
+        "US CARDS": "EMAIL 1. US | Email | MAPA Near Level Campaigns 2. US | Email | MAPA Abandoned App Retargeting Campaign 3. US | Chase | Email | Zeta 3rd party Marketing Email Campaign",
+        "Col1": "",
+        "INTERNATIONAL CARDS": "",
+        "Col3": ""
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p32_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 32,
+    "title": "Table 1 (Page 32): Placements, Duration, Impressions, Clicks",
+    "columns": [
+      "Placements",
+      "Duration",
+      "Impressions",
+      "Clicks",
+      "CTR",
+      "Applications",
+      "Acquisitions",
+      "Approval Rate"
+    ],
+    "rows_count": 16,
+    "markdown": "|Placements|Duration|Impressions|Clicks|CTR|Applications|Acquisitions|Approval Rate|\n|---|---|---|---|---|---|---|---|\n|**Placements**|Feb 6 \u2013 Apr 2, 2025|459.4K|4,048|0.9%||||\n|**AJO**|**1 Round (4 Days)**|**5.1K**|**457**|**8.9%**|**-**|**-**||\n|**AJO**|Mar 20 \u2013 Jun 15, 2025|451.3K|6,114|1.4%||||\n|**AJO**|**1 Round (4 Days)**|**10.5K**|**814**|**7.7%**|**-**|**-**||\n|**AJO**|Mar 13 \u2013 Aug 27, 2025|531.7K|9,789|1.8%||||\n|**AJO**|**2 Round (10 Days)**|**12.5K**|**3,747**|**29.9%**|**-**|**-**||\n|**AJO**|Apr 3 \u2013 May 14, 2025|22.5K|149|0.7%||||\n|**AJO**|**1 Round (5 Days)**|**1.8K**|**248**|**13.7%**|**-**|**-**||\n|**AJO**|Apr 17 \u2013 Jun 30, 2025|128.6K|1,519|1.2%||||\n|**AJO**|**1 Round (5 Days)**|**5.2K**|**380**|**7.3%**|**-**|**-**||\n|**AJO**|Apr 17 \u2013 Jun 6, 2025|58.5K|574|1.0%||||\n|**AJO**|**1 Round (5 Days)**|**3.9K**|**299**|**7.6%**|**-**|**-**||\n|**AJO**|May 8 \u2013 Jun 30, 2025|407.7K|15,688|3.9%||||\n|**AJO**|**1 Round (6 Days)**|**19.6K**|**2,934**|**15.0%**|**-**|**-**||\n|**AJO**|May 22 \u2013 Aug 18, 2025|3.1M|11,986|0.39%|937|611|65%|\n|**AJO**|**2 Rounds (10 Days)**|**221.9K**|**15,937**|**7.2%**|**121**|**52**|**43%**|\n\n",
+    "row_facts": [
+      "Row 1: [Duration] = Feb 6 \u2013 Apr 2, 2025, [Impressions] = 459.4K, [Clicks] = 4,048, [CTR] = 0.9%",
+      "Row 2: [Placements] = AJO, [Duration] = 1 Round (4 Days), [Impressions] = 5.1K, [Clicks] = 457, [CTR] = 8.9%, [Applications] = -, [Acquisitions] = -",
+      "Row 3: [Duration] = Mar 20 \u2013 Jun 15, 2025, [Impressions] = 451.3K, [Clicks] = 6,114, [CTR] = 1.4%",
+      "Row 4: [Placements] = AJO, [Duration] = 1 Round (4 Days), [Impressions] = 10.5K, [Clicks] = 814, [CTR] = 7.7%, [Applications] = -, [Acquisitions] = -",
+      "Row 5: [Duration] = Mar 13 \u2013 Aug 27, 2025, [Impressions] = 531.7K, [Clicks] = 9,789, [CTR] = 1.8%",
+      "Row 6: [Placements] = AJO, [Duration] = 2 Round (10 Days), [Impressions] = 12.5K, [Clicks] = 3,747, [CTR] = 29.9%, [Applications] = -, [Acquisitions] = -",
+      "Row 7: [Duration] = Apr 3 \u2013 May 14, 2025, [Impressions] = 22.5K, [Clicks] = 149, [CTR] = 0.7%",
+      "Row 8: [Placements] = AJO, [Duration] = 1 Round (5 Days), [Impressions] = 1.8K, [Clicks] = 248, [CTR] = 13.7%, [Applications] = -, [Acquisitions] = -",
+      "Row 9: [Duration] = Apr 17 \u2013 Jun 30, 2025, [Impressions] = 128.6K, [Clicks] = 1,519, [CTR] = 1.2%",
+      "Row 10: [Placements] = AJO, [Duration] = 1 Round (5 Days), [Impressions] = 5.2K, [Clicks] = 380, [CTR] = 7.3%, [Applications] = -, [Acquisitions] = -",
+      "Row 11: [Duration] = Apr 17 \u2013 Jun 6, 2025, [Impressions] = 58.5K, [Clicks] = 574, [CTR] = 1.0%",
+      "Row 12: [Placements] = AJO, [Duration] = 1 Round (5 Days), [Impressions] = 3.9K, [Clicks] = 299, [CTR] = 7.6%, [Applications] = -, [Acquisitions] = -",
+      "Row 13: [Duration] = May 8 \u2013 Jun 30, 2025, [Impressions] = 407.7K, [Clicks] = 15,688, [CTR] = 3.9%",
+      "Row 14: [Placements] = AJO, [Duration] = 1 Round (6 Days), [Impressions] = 19.6K, [Clicks] = 2,934, [CTR] = 15.0%, [Applications] = -, [Acquisitions] = -",
+      "Row 15: [Duration] = May 22 \u2013 Aug 18, 2025, [Impressions] = 3.1M, [Clicks] = 11,986, [CTR] = 0.39%, [Applications] = 937, [Acquisitions] = 611, [Approval Rate] = 65%",
+      "Row 16: [Placements] = AJO, [Duration] = 2 Rounds (10 Days), [Impressions] = 221.9K, [Clicks] = 15,937, [CTR] = 7.2%, [Applications] = 121, [Acquisitions] = 52, [Approval Rate] = 43%"
+    ],
+    "records": [
+      {
+        "Placements": "",
+        "Duration": "Feb 6 \u2013 Apr 2, 2025",
+        "Impressions": "459.4K",
+        "Clicks": "4,048",
+        "CTR": "0.9%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (4 Days)",
+        "Impressions": "5.1K",
+        "Clicks": "457",
+        "CTR": "8.9%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "Mar 20 \u2013 Jun 15, 2025",
+        "Impressions": "451.3K",
+        "Clicks": "6,114",
+        "CTR": "1.4%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (4 Days)",
+        "Impressions": "10.5K",
+        "Clicks": "814",
+        "CTR": "7.7%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "Mar 13 \u2013 Aug 27, 2025",
+        "Impressions": "531.7K",
+        "Clicks": "9,789",
+        "CTR": "1.8%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "2 Round (10 Days)",
+        "Impressions": "12.5K",
+        "Clicks": "3,747",
+        "CTR": "29.9%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "Apr 3 \u2013 May 14, 2025",
+        "Impressions": "22.5K",
+        "Clicks": "149",
+        "CTR": "0.7%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (5 Days)",
+        "Impressions": "1.8K",
+        "Clicks": "248",
+        "CTR": "13.7%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "Apr 17 \u2013 Jun 30, 2025",
+        "Impressions": "128.6K",
+        "Clicks": "1,519",
+        "CTR": "1.2%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (5 Days)",
+        "Impressions": "5.2K",
+        "Clicks": "380",
+        "CTR": "7.3%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "Apr 17 \u2013 Jun 6, 2025",
+        "Impressions": "58.5K",
+        "Clicks": "574",
+        "CTR": "1.0%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (5 Days)",
+        "Impressions": "3.9K",
+        "Clicks": "299",
+        "CTR": "7.6%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "May 8 \u2013 Jun 30, 2025",
+        "Impressions": "407.7K",
+        "Clicks": "15,688",
+        "CTR": "3.9%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (6 Days)",
+        "Impressions": "19.6K",
+        "Clicks": "2,934",
+        "CTR": "15.0%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "May 22 \u2013 Aug 18, 2025",
+        "Impressions": "3.1M",
+        "Clicks": "11,986",
+        "CTR": "0.39%",
+        "Applications": "937",
+        "Acquisitions": "611",
+        "Approval Rate": "65%"
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "2 Rounds (10 Days)",
+        "Impressions": "221.9K",
+        "Clicks": "15,937",
+        "CTR": "7.2%",
+        "Applications": "121",
+        "Acquisitions": "52",
+        "Approval Rate": "43%"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p33_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 33,
+    "title": "Table 1 (Page 33): Placements, Duration, Impressions, Clicks",
+    "columns": [
+      "Placements",
+      "Duration",
+      "Impressions",
+      "Clicks",
+      "CTR",
+      "Applications",
+      "Acquisitions",
+      "Approval Rate"
+    ],
+    "rows_count": 12,
+    "markdown": "|Placements|Duration|Impressions|Clicks|CTR|Applications|Acquisitions|Approval Rate|\n|---|---|---|---|---|---|---|---|\n|**Placements**|May 29 \u2013 Jul 15, 2025|225.5K|728|0.32%||||\n|**AJO**|**1 Round (5 Days)**|**911**|**31**|**3.4%**|**-**|**-**||\n|**AJO**|Jun 5 \u2013 Sep 30, 2025|406.7K|5,693|1.40%||||\n|**AJO**|**2 Round (10 Days)**|**16.2K**|**2,706**|**16.7%**|**-**|**-**||\n|**AJO**|AJO on Jul 28|-|-|-||||\n|**AJO Only Campaign**|**1 Round (6 days)**|**46.2K**|**27,644**|**59.9%**|**-**|**-**||\n|**AJO Only Campaign**|AJO on Aug 11, Sep 8|-|-|-||||\n|**AJO Only Campaign**|**2 Rounds (12 days)**|**38.1K**|**24,295**|**63.8%**|**-**|**-**||\n|**AJO Only Campaign**|Aug 21 \u2013 Oct 21, 2025|1.47M|8,852|0.60%||||\n|**AJO**|**1 Round (5 days)**|**23.6K**|**1,199**|**5.1%**|**-**|**-**||\n|**AJO**|Sep 18 \u2013 Nov 30, 2025|588.5K|5,962|1.01%||||\n|**AJO**|**1 Round (5 days)**|**14.8K**|**1,200**|**8.1%**|**-**|**-**||\n\n",
+    "row_facts": [
+      "Row 1: [Duration] = May 29 \u2013 Jul 15, 2025, [Impressions] = 225.5K, [Clicks] = 728, [CTR] = 0.32%",
+      "Row 2: [Placements] = AJO, [Duration] = 1 Round (5 Days), [Impressions] = 911, [Clicks] = 31, [CTR] = 3.4%, [Applications] = -, [Acquisitions] = -",
+      "Row 3: [Duration] = Jun 5 \u2013 Sep 30, 2025, [Impressions] = 406.7K, [Clicks] = 5,693, [CTR] = 1.40%",
+      "Row 4: [Placements] = AJO, [Duration] = 2 Round (10 Days), [Impressions] = 16.2K, [Clicks] = 2,706, [CTR] = 16.7%, [Applications] = -, [Acquisitions] = -",
+      "Row 5: [Duration] = AJO on Jul 28, [Impressions] = -, [Clicks] = -, [CTR] = -",
+      "Row 6: [Placements] = AJO Only Campaign, [Duration] = 1 Round (6 days), [Impressions] = 46.2K, [Clicks] = 27,644, [CTR] = 59.9%, [Applications] = -, [Acquisitions] = -",
+      "Row 7: [Duration] = AJO on Aug 11, Sep 8, [Impressions] = -, [Clicks] = -, [CTR] = -",
+      "Row 8: [Placements] = AJO Only Campaign, [Duration] = 2 Rounds (12 days), [Impressions] = 38.1K, [Clicks] = 24,295, [CTR] = 63.8%, [Applications] = -, [Acquisitions] = -",
+      "Row 9: [Duration] = Aug 21 \u2013 Oct 21, 2025, [Impressions] = 1.47M, [Clicks] = 8,852, [CTR] = 0.60%",
+      "Row 10: [Placements] = AJO, [Duration] = 1 Round (5 days), [Impressions] = 23.6K, [Clicks] = 1,199, [CTR] = 5.1%, [Applications] = -, [Acquisitions] = -",
+      "Row 11: [Duration] = Sep 18 \u2013 Nov 30, 2025, [Impressions] = 588.5K, [Clicks] = 5,962, [CTR] = 1.01%",
+      "Row 12: [Placements] = AJO, [Duration] = 1 Round (5 days), [Impressions] = 14.8K, [Clicks] = 1,200, [CTR] = 8.1%, [Applications] = -, [Acquisitions] = -"
+    ],
+    "records": [
+      {
+        "Placements": "",
+        "Duration": "May 29 \u2013 Jul 15, 2025",
+        "Impressions": "225.5K",
+        "Clicks": "728",
+        "CTR": "0.32%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (5 Days)",
+        "Impressions": "911",
+        "Clicks": "31",
+        "CTR": "3.4%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "Jun 5 \u2013 Sep 30, 2025",
+        "Impressions": "406.7K",
+        "Clicks": "5,693",
+        "CTR": "1.40%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "2 Round (10 Days)",
+        "Impressions": "16.2K",
+        "Clicks": "2,706",
+        "CTR": "16.7%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "AJO on Jul 28",
+        "Impressions": "-",
+        "Clicks": "-",
+        "CTR": "-",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO Only Campaign",
+        "Duration": "1 Round (6 days)",
+        "Impressions": "46.2K",
+        "Clicks": "27,644",
+        "CTR": "59.9%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "AJO on Aug 11, Sep 8",
+        "Impressions": "-",
+        "Clicks": "-",
+        "CTR": "-",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO Only Campaign",
+        "Duration": "2 Rounds (12 days)",
+        "Impressions": "38.1K",
+        "Clicks": "24,295",
+        "CTR": "63.8%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "Aug 21 \u2013 Oct 21, 2025",
+        "Impressions": "1.47M",
+        "Clicks": "8,852",
+        "CTR": "0.60%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (5 days)",
+        "Impressions": "23.6K",
+        "Clicks": "1,199",
+        "CTR": "5.1%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "Sep 18 \u2013 Nov 30, 2025",
+        "Impressions": "588.5K",
+        "Clicks": "5,962",
+        "CTR": "1.01%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (5 days)",
+        "Impressions": "14.8K",
+        "Clicks": "1,200",
+        "CTR": "8.1%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p34_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 34,
+    "title": "Table 1 (Page 34): Placements, Duration, Impressions, Clicks",
+    "columns": [
+      "Placements",
+      "Duration",
+      "Impressions",
+      "Clicks",
+      "CTR",
+      "Applications",
+      "Acquisitions",
+      "Approval Rate"
+    ],
+    "rows_count": 8,
+    "markdown": "|Placements|Duration|Impressions|Clicks|CTR|Applications|Acquisitions|Approval Rate|\n|---|---|---|---|---|---|---|---|\n|**Placements**|Sep 25 \u2013 Nov 5, 2025|2.05M|2,005|0.1%||||\n|**AJO**|**1 Round (6 days)**|**20.6K**|**1,080**|**5.2%**|**-**|**-**||\n|**AJO**|Oct 9 \u2013 Nov 30, 2025|122.1K|684|0.56%||||\n|**AJO**|**1 Round (5 days)**|**774**|**49**|**6.3%**|**-**|**-**||\n|**AJO**|Oct 30 \u2013 Nov 30, 2025|294.3K|6,329|2.15%||||\n|**AJO**|**1 Round (5 days)**|**1,323**|**252**|**19.0%**|**-**|**-**||\n|**AJO**|Nov 20 \u2013 Dec 31|646.4K|12,053|1.86%||||\n|**AJO**|**1 Round (5 days)**|**37.6K**|**2,515**|**6.7%**|**-**|**-**||\n\n",
+    "row_facts": [
+      "Row 1: [Duration] = Sep 25 \u2013 Nov 5, 2025, [Impressions] = 2.05M, [Clicks] = 2,005, [CTR] = 0.1%",
+      "Row 2: [Placements] = AJO, [Duration] = 1 Round (6 days), [Impressions] = 20.6K, [Clicks] = 1,080, [CTR] = 5.2%, [Applications] = -, [Acquisitions] = -",
+      "Row 3: [Duration] = Oct 9 \u2013 Nov 30, 2025, [Impressions] = 122.1K, [Clicks] = 684, [CTR] = 0.56%",
+      "Row 4: [Placements] = AJO, [Duration] = 1 Round (5 days), [Impressions] = 774, [Clicks] = 49, [CTR] = 6.3%, [Applications] = -, [Acquisitions] = -",
+      "Row 5: [Duration] = Oct 30 \u2013 Nov 30, 2025, [Impressions] = 294.3K, [Clicks] = 6,329, [CTR] = 2.15%",
+      "Row 6: [Placements] = AJO, [Duration] = 1 Round (5 days), [Impressions] = 1,323, [Clicks] = 252, [CTR] = 19.0%, [Applications] = -, [Acquisitions] = -",
+      "Row 7: [Duration] = Nov 20 \u2013 Dec 31, [Impressions] = 646.4K, [Clicks] = 12,053, [CTR] = 1.86%",
+      "Row 8: [Placements] = AJO, [Duration] = 1 Round (5 days), [Impressions] = 37.6K, [Clicks] = 2,515, [CTR] = 6.7%, [Applications] = -, [Acquisitions] = -"
+    ],
+    "records": [
+      {
+        "Placements": "",
+        "Duration": "Sep 25 \u2013 Nov 5, 2025",
+        "Impressions": "2.05M",
+        "Clicks": "2,005",
+        "CTR": "0.1%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (6 days)",
+        "Impressions": "20.6K",
+        "Clicks": "1,080",
+        "CTR": "5.2%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "Oct 9 \u2013 Nov 30, 2025",
+        "Impressions": "122.1K",
+        "Clicks": "684",
+        "CTR": "0.56%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (5 days)",
+        "Impressions": "774",
+        "Clicks": "49",
+        "CTR": "6.3%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "Oct 30 \u2013 Nov 30, 2025",
+        "Impressions": "294.3K",
+        "Clicks": "6,329",
+        "CTR": "2.15%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (5 days)",
+        "Impressions": "1,323",
+        "Clicks": "252",
+        "CTR": "19.0%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "",
+        "Duration": "Nov 20 \u2013 Dec 31",
+        "Impressions": "646.4K",
+        "Clicks": "12,053",
+        "CTR": "1.86%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      },
+      {
+        "Placements": "AJO",
+        "Duration": "1 Round (5 days)",
+        "Impressions": "37.6K",
+        "Clicks": "2,515",
+        "CTR": "6.7%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": ""
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p35_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 35,
+    "title": "Table 1 (Page 35): Placements, % Impressions Share, Impressions, Clicks",
+    "columns": [
+      "Placements",
+      "% Impressions Share",
+      "Impressions",
+      "Clicks",
+      "CTR"
+    ],
+    "rows_count": 3,
+    "markdown": "|Placements|% Impressions Share|Impressions|Clicks|CTR|\n|---|---|---|---|---|\n|**Placements**|100%|1.7M|6.9K|0.41%|\n|**Portal Page Modal**|**12.7%**|**0.2M**|**2,750**|**1.28%**|\n|**Property Portal Banner**|**12.2%**|**0.2M**|**119**|**0.06%**|\n\n",
+    "row_facts": [
+      "Row 1: [% Impressions Share] = 100%, [Impressions] = 1.7M, [Clicks] = 6.9K, [CTR] = 0.41%",
+      "Row 2: [Placements] = Portal Page Modal, [% Impressions Share] = 12.7%, [Impressions] = 0.2M, [Clicks] = 2,750, [CTR] = 1.28%",
+      "Row 3: [Placements] = Property Portal Banner, [% Impressions Share] = 12.2%, [Impressions] = 0.2M, [Clicks] = 119, [CTR] = 0.06%"
+    ],
+    "records": [
+      {
+        "Placements": "",
+        "% Impressions Share": "100%",
+        "Impressions": "1.7M",
+        "Clicks": "6.9K",
+        "CTR": "0.41%"
+      },
+      {
+        "Placements": "Portal Page Modal",
+        "% Impressions Share": "12.7%",
+        "Impressions": "0.2M",
+        "Clicks": "2,750",
+        "CTR": "1.28%"
+      },
+      {
+        "Placements": "Property Portal Banner",
+        "% Impressions Share": "12.2%",
+        "Impressions": "0.2M",
+        "Clicks": "119",
+        "CTR": "0.06%"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p35_t2",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 35,
+    "title": "Table 2 (Page 35): Placements, % Impressions Share, Impressions, Clicks",
+    "columns": [
+      "Placements",
+      "% Impressions Share",
+      "Impressions",
+      "Clicks",
+      "CTR",
+      "Applications",
+      "Acquisitions",
+      "Approval Rate"
+    ],
+    "rows_count": 3,
+    "markdown": "|Placements|% Impressions Share|Impressions|Clicks|CTR|Applications|Acquisitions|Approval Rate|\n|---|---|---|---|---|---|---|---|\n|**Placements**|100%|1.3M|38.5K|2.87%|-|-|-|\n|**Portal Page Modal**|**26.4%**|**0.4M**|**33.3K**|**9.42%**|**126**|**45**|**36%**|\n|**Property Portal Banner**|**8.0%**|**0.1M**|**370**|**0.35%**|**0.35%**|**0.35%**|**0.35%**|\n\n",
+    "row_facts": [
+      "Row 1: [% Impressions Share] = 100%, [Impressions] = 1.3M, [Clicks] = 38.5K, [CTR] = 2.87%, [Applications] = -, [Acquisitions] = -, [Approval Rate] = -",
+      "Row 2: [Placements] = Portal Page Modal, [% Impressions Share] = 26.4%, [Impressions] = 0.4M, [Clicks] = 33.3K, [CTR] = 9.42%, [Applications] = 126, [Acquisitions] = 45, [Approval Rate] = 36%",
+      "Row 3: [Placements] = Property Portal Banner, [% Impressions Share] = 8.0%, [Impressions] = 0.1M, [Clicks] = 370, [CTR] = 0.35%"
+    ],
+    "records": [
+      {
+        "Placements": "",
+        "% Impressions Share": "100%",
+        "Impressions": "1.3M",
+        "Clicks": "38.5K",
+        "CTR": "2.87%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": "-"
+      },
+      {
+        "Placements": "Portal Page Modal",
+        "% Impressions Share": "26.4%",
+        "Impressions": "0.4M",
+        "Clicks": "33.3K",
+        "CTR": "9.42%",
+        "Applications": "126",
+        "Acquisitions": "45",
+        "Approval Rate": "36%"
+      },
+      {
+        "Placements": "Property Portal Banner",
+        "% Impressions Share": "8.0%",
+        "Impressions": "0.1M",
+        "Clicks": "370",
+        "CTR": "0.35%",
+        "Applications": "",
+        "Acquisitions": "",
+        "Approval Rate": ""
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p35_t3",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 35,
+    "title": "Table 3 (Page 35): Placements, % Impressions Share, Impressions, Clicks",
+    "columns": [
+      "Placements",
+      "% Impressions Share",
+      "Impressions",
+      "Clicks",
+      "CTR",
+      "Applications",
+      "Acquisitions",
+      "Approval Rate"
+    ],
+    "rows_count": 2,
+    "markdown": "|Placements|% Impressions Share|Impressions|Clicks|CTR|Applications|Acquisitions|Approval Rate|\n|---|---|---|---|---|---|---|---|\n|**Placements**|100%|6.1M|22.4K|0.36%|842|468|56%|\n|**Portal Page Modal**|**20.8%**|**1.3M**|**14.5K**|**1.14%**|**280**|**114**|**41%**|\n\n",
+    "row_facts": [
+      "Row 1: [% Impressions Share] = 100%, [Impressions] = 6.1M, [Clicks] = 22.4K, [CTR] = 0.36%, [Applications] = 842, [Acquisitions] = 468, [Approval Rate] = 56%",
+      "Row 2: [Placements] = Portal Page Modal, [% Impressions Share] = 20.8%, [Impressions] = 1.3M, [Clicks] = 14.5K, [CTR] = 1.14%, [Applications] = 280, [Acquisitions] = 114, [Approval Rate] = 41%"
+    ],
+    "records": [
+      {
+        "Placements": "",
+        "% Impressions Share": "100%",
+        "Impressions": "6.1M",
+        "Clicks": "22.4K",
+        "CTR": "0.36%",
+        "Applications": "842",
+        "Acquisitions": "468",
+        "Approval Rate": "56%"
+      },
+      {
+        "Placements": "Portal Page Modal",
+        "% Impressions Share": "20.8%",
+        "Impressions": "1.3M",
+        "Clicks": "14.5K",
+        "CTR": "1.14%",
+        "Applications": "280",
+        "Acquisitions": "114",
+        "Approval Rate": "41%"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p36_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 36,
+    "title": "Table 1 (Page 36): Placements, % Impressions Share, Impressions, Clicks",
+    "columns": [
+      "Placements",
+      "% Impressions Share",
+      "Impressions",
+      "Clicks",
+      "CTR"
+    ],
+    "rows_count": 2,
+    "markdown": "|Placements|% Impressions Share|Impressions|Clicks|CTR|\n|---|---|---|---|---|\n|**Placements**|100%|1.97M|12.7K|0.64%|\n|**Portal Page Modal**|**14.3%**|**283.1K**|**8,598**|**3.04%**|\n\n",
+    "row_facts": [
+      "Row 1: [% Impressions Share] = 100%, [Impressions] = 1.97M, [Clicks] = 12.7K, [CTR] = 0.64%",
+      "Row 2: [Placements] = Portal Page Modal, [% Impressions Share] = 14.3%, [Impressions] = 283.1K, [Clicks] = 8,598, [CTR] = 3.04%"
+    ],
+    "records": [
+      {
+        "Placements": "",
+        "% Impressions Share": "100%",
+        "Impressions": "1.97M",
+        "Clicks": "12.7K",
+        "CTR": "0.64%"
+      },
+      {
+        "Placements": "Portal Page Modal",
+        "% Impressions Share": "14.3%",
+        "Impressions": "283.1K",
+        "Clicks": "8,598",
+        "CTR": "3.04%"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p36_t2",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 36,
+    "title": "Table 2 (Page 36): Placements, % Impressions Share, Impressions, Clicks",
+    "columns": [
+      "Placements",
+      "% Impressions Share",
+      "Impressions",
+      "Clicks",
+      "CTR",
+      "Applications",
+      "Acquisitions",
+      "Approval Rate"
+    ],
+    "rows_count": 2,
+    "markdown": "|Placements|% Impressions Share|Impressions|Clicks|CTR|Applications|Acquisitions|Approval Rate|\n|---|---|---|---|---|---|---|---|\n|**Placements**|100%|417.9K|17.1K|4.1%|-|-|-|\n|**Portal Page Modal**|**32.7%**|**136.5K**|**15.8K**|**11.6%**|**52**|**26**|**50%**|\n\n",
+    "row_facts": [
+      "Row 1: [% Impressions Share] = 100%, [Impressions] = 417.9K, [Clicks] = 17.1K, [CTR] = 4.1%, [Applications] = -, [Acquisitions] = -, [Approval Rate] = -",
+      "Row 2: [Placements] = Portal Page Modal, [% Impressions Share] = 32.7%, [Impressions] = 136.5K, [Clicks] = 15.8K, [CTR] = 11.6%, [Applications] = 52, [Acquisitions] = 26, [Approval Rate] = 50%"
+    ],
+    "records": [
+      {
+        "Placements": "",
+        "% Impressions Share": "100%",
+        "Impressions": "417.9K",
+        "Clicks": "17.1K",
+        "CTR": "4.1%",
+        "Applications": "-",
+        "Acquisitions": "-",
+        "Approval Rate": "-"
+      },
+      {
+        "Placements": "Portal Page Modal",
+        "% Impressions Share": "32.7%",
+        "Impressions": "136.5K",
+        "Clicks": "15.8K",
+        "CTR": "11.6%",
+        "Applications": "52",
+        "Acquisitions": "26",
+        "Approval Rate": "50%"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p36_t3",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 36,
+    "title": "Table 3 (Page 36): Placements, % Impressions Share, Impressions, Clicks",
+    "columns": [
+      "Placements",
+      "% Impressions Share",
+      "Impressions",
+      "Clicks",
+      "CTR"
+    ],
+    "rows_count": 2,
+    "markdown": "|Placements|% Impressions Share|Impressions|Clicks|CTR|\n|---|---|---|---|---|\n|**Placements**|100%|2.07M|15.7K|0.76%|\n|**Portal Page Modal**|**32.9%**|**681.9K**|**13.4K**|**1.96%**|\n\n",
+    "row_facts": [
+      "Row 1: [% Impressions Share] = 100%, [Impressions] = 2.07M, [Clicks] = 15.7K, [CTR] = 0.76%",
+      "Row 2: [Placements] = Portal Page Modal, [% Impressions Share] = 32.9%, [Impressions] = 681.9K, [Clicks] = 13.4K, [CTR] = 1.96%"
+    ],
+    "records": [
+      {
+        "Placements": "",
+        "% Impressions Share": "100%",
+        "Impressions": "2.07M",
+        "Clicks": "15.7K",
+        "CTR": "0.76%"
+      },
+      {
+        "Placements": "Portal Page Modal",
+        "% Impressions Share": "32.9%",
+        "Impressions": "681.9K",
+        "Clicks": "13.4K",
+        "CTR": "1.96%"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p37_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 37,
+    "title": "Table 1 (Page 37): Month, Application, Acquisition, Approval Rate",
+    "columns": [
+      "Month",
+      "Application",
+      "Acquisition",
+      "Approval Rate"
+    ],
+    "rows_count": 4,
+    "markdown": "|Month|Application|Acquisition|Approval Rate|\n|---|---|---|---|\n|Dec \u201824|1|-|-|\n|Q1: Jan \u2013 Mar \u201925|11|5|45%|\n|Q2: Apr \u2013 Jun \u201825|22|14|64%|\n|Q3: Jul \u2013 Sep \u201825|16|8|50%|\n\n",
+    "row_facts": [
+      "Row 1: [Month] = Dec \u201824, [Application] = 1, [Acquisition] = -, [Approval Rate] = -",
+      "Row 2: [Month] = Q1: Jan \u2013 Mar \u201925, [Application] = 11, [Acquisition] = 5, [Approval Rate] = 45%",
+      "Row 3: [Month] = Q2: Apr \u2013 Jun \u201825, [Application] = 22, [Acquisition] = 14, [Approval Rate] = 64%",
+      "Row 4: [Month] = Q3: Jul \u2013 Sep \u201825, [Application] = 16, [Acquisition] = 8, [Approval Rate] = 50%"
+    ],
+    "records": [
+      {
+        "Month": "Dec \u201824",
+        "Application": "1",
+        "Acquisition": "-",
+        "Approval Rate": "-"
+      },
+      {
+        "Month": "Q1: Jan \u2013 Mar \u201925",
+        "Application": "11",
+        "Acquisition": "5",
+        "Approval Rate": "45%"
+      },
+      {
+        "Month": "Q2: Apr \u2013 Jun \u201825",
+        "Application": "22",
+        "Acquisition": "14",
+        "Approval Rate": "64%"
+      },
+      {
+        "Month": "Q3: Jul \u2013 Sep \u201825",
+        "Application": "16",
+        "Acquisition": "8",
+        "Approval Rate": "50%"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p47_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 47,
+    "title": "Table 1 (Page 47): NL Email Messaging, Applications, NAAs",
+    "columns": [
+      "NL Email Messaging",
+      "Applications",
+      "NAAs"
+    ],
+    "rows_count": 14,
+    "markdown": "|NL Email Messaging|Applications|NAAs|\n|---|---|---|\n|**NL Personalized Trigger Email**|**1,095**|**449**|\n|Q2 (May onwards)|259|107|\n|Q3|413|144|\n|Q4|423|198|\n|**Chase ACQ BAU module - Non-Mem NL**|**247**|**53**|\n|Q3|165|29|\n|Q4|82|24|\n|**Chase ACQ BAU module - Basic NL**|**597**|**152**|\n|Q3|308|66|\n|Q4|289|86|\n|**Chase ACQ BAU module - Elite NL**|**228**|**111**|\n|Q3|68|24|\n|Q4|160|87|\n|**Total**|**2,167**|**765**|\n\n",
+    "row_facts": [
+      "Row 1: [NL Email Messaging] = NL Personalized Trigger Email, [Applications] = 1,095, [NAAs] = 449",
+      "Row 2: [NL Email Messaging] = Q2 (May onwards), [Applications] = 259, [NAAs] = 107",
+      "Row 3: [NL Email Messaging] = Q3, [Applications] = 413, [NAAs] = 144",
+      "Row 4: [NL Email Messaging] = Q4, [Applications] = 423, [NAAs] = 198",
+      "Row 5: [NL Email Messaging] = Chase ACQ BAU module - Non-Mem NL, [Applications] = 247, [NAAs] = 53",
+      "Row 6: [NL Email Messaging] = Q3, [Applications] = 165, [NAAs] = 29",
+      "Row 7: [NL Email Messaging] = Q4, [Applications] = 82, [NAAs] = 24",
+      "Row 8: [NL Email Messaging] = Chase ACQ BAU module - Basic NL, [Applications] = 597, [NAAs] = 152",
+      "Row 9: [NL Email Messaging] = Q3, [Applications] = 308, [NAAs] = 66",
+      "Row 10: [NL Email Messaging] = Q4, [Applications] = 289, [NAAs] = 86",
+      "Row 11: [NL Email Messaging] = Chase ACQ BAU module - Elite NL, [Applications] = 228, [NAAs] = 111",
+      "Row 12: [NL Email Messaging] = Q3, [Applications] = 68, [NAAs] = 24",
+      "Row 13: [NL Email Messaging] = Q4, [Applications] = 160, [NAAs] = 87",
+      "Row 14: [NL Email Messaging] = Total, [Applications] = 2,167, [NAAs] = 765"
+    ],
+    "records": [
+      {
+        "NL Email Messaging": "NL Personalized Trigger Email",
+        "Applications": "1,095",
+        "NAAs": "449"
+      },
+      {
+        "NL Email Messaging": "Q2 (May onwards)",
+        "Applications": "259",
+        "NAAs": "107"
+      },
+      {
+        "NL Email Messaging": "Q3",
+        "Applications": "413",
+        "NAAs": "144"
+      },
+      {
+        "NL Email Messaging": "Q4",
+        "Applications": "423",
+        "NAAs": "198"
+      },
+      {
+        "NL Email Messaging": "Chase ACQ BAU module - Non-Mem NL",
+        "Applications": "247",
+        "NAAs": "53"
+      },
+      {
+        "NL Email Messaging": "Q3",
+        "Applications": "165",
+        "NAAs": "29"
+      },
+      {
+        "NL Email Messaging": "Q4",
+        "Applications": "82",
+        "NAAs": "24"
+      },
+      {
+        "NL Email Messaging": "Chase ACQ BAU module - Basic NL",
+        "Applications": "597",
+        "NAAs": "152"
+      },
+      {
+        "NL Email Messaging": "Q3",
+        "Applications": "308",
+        "NAAs": "66"
+      },
+      {
+        "NL Email Messaging": "Q4",
+        "Applications": "289",
+        "NAAs": "86"
+      },
+      {
+        "NL Email Messaging": "Chase ACQ BAU module - Elite NL",
+        "Applications": "228",
+        "NAAs": "111"
+      },
+      {
+        "NL Email Messaging": "Q3",
+        "Applications": "68",
+        "NAAs": "24"
+      },
+      {
+        "NL Email Messaging": "Q4",
+        "Applications": "160",
+        "NAAs": "87"
+      },
+      {
+        "NL Email Messaging": "Total",
+        "Applications": "2,167",
+        "NAAs": "765"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p51_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 51,
+    "title": "Table 1 (Page 51): Col0, Month, Delivered Notification, Application",
+    "columns": [
+      "Col0",
+      "Month",
+      "Delivered Notification",
+      "Application",
+      "Acquisition",
+      "Approval Rate"
+    ],
+    "rows_count": 6,
+    "markdown": "|Col0|Month|Delivered<br>Notification|Application|Acquisition|Approval Rate|\n|---|---|---|---|---|---|\n|**China CITIC**<br>**Acquisition LTO 10/15K**<br>(Live from May 15 \u2013 Jul 30)|May|27,202|2|0|-|\n|**China CITIC**<br>**Acquisition LTO 10/15K**<br>(Live from May 15 \u2013 Jul 30)|Jun|36,644|11|2|18%|\n|**China CITIC**<br>**Acquisition LTO 10/15K**<br>(Live from May 15 \u2013 Jul 30)|Jul|20,606|4|0|-|\n|**China CITIC**<br>**Acquisition LTO 10/15K**<br>(Live from May 15 \u2013 Jul 30)|Aug|-|1|1|100%|\n|**China CITIC**<br>**Acquisition LTO 10/15K**<br>(Live from May 15 \u2013 Jul 30)|Sep|-|4|4|100%|\n|**China CITIC**<br>**Acquisition LTO 10/15K**<br>(Live from May 15 \u2013 Jul 30)|**Total**|**84,452**|**22**|**7**|**32%**|\n\n",
+    "row_facts": [
+      "Row 1: [Col0] = China CITIC Acquisition LTO 10/15K (Live from May 15 \u2013 Jul 30), [Month] = May, [Delivered Notification] = 27,202, [Application] = 2, [Acquisition] = 0, [Approval Rate] = -",
+      "Row 2: [Month] = Jun, [Delivered Notification] = 36,644, [Application] = 11, [Acquisition] = 2, [Approval Rate] = 18%",
+      "Row 3: [Month] = Jul, [Delivered Notification] = 20,606, [Application] = 4, [Acquisition] = 0, [Approval Rate] = -",
+      "Row 4: [Month] = Aug, [Delivered Notification] = -, [Application] = 1, [Acquisition] = 1, [Approval Rate] = 100%",
+      "Row 5: [Month] = Sep, [Delivered Notification] = -, [Application] = 4, [Acquisition] = 4, [Approval Rate] = 100%",
+      "Row 6: [Month] = Total, [Delivered Notification] = 84,452, [Application] = 22, [Acquisition] = 7, [Approval Rate] = 32%"
+    ],
+    "records": [
+      {
+        "Col0": "China CITIC Acquisition LTO 10/15K (Live from May 15 \u2013 Jul 30)",
+        "Month": "May",
+        "Delivered Notification": "27,202",
+        "Application": "2",
+        "Acquisition": "0",
+        "Approval Rate": "-"
+      },
+      {
+        "Col0": "",
+        "Month": "Jun",
+        "Delivered Notification": "36,644",
+        "Application": "11",
+        "Acquisition": "2",
+        "Approval Rate": "18%"
+      },
+      {
+        "Col0": "",
+        "Month": "Jul",
+        "Delivered Notification": "20,606",
+        "Application": "4",
+        "Acquisition": "0",
+        "Approval Rate": "-"
+      },
+      {
+        "Col0": "",
+        "Month": "Aug",
+        "Delivered Notification": "-",
+        "Application": "1",
+        "Acquisition": "1",
+        "Approval Rate": "100%"
+      },
+      {
+        "Col0": "",
+        "Month": "Sep",
+        "Delivered Notification": "-",
+        "Application": "4",
+        "Acquisition": "4",
+        "Approval Rate": "100%"
+      },
+      {
+        "Col0": "",
+        "Month": "Total",
+        "Delivered Notification": "84,452",
+        "Application": "22",
+        "Acquisition": "7",
+        "Approval Rate": "32%"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p53_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 53,
+    "title": "Table 1 (Page 53): Start Date, End Date, # Days, Placement",
+    "columns": [
+      "Start Date",
+      "End Date",
+      "# Days",
+      "Placement",
+      "Targeted Card",
+      "Offer",
+      "Impressions",
+      "APP Rate1",
+      "NAAs1"
+    ],
+    "rows_count": 36,
+    "markdown": "|Start Date|End Date|# Days|Placement|Targeted Card|Offer|Impressions|APP Rate1|NAAs1|\n|---|---|---|---|---|---|---|---|---|\n|1/7/2025|1/22/2025|16|App Trips|Boundless|EG250+50K|215.3K|0.028%|12|\n|1/23/2025|1/27/2025|5|Home|Boundless|EG400+25Kprearrival|220.6K|0.056%|38|\n|1/23/2025|1/27/2025|5|Home|Boundless|SC150+100K|658.4K|0.060%|118|\n|1/23/2025|1/27/2025|5|Home|Bold|60K+1FN|107.8K|0.097%|27|\n|2/7/2025|2/10/2025|4|Home|SMB|125K|62.9K|0.000%|TBD**2**|\n|2/14/2025|2/16/2025|3|App Trips|Boundless|EG400+25Kprearrival|45.1K|0.058%|2|\n|2/24/2025|2/28/2025|4|Home|Boundless|SC150+100K last chance|721.7K|0.049%|100|\n|2/24/2025|2/28/2025|4|Home|Bold|60K+1FN last Chance|137.2K|0.094%|37|\n|2/24/2025|2/28/2025|4|Home|Boundless|EG400+25Kprearrival|222.3K|0.058%|18|\n|3/1/2025|3/5/2025|5|App Trips|Boundless|EG400+25Kprearrival last chance|81.4K|0.042%|7|\n|3/13/2025|3/17/2025|5|Home|Boundless|RAF PT 40K|333.9K|0.000%**2**|TBD**2**|\n|3/17/2025|3/21/2025|5|Home|Brilliant|185K|93.1K|0.0408%|18|\n|3/17/2025|3/21/2025|5|Home|Bevy|155K|75.8K|0.0277%|8|\n|4/16/2025|4/20/2025|5|Home|Boundless|3FNA+50K|745.9K|0.0302%|54|\n|4/16/2025|4/20/2025|5|Home|Boundless|EG250+100Kprearrival|359.8K|0.0258%|31|\n|5/1/2025|5/6/2025|6|Home|Brilliant|185K|108.5K|0.0452%|33|\n|5/1/2025|5/6/2025|6|Home|Bevy|155K|88.5K|0.0497%|16|\n|5/15/2025|5/19/2025|5|App trips|Boundless|EG250+100Kprearrival|112.9K|0.0390%|7|\n|6/12/2025|6/16/2025|5|Home|Boundless|5FNA|857.4K|0.0534%|172|\n|6/12/2025|6/16/2025|5|Home|Boundless|EG400+50Kprearrival|434.0K|0.0705%|82|\n|6/12/2025|6/16/2025|5|Home|Bold|60K+1FN|86.7K|0.1395%|39|\n|7/17/2025|7/23/2025|7|App Trips|Boundless|EG400+50Kprearrival|167.4K|0.0747%|27|\n|8/4/2025|8/9/2025 (SMB till<br>8/8)|6|Home|Brilliant|185K|124.1K|0.0387%|18|\n|8/4/2025|8/9/2025 (SMB till<br>8/8)|6|Home|Bevy|155K|81.4K|0.0307%|10|\n|8/4/2025|8/9/2025 (SMB till<br>8/8)|6|Home|SMB|125K|53.2K|0.0075%|3|\n|9/15/2025|9/20/2025 (Brilliant<br>till 9/19)|6|Home|Brilliant|185K Last Chance|144.8K|0.0352%|23|\n|9/15/2025|9/20/2025 (Brilliant<br>till 9/19)|6|Home|Bevy|155K Last Chance|72.2K|0.0346%|8|\n|9/30/2025|10/4/2025|5|Home|Boundless|EG400+50Kprearrival|333.4K|0.0132%|11|\n|9/30/2025|10/4/2025|5|Home|Boundless|125+1FN|736.2K|0.0566%|112|\n|9/30/2025|10/4/2025|5|Home|Bold|60K|154.8K|0.0743%|30|\n|10/23/2025|10/27/2025|5|Home|Boundless|EG400+50Kprearrival LC|77.3K|0.0324%|6|\n|10/23/2025|10/27/2025|5|Home|Boundless|125+1FN LC|169.7K|0.0542%|24|\n|10/23/2025|10/27/2025|5|Home|Bold|60K LC|10.8K|0.2495%|2|\n|11/10/2025|11/15/2025|6|Home|Boundless|3FNA+50K|131.2K|0.0175%|3|\n|11/10/2025|11/14/2025|5|Home|Brilliant|250SC+150K RTO|1.7K|0.0576%|1|\n|**Total (YTD 2025)**|**Total (YTD 2025)**|**108**||||**7.8M**|**0.049%2**|**1,0972**|\n\n",
+    "row_facts": [
+      "Row 1: [Start Date] = 1/7/2025, [End Date] = 1/22/2025, [# Days] = 16, [Placement] = App Trips, [Targeted Card] = Boundless, [Offer] = EG250+50K, [Impressions] = 215.3K, [APP Rate1] = 0.028%, [NAAs1] = 12",
+      "Row 2: [Start Date] = 1/23/2025, [End Date] = 1/27/2025, [# Days] = 5, [Placement] = Home, [Targeted Card] = Boundless, [Offer] = EG400+25K prearrival, [Impressions] = 220.6K, [APP Rate1] = 0.056%, [NAAs1] = 38",
+      "Row 3: [Targeted Card] = Boundless, [Offer] = SC150+100K, [Impressions] = 658.4K, [APP Rate1] = 0.060%, [NAAs1] = 118",
+      "Row 4: [Targeted Card] = Bold, [Offer] = 60K+1FN, [Impressions] = 107.8K, [APP Rate1] = 0.097%, [NAAs1] = 27",
+      "Row 5: [Start Date] = 2/7/2025, [End Date] = 2/10/2025, [# Days] = 4, [Placement] = Home, [Targeted Card] = SMB, [Offer] = 125K, [Impressions] = 62.9K, [APP Rate1] = 0.000%, [NAAs1] = TBD2",
+      "Row 6: [Start Date] = 2/14/2025, [End Date] = 2/16/2025, [# Days] = 3, [Placement] = App Trips, [Targeted Card] = Boundless, [Offer] = EG400+25K prearrival, [Impressions] = 45.1K, [APP Rate1] = 0.058%, [NAAs1] = 2",
+      "Row 7: [Start Date] = 2/24/2025, [End Date] = 2/28/2025, [# Days] = 4, [Placement] = Home, [Targeted Card] = Boundless, [Offer] = SC150+100K last chance, [Impressions] = 721.7K, [APP Rate1] = 0.049%, [NAAs1] = 100",
+      "Row 8: [Targeted Card] = Bold, [Offer] = 60K+1FN last Chance, [Impressions] = 137.2K, [APP Rate1] = 0.094%, [NAAs1] = 37",
+      "Row 9: [Targeted Card] = Boundless, [Offer] = EG400+25K prearrival, [Impressions] = 222.3K, [APP Rate1] = 0.058%, [NAAs1] = 18",
+      "Row 10: [Start Date] = 3/1/2025, [End Date] = 3/5/2025, [# Days] = 5, [Placement] = App Trips, [Targeted Card] = Boundless, [Offer] = EG400+25K prearrival last chance, [Impressions] = 81.4K, [APP Rate1] = 0.042%, [NAAs1] = 7",
+      "Row 11: [Start Date] = 3/13/2025, [End Date] = 3/17/2025, [# Days] = 5, [Placement] = Home, [Targeted Card] = Boundless, [Offer] = RAF PT 40K, [Impressions] = 333.9K, [APP Rate1] = 0.000%2, [NAAs1] = TBD2",
+      "Row 12: [Start Date] = 3/17/2025, [End Date] = 3/21/2025, [# Days] = 5, [Placement] = Home, [Targeted Card] = Brilliant, [Offer] = 185K, [Impressions] = 93.1K, [APP Rate1] = 0.0408%, [NAAs1] = 18",
+      "Row 13: [Targeted Card] = Bevy, [Offer] = 155K, [Impressions] = 75.8K, [APP Rate1] = 0.0277%, [NAAs1] = 8",
+      "Row 14: [Start Date] = 4/16/2025, [End Date] = 4/20/2025, [# Days] = 5, [Placement] = Home, [Targeted Card] = Boundless, [Offer] = 3FNA+50K, [Impressions] = 745.9K, [APP Rate1] = 0.0302%, [NAAs1] = 54",
+      "Row 15: [Targeted Card] = Boundless, [Offer] = EG250+100K prearrival, [Impressions] = 359.8K, [APP Rate1] = 0.0258%, [NAAs1] = 31",
+      "Row 16: [Start Date] = 5/1/2025, [End Date] = 5/6/2025, [# Days] = 6, [Placement] = Home, [Targeted Card] = Brilliant, [Offer] = 185K, [Impressions] = 108.5K, [APP Rate1] = 0.0452%, [NAAs1] = 33",
+      "Row 17: [Targeted Card] = Bevy, [Offer] = 155K, [Impressions] = 88.5K, [APP Rate1] = 0.0497%, [NAAs1] = 16",
+      "Row 18: [Start Date] = 5/15/2025, [End Date] = 5/19/2025, [# Days] = 5, [Placement] = App trips, [Targeted Card] = Boundless, [Offer] = EG250+100K prearrival, [Impressions] = 112.9K, [APP Rate1] = 0.0390%, [NAAs1] = 7",
+      "Row 19: [Start Date] = 6/12/2025, [End Date] = 6/16/2025, [# Days] = 5, [Placement] = Home, [Targeted Card] = Boundless, [Offer] = 5FNA, [Impressions] = 857.4K, [APP Rate1] = 0.0534%, [NAAs1] = 172",
+      "Row 20: [Targeted Card] = Boundless, [Offer] = EG400+50K prearrival, [Impressions] = 434.0K, [APP Rate1] = 0.0705%, [NAAs1] = 82",
+      "Row 21: [Targeted Card] = Bold, [Offer] = 60K+1FN, [Impressions] = 86.7K, [APP Rate1] = 0.1395%, [NAAs1] = 39",
+      "Row 22: [Start Date] = 7/17/2025, [End Date] = 7/23/2025, [# Days] = 7, [Placement] = App Trips, [Targeted Card] = Boundless, [Offer] = EG400+50K prearrival, [Impressions] = 167.4K, [APP Rate1] = 0.0747%, [NAAs1] = 27",
+      "Row 23: [Start Date] = 8/4/2025, [End Date] = 8/9/2025 (SMB till 8/8), [# Days] = 6, [Placement] = Home, [Targeted Card] = Brilliant, [Offer] = 185K, [Impressions] = 124.1K, [APP Rate1] = 0.0387%, [NAAs1] = 18",
+      "Row 24: [Targeted Card] = Bevy, [Offer] = 155K, [Impressions] = 81.4K, [APP Rate1] = 0.0307%, [NAAs1] = 10",
+      "Row 25: [Targeted Card] = SMB, [Offer] = 125K, [Impressions] = 53.2K, [APP Rate1] = 0.0075%, [NAAs1] = 3",
+      "Row 26: [Start Date] = 9/15/2025, [End Date] = 9/20/2025 (Brilliant till 9/19), [# Days] = 6, [Placement] = Home, [Targeted Card] = Brilliant, [Offer] = 185K Last Chance, [Impressions] = 144.8K, [APP Rate1] = 0.0352%, [NAAs1] = 23",
+      "Row 27: [Targeted Card] = Bevy, [Offer] = 155K Last Chance, [Impressions] = 72.2K, [APP Rate1] = 0.0346%, [NAAs1] = 8",
+      "Row 28: [Start Date] = 9/30/2025, [End Date] = 10/4/2025, [# Days] = 5, [Placement] = Home, [Targeted Card] = Boundless, [Offer] = EG400+50K prearrival, [Impressions] = 333.4K, [APP Rate1] = 0.0132%, [NAAs1] = 11",
+      "Row 29: [Targeted Card] = Boundless, [Offer] = 125+1FN, [Impressions] = 736.2K, [APP Rate1] = 0.0566%, [NAAs1] = 112",
+      "Row 30: [Targeted Card] = Bold, [Offer] = 60K, [Impressions] = 154.8K, [APP Rate1] = 0.0743%, [NAAs1] = 30",
+      "Row 31: [Start Date] = 10/23/2025, [End Date] = 10/27/2025, [# Days] = 5, [Placement] = Home, [Targeted Card] = Boundless, [Offer] = EG400+50K prearrival LC, [Impressions] = 77.3K, [APP Rate1] = 0.0324%, [NAAs1] = 6",
+      "Row 32: [Targeted Card] = Boundless, [Offer] = 125+1FN LC, [Impressions] = 169.7K, [APP Rate1] = 0.0542%, [NAAs1] = 24",
+      "Row 33: [Targeted Card] = Bold, [Offer] = 60K LC, [Impressions] = 10.8K, [APP Rate1] = 0.2495%, [NAAs1] = 2",
+      "Row 34: [Start Date] = 11/10/2025, [End Date] = 11/15/2025, [# Days] = 6, [Placement] = Home, [Targeted Card] = Boundless, [Offer] = 3FNA+50K, [Impressions] = 131.2K, [APP Rate1] = 0.0175%, [NAAs1] = 3",
+      "Row 35: [Start Date] = 11/10/2025, [End Date] = 11/14/2025, [# Days] = 5, [Placement] = Home, [Targeted Card] = Brilliant, [Offer] = 250SC+150K RTO, [Impressions] = 1.7K, [APP Rate1] = 0.0576%, [NAAs1] = 1",
+      "Row 36: [Start Date] = Total (YTD 2025), [# Days] = 108, [Impressions] = 7.8M, [APP Rate1] = 0.049%2, [NAAs1] = 1,0972"
+    ],
+    "records": [
+      {
+        "Start Date": "1/7/2025",
+        "End Date": "1/22/2025",
+        "# Days": "16",
+        "Placement": "App Trips",
+        "Targeted Card": "Boundless",
+        "Offer": "EG250+50K",
+        "Impressions": "215.3K",
+        "APP Rate1": "0.028%",
+        "NAAs1": "12"
+      },
+      {
+        "Start Date": "1/23/2025",
+        "End Date": "1/27/2025",
+        "# Days": "5",
+        "Placement": "Home",
+        "Targeted Card": "Boundless",
+        "Offer": "EG400+25K prearrival",
+        "Impressions": "220.6K",
+        "APP Rate1": "0.056%",
+        "NAAs1": "38"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Boundless",
+        "Offer": "SC150+100K",
+        "Impressions": "658.4K",
+        "APP Rate1": "0.060%",
+        "NAAs1": "118"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Bold",
+        "Offer": "60K+1FN",
+        "Impressions": "107.8K",
+        "APP Rate1": "0.097%",
+        "NAAs1": "27"
+      },
+      {
+        "Start Date": "2/7/2025",
+        "End Date": "2/10/2025",
+        "# Days": "4",
+        "Placement": "Home",
+        "Targeted Card": "SMB",
+        "Offer": "125K",
+        "Impressions": "62.9K",
+        "APP Rate1": "0.000%",
+        "NAAs1": "TBD2"
+      },
+      {
+        "Start Date": "2/14/2025",
+        "End Date": "2/16/2025",
+        "# Days": "3",
+        "Placement": "App Trips",
+        "Targeted Card": "Boundless",
+        "Offer": "EG400+25K prearrival",
+        "Impressions": "45.1K",
+        "APP Rate1": "0.058%",
+        "NAAs1": "2"
+      },
+      {
+        "Start Date": "2/24/2025",
+        "End Date": "2/28/2025",
+        "# Days": "4",
+        "Placement": "Home",
+        "Targeted Card": "Boundless",
+        "Offer": "SC150+100K last chance",
+        "Impressions": "721.7K",
+        "APP Rate1": "0.049%",
+        "NAAs1": "100"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Bold",
+        "Offer": "60K+1FN last Chance",
+        "Impressions": "137.2K",
+        "APP Rate1": "0.094%",
+        "NAAs1": "37"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Boundless",
+        "Offer": "EG400+25K prearrival",
+        "Impressions": "222.3K",
+        "APP Rate1": "0.058%",
+        "NAAs1": "18"
+      },
+      {
+        "Start Date": "3/1/2025",
+        "End Date": "3/5/2025",
+        "# Days": "5",
+        "Placement": "App Trips",
+        "Targeted Card": "Boundless",
+        "Offer": "EG400+25K prearrival last chance",
+        "Impressions": "81.4K",
+        "APP Rate1": "0.042%",
+        "NAAs1": "7"
+      },
+      {
+        "Start Date": "3/13/2025",
+        "End Date": "3/17/2025",
+        "# Days": "5",
+        "Placement": "Home",
+        "Targeted Card": "Boundless",
+        "Offer": "RAF PT 40K",
+        "Impressions": "333.9K",
+        "APP Rate1": "0.000%2",
+        "NAAs1": "TBD2"
+      },
+      {
+        "Start Date": "3/17/2025",
+        "End Date": "3/21/2025",
+        "# Days": "5",
+        "Placement": "Home",
+        "Targeted Card": "Brilliant",
+        "Offer": "185K",
+        "Impressions": "93.1K",
+        "APP Rate1": "0.0408%",
+        "NAAs1": "18"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Bevy",
+        "Offer": "155K",
+        "Impressions": "75.8K",
+        "APP Rate1": "0.0277%",
+        "NAAs1": "8"
+      },
+      {
+        "Start Date": "4/16/2025",
+        "End Date": "4/20/2025",
+        "# Days": "5",
+        "Placement": "Home",
+        "Targeted Card": "Boundless",
+        "Offer": "3FNA+50K",
+        "Impressions": "745.9K",
+        "APP Rate1": "0.0302%",
+        "NAAs1": "54"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Boundless",
+        "Offer": "EG250+100K prearrival",
+        "Impressions": "359.8K",
+        "APP Rate1": "0.0258%",
+        "NAAs1": "31"
+      },
+      {
+        "Start Date": "5/1/2025",
+        "End Date": "5/6/2025",
+        "# Days": "6",
+        "Placement": "Home",
+        "Targeted Card": "Brilliant",
+        "Offer": "185K",
+        "Impressions": "108.5K",
+        "APP Rate1": "0.0452%",
+        "NAAs1": "33"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Bevy",
+        "Offer": "155K",
+        "Impressions": "88.5K",
+        "APP Rate1": "0.0497%",
+        "NAAs1": "16"
+      },
+      {
+        "Start Date": "5/15/2025",
+        "End Date": "5/19/2025",
+        "# Days": "5",
+        "Placement": "App trips",
+        "Targeted Card": "Boundless",
+        "Offer": "EG250+100K prearrival",
+        "Impressions": "112.9K",
+        "APP Rate1": "0.0390%",
+        "NAAs1": "7"
+      },
+      {
+        "Start Date": "6/12/2025",
+        "End Date": "6/16/2025",
+        "# Days": "5",
+        "Placement": "Home",
+        "Targeted Card": "Boundless",
+        "Offer": "5FNA",
+        "Impressions": "857.4K",
+        "APP Rate1": "0.0534%",
+        "NAAs1": "172"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Boundless",
+        "Offer": "EG400+50K prearrival",
+        "Impressions": "434.0K",
+        "APP Rate1": "0.0705%",
+        "NAAs1": "82"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Bold",
+        "Offer": "60K+1FN",
+        "Impressions": "86.7K",
+        "APP Rate1": "0.1395%",
+        "NAAs1": "39"
+      },
+      {
+        "Start Date": "7/17/2025",
+        "End Date": "7/23/2025",
+        "# Days": "7",
+        "Placement": "App Trips",
+        "Targeted Card": "Boundless",
+        "Offer": "EG400+50K prearrival",
+        "Impressions": "167.4K",
+        "APP Rate1": "0.0747%",
+        "NAAs1": "27"
+      },
+      {
+        "Start Date": "8/4/2025",
+        "End Date": "8/9/2025 (SMB till 8/8)",
+        "# Days": "6",
+        "Placement": "Home",
+        "Targeted Card": "Brilliant",
+        "Offer": "185K",
+        "Impressions": "124.1K",
+        "APP Rate1": "0.0387%",
+        "NAAs1": "18"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Bevy",
+        "Offer": "155K",
+        "Impressions": "81.4K",
+        "APP Rate1": "0.0307%",
+        "NAAs1": "10"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "SMB",
+        "Offer": "125K",
+        "Impressions": "53.2K",
+        "APP Rate1": "0.0075%",
+        "NAAs1": "3"
+      },
+      {
+        "Start Date": "9/15/2025",
+        "End Date": "9/20/2025 (Brilliant till 9/19)",
+        "# Days": "6",
+        "Placement": "Home",
+        "Targeted Card": "Brilliant",
+        "Offer": "185K Last Chance",
+        "Impressions": "144.8K",
+        "APP Rate1": "0.0352%",
+        "NAAs1": "23"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Bevy",
+        "Offer": "155K Last Chance",
+        "Impressions": "72.2K",
+        "APP Rate1": "0.0346%",
+        "NAAs1": "8"
+      },
+      {
+        "Start Date": "9/30/2025",
+        "End Date": "10/4/2025",
+        "# Days": "5",
+        "Placement": "Home",
+        "Targeted Card": "Boundless",
+        "Offer": "EG400+50K prearrival",
+        "Impressions": "333.4K",
+        "APP Rate1": "0.0132%",
+        "NAAs1": "11"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Boundless",
+        "Offer": "125+1FN",
+        "Impressions": "736.2K",
+        "APP Rate1": "0.0566%",
+        "NAAs1": "112"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Bold",
+        "Offer": "60K",
+        "Impressions": "154.8K",
+        "APP Rate1": "0.0743%",
+        "NAAs1": "30"
+      },
+      {
+        "Start Date": "10/23/2025",
+        "End Date": "10/27/2025",
+        "# Days": "5",
+        "Placement": "Home",
+        "Targeted Card": "Boundless",
+        "Offer": "EG400+50K prearrival LC",
+        "Impressions": "77.3K",
+        "APP Rate1": "0.0324%",
+        "NAAs1": "6"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Boundless",
+        "Offer": "125+1FN LC",
+        "Impressions": "169.7K",
+        "APP Rate1": "0.0542%",
+        "NAAs1": "24"
+      },
+      {
+        "Start Date": "",
+        "End Date": "",
+        "# Days": "",
+        "Placement": "",
+        "Targeted Card": "Bold",
+        "Offer": "60K LC",
+        "Impressions": "10.8K",
+        "APP Rate1": "0.2495%",
+        "NAAs1": "2"
+      },
+      {
+        "Start Date": "11/10/2025",
+        "End Date": "11/15/2025",
+        "# Days": "6",
+        "Placement": "Home",
+        "Targeted Card": "Boundless",
+        "Offer": "3FNA+50K",
+        "Impressions": "131.2K",
+        "APP Rate1": "0.0175%",
+        "NAAs1": "3"
+      },
+      {
+        "Start Date": "11/10/2025",
+        "End Date": "11/14/2025",
+        "# Days": "5",
+        "Placement": "Home",
+        "Targeted Card": "Brilliant",
+        "Offer": "250SC+150K RTO",
+        "Impressions": "1.7K",
+        "APP Rate1": "0.0576%",
+        "NAAs1": "1"
+      },
+      {
+        "Start Date": "Total (YTD 2025)",
+        "End Date": "",
+        "# Days": "108",
+        "Placement": "",
+        "Targeted Card": "",
+        "Offer": "",
+        "Impressions": "7.8M",
+        "APP Rate1": "0.049%2",
+        "NAAs1": "1,0972"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p54_t1",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 54,
+    "title": "Table 1 (Page 54): A/B Test Initiatives, Status",
+    "columns": [
+      "A/B Test Initiatives",
+      "Status"
+    ],
+    "rows_count": 26,
+    "markdown": "|A/B Test Initiatives|Status|\n|---|---|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n|**A/B Test Initiatives**|Complete|\n\n",
+    "row_facts": [
+      "Row 1: [Status] = Complete",
+      "Row 2: [Status] = Complete",
+      "Row 3: [Status] = Complete",
+      "Row 4: [Status] = Complete",
+      "Row 5: [Status] = Complete",
+      "Row 6: [Status] = Complete",
+      "Row 7: [Status] = Complete",
+      "Row 8: [Status] = Complete",
+      "Row 9: [Status] = Complete",
+      "Row 10: [Status] = Complete",
+      "Row 11: [Status] = Complete",
+      "Row 12: [Status] = Complete",
+      "Row 13: [Status] = Complete",
+      "Row 14: [Status] = Complete",
+      "Row 15: [Status] = Complete",
+      "Row 16: [Status] = Complete",
+      "Row 17: [Status] = Complete",
+      "Row 18: [Status] = Complete",
+      "Row 19: [Status] = Complete",
+      "Row 20: [Status] = Complete",
+      "Row 21: [Status] = Complete",
+      "Row 22: [Status] = Complete",
+      "Row 23: [Status] = Complete",
+      "Row 24: [Status] = Complete",
+      "Row 25: [Status] = Complete",
+      "Row 26: [Status] = Complete"
+    ],
+    "records": [
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      },
+      {
+        "A/B Test Initiatives": "",
+        "Status": "Complete"
+      }
+    ]
+  },
+  {
+    "table_id": "doc_5fe04c543a56_p54_t2",
+    "doc_id": "doc_5fe04c543a56",
+    "page": 54,
+    "title": "Table 2 (Page 54): Directly Deployed Initiatives, Status",
+    "columns": [
+      "Directly Deployed Initiatives",
+      "Status"
+    ],
+    "rows_count": 7,
+    "markdown": "|Directly Deployed Initiatives|Status|\n|---|---|\n|**Directly Deployed Initiatives**|Deployed|\n|**Directly Deployed Initiatives**|Deployed|\n|**Directly Deployed Initiatives**|Deployed|\n|**Directly Deployed Initiatives**|Deployed|\n|**Directly Deployed Initiatives**|Deployed|\n|**Directly Deployed Initiatives**|Deployed|\n|**Directly Deployed Initiatives**|Deployed|\n\n",
+    "row_facts": [
+      "Row 1: [Status] = Deployed",
+      "Row 2: [Status] = Deployed",
+      "Row 3: [Status] = Deployed",
+      "Row 4: [Status] = Deployed",
+      "Row 5: [Status] = Deployed",
+      "Row 6: [Status] = Deployed",
+      "Row 7: [Status] = Deployed"
+    ],
+    "records": [
+      {
+        "Directly Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Directly Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Directly Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Directly Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Directly Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Directly Deployed Initiatives": "",
+        "Status": "Deployed"
+      },
+      {
+        "Directly Deployed Initiatives": "",
+        "Status": "Deployed"
+      }
+    ]
+  }
+]

@@ -9,22 +9,25 @@ from typing import Any, Dict, List, Optional
 import pandas as pd
 import streamlit as st
 
+from core import ledger as ledger_mod
+from core import providers
 from core.pipeline import GraphRAGEngine
 from ui import components as c
 from ui import data
 from ui.tokens import esc, query_string
 
 REGISTRY_GRID = "2.2fr .7fr .7fr .8fr .8fr 1.2fr 1fr"
-STEPS = ["Persist", "Extract text", "Extract tables", "Build graph", "Sync vectors"]
+STEPS = ["Persist", "Extract text", "Build graph", "Sync vectors", "Write reports"]
 
-# Maps the engine's progress steps onto the registry's five ingest steps.
+# Maps the engine's progress steps onto the registry's ingest steps.
 STEP_ALIASES = {
     "Chunk documents": "Extract text",
     "Extract concepts": "Build graph",
     "Cluster communities": "Build graph",
-    "Write reports": "Build graph",
+    "Write graph": "Build graph",
     "Sync vectors": "Sync vectors",
     "Draw concept map": "Sync vectors",
+    "Write reports": "Write reports",
 }
 
 
@@ -48,6 +51,8 @@ def render(state: Dict[str, Any]) -> None:
             reverse=True,
         )
 
+        _last_run_banner()
+
         if st.session_state.get("vault_add_open"):
             _uploader(vault, catalog)
 
@@ -68,6 +73,46 @@ def render(state: Dict[str, Any]) -> None:
         document = vault.get_document(selected_id)
         if document:
             _inspector(vault, document, state)
+
+
+def _last_run_banner() -> None:
+    """Surface the previous index run when it was interrupted or failed."""
+    run = data.get_run_log().latest()
+    if not run or run["status"] == "complete":
+        return
+
+    if run["status"] == "running":
+        st.markdown(
+            '<div class="k-card"><div class="k-card__body">'
+            f'{c.status_dot("progress", f"Indexing in progress · {esc(run.get("stage", ""))}")}'
+            '<div class="k-faint" style="font-size:11.5px;margin-top:6px">'
+            f'Started {esc(run.get("started_at", ""))}. Leave this tab open until it finishes.'
+            "</div></div></div>",
+            unsafe_allow_html=True,
+        )
+        return
+
+    kind = "warn" if run["status"] == "interrupted" else "danger"
+    headline = (
+        f"Last index run was interrupted during '{run.get('stage', 'unknown')}'"
+        if run["status"] == "interrupted"
+        else f"Last index run failed during '{run.get('stage', 'unknown')}'"
+    )
+    titles = ", ".join(d.get("title", "") for d in run.get("documents", [])[:3])
+    st.markdown(
+        '<div class="k-card"><div class="k-card__body">'
+        f"{c.status_dot(kind, headline)}"
+        '<div class="k-faint" style="font-size:11.5px;margin-top:6px">'
+        f'{esc(run.get("started_at", ""))} · {esc(titles)}</div>'
+        + (
+            f'<div class="k-error__detail" style="margin-top:8px">{esc(run.get("error", ""))}</div>'
+            if run.get("error") else ""
+        )
+        + '<div class="k-faint" style="font-size:11.5px;margin-top:8px">'
+        "Re-index graph on any document to retry.</div>"
+        "</div></div>",
+        unsafe_allow_html=True,
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -130,11 +175,39 @@ def _pending_row(pending: Dict[str, Any]) -> str:
     )
 
 
+def coverage_of(document: Dict[str, Any]) -> float:
+    """Share of the document's chunks that are actually in the graph."""
+    total = int(document.get("chunks_total") or 0)
+    indexed = int(document.get("chunks_indexed") or 0)
+    if not total:
+        return 0.0
+    return max(0.0, min(1.0, indexed / total))
+
+
 def _status_cell(document: Dict[str, Any]) -> str:
-    status = str(document.get("status", "")).lower()
-    if "needs" in status:
+    """Never-indexed, interrupted, failed and PARTIAL are distinct states.
+
+    A document indexed to 8 of 72 chunks previously read as plain "Indexed",
+    so an analyst had no way to know an answer was drawn from a ninth of the
+    source. Partial coverage is now its own state and carries the fraction.
+    """
+    status = str(document.get("status", ""))
+    if status == "Indexing interrupted":
+        return f'<span>{c.status_dot("warn", "Interrupted")}</span>'
+    if status == "Indexing failed":
+        return f'<span>{c.status_dot("danger", "Failed")}</span>'
+    if status == "Needs re-index":
         return f'<span>{c.status_dot("warn", "Needs re-index")}</span>'
     if document.get("chunks_indexed"):
+        indexed = int(document.get("chunks_indexed") or 0)
+        total = int(document.get("chunks_total") or 0)
+        coverage = coverage_of(document)
+        if total and coverage < 0.999:
+            return (
+                f'<span>{c.status_dot("warn", f"Partial · {indexed}/{total}")}'
+                f'<span class="k-mono k-faint" style="font-size:10.5px;margin-left:4px">'
+                f'{coverage * 100:.0f}%</span></span>'
+            )
         return f'<span>{c.status_dot("ok", "Indexed")}</span>'
     return f'<span>{c.status_dot("idle", "Not indexed")}</span>'
 
@@ -315,14 +388,37 @@ def _uploader(vault, catalog: List[Dict[str, Any]]) -> None:
         )
         index_now = st.checkbox("Re-index graph now", value=True, key="vault_index_now")
         chunk_limit = st.slider(
-            "Chunk limit per document", min_value=1, max_value=40, value=8,
-            help="Caps how many chunks of each document are sent for extraction.",
+            "Chunk limit per document", min_value=1, max_value=40, value=4,
+            help="Caps how many chunks of each document are sent for extraction. "
+                 "Indexing is cumulative, so this applies to every retained document.",
             key="vault_chunk_limit",
         )
+
+        # Indexing covers the whole vault, so the cost scales with the registry,
+        # not with this one upload.
+        if index_now:
+            documents = max(1, len(catalog) + (1 if uploaded else 0))
+            calls = documents * chunk_limit
+            st.markdown(
+                '<div class="k-faint" style="font-size:11.5px">'
+                f"Re-indexes all {documents} document(s): about {calls} extraction calls "
+                f"plus one per community. Roughly {_estimate_minutes(calls)}."
+                "</div>",
+                unsafe_allow_html=True,
+            )
+
         if not uploaded:
             return
         if st.button("Upload & retain", type="primary", key="vault_upload_go"):
             _ingest(vault, uploaded, catalog, index_now, chunk_limit)
+
+
+def _estimate_minutes(calls: int) -> str:
+    """Rough wall-clock estimate; extraction runs four calls at a time."""
+    seconds = (calls / 4.0) * 6.0 + 45
+    if seconds < 90:
+        return "under 2 minutes"
+    return f"{int(round(seconds / 60))}-{int(round(seconds / 60)) + 2} minutes"
 
 
 def _ingest(vault, uploaded, catalog, index_now: bool, chunk_limit: int) -> None:
@@ -453,32 +549,98 @@ def ingest_files(vault, files, chunk_limit: int = 8, index_now: bool = True) -> 
     return stored_ids
 
 
-def _run_engine(vault, chunk_limit: int, on_progress=None) -> Dict[str, Any]:
-    """Rebuild the graph from every retained document and record the chunk counts."""
+def vault_documents_for_index(vault) -> List[Dict[str, Any]]:
+    """Every retained document with readable text, for a cumulative rebuild."""
     documents = []
     for entry in vault.get_catalog():
         text = vault.get_document_text(entry["id"])
         if text.strip():
             documents.append({"id": entry["id"], "title": entry["title"], "text": text})
+    return documents
+
+
+def _run_engine(vault, chunk_limit: int, on_progress=None) -> Dict[str, Any]:
+    """Rebuild the graph from every retained document, recording the run on disk.
+
+    The run is written before the work starts and updated on each stage, so a
+    build killed by a script restart is visible afterwards rather than silently
+    leaving the vault untouched.
+    """
+    documents = vault_documents_for_index(vault)
     if not documents:
         raise ValueError("No readable documents in the vault.")
 
+    extraction_provider = data.provider_for("extraction")
+    report_provider = data.provider_for("reports")
+
+    # Check the endpoint once, before the run. A dead endpoint otherwise fails
+    # per chunk, which on a full corpus is hundreds of slow timeouts.
+    for stage, provider in (("extraction", extraction_provider), ("reports", report_provider)):
+        ok, reason = providers.health(provider)
+        if not ok:
+            raise RuntimeError(f"{provider.label} is not usable for {stage}: {reason}")
+
+    run_log = data.get_run_log()
+    run_id = run_log.start(documents, chunk_limit)
+    doc_ids = [d["id"] for d in documents]
+    last_stage = [""]
+
+    def track(fraction: float, message: str, stats: Dict[str, Any]):
+        stage = stats.get("step") or last_stage[0]
+        # Only touch disk when the stage changes; progress ticks are frequent.
+        if stage and stage != last_stage[0]:
+            last_stage[0] = stage
+            run_log.update(run_id, stage, fraction, stats)
+        if on_progress:
+            on_progress(fraction, message, stats)
+
+    usage = data.new_ledger()
     engine = GraphRAGEngine(
         output_dir=str(data.OUTPUT_DIR),
         chroma_dir=str(data.CHROMA_DIR),
         notebook_dir=str(data.CONCEPT_MAP_PATH.parent),
-        model_name=data.MODEL_NAME,
         temperature=0.0,
+        extraction_provider=extraction_provider,
+        report_provider=report_provider,
+        cache=data.get_extraction_cache(),
+        usage=usage,
     )
-    result = engine.build_from_documents(
-        documents,
-        max_chunks_per_doc=chunk_limit,
-        progress_callback=on_progress,
-    )
+    try:
+        result = engine.build_from_documents(
+            documents,
+            max_chunks_per_doc=chunk_limit,
+            progress_callback=track,
+        )
+    except Exception as exc:
+        run_log.fail(run_id, f"{type(exc).__name__}: {exc}")
+        vault.mark_index_outcome(doc_ids, vault.FAILED, f"{type(exc).__name__}: {exc}")
+        raise
+
     for entry in result.get("documents", []):
         vault.mark_indexed(
             entry["document_id"], entry["chunks_indexed"], entry["chunks_total"]
         )
+    totals = usage.totals()
+    run_log.finish(run_id, {
+        "entities": result["entities_count"],
+        "relationships": result["relationships_count"],
+        "communities": result["communities_count"],
+        "chunks": result["chunks_count"],
+        "elapsed_seconds": result["elapsed_seconds"],
+        "extraction_provider": extraction_provider.key,
+        "extraction_model": extraction_provider.model,
+        "report_provider": report_provider.key,
+        **totals,
+    })
+    ledger_mod.append_run(str(data.VAULT_DIR), {
+        "kind": "index",
+        "documents": len(documents),
+        "chunks": result["chunks_count"],
+        "extraction_provider": extraction_provider.key,
+        "report_provider": report_provider.key,
+        **totals,
+    })
+    result["usage_headline"] = usage.headline()
     return result
 
 

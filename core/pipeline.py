@@ -6,15 +6,19 @@ describe the same corpus. Rebuilding is cumulative over the vault rather than
 per upload, which is what lets several documents share one graph.
 """
 
+import hashlib
 import os
+import queue
 import re
 import json
+import threading
 import time
 import uuid
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import replace
 from pathlib import Path
-from typing import List, Dict, Any, Tuple, Optional, Callable
+from typing import List, Dict, Any, Tuple, Optional, Callable, TYPE_CHECKING
 
 import pandas as pd
 import networkx as nx
@@ -34,6 +38,10 @@ import truststore
 truststore.inject_into_ssl()
 
 import pymupdf
+
+if TYPE_CHECKING:
+    from core.cache import ExtractionCache, ReportCache
+    from core.ledger import UsageLedger
 
 CHROMA_COLLECTION = "paper_collection"
 
@@ -142,6 +150,48 @@ class TextChunker:
 # -----------------------------------------------------------------------------
 # 3. Entity & relationship extractor
 # -----------------------------------------------------------------------------
+PROMPT_VERSION = "json-v1"   # part of the extraction cache key; bump when prompts change
+
+# JSON replaces GraphRAG's legacy ("entity"<|delimiter|>...) format. Measured
+# 2026-09-18: an 8B-class open-weight model reproduces that custom format
+# unreliably — it emitted the literal placeholder <NAME> and mangled the
+# delimiter — while naming the right entities. A schema the provider enforces
+# removes the largest source of non-frontier-model failure, and makes extraction
+# quality far less dependent on which route is selected.
+EXTRACTION_PROMPT_JSON = """You extract a knowledge graph from one chunk of a document.
+
+Return ONLY a JSON object with exactly these two keys:
+
+{{
+  "entities": [
+    {{"name": "ENTITY NAME IN CAPITALS",
+      "type": "CONCEPT|METHOD|TOOL|ORGANIZATION|TECHNIQUE|METRIC|BENCHMARK|QUANTITY|TIMEFRAME",
+      "description": "what it is, including exact numbers, units and scope"}}
+  ],
+  "relationships": [
+    {{"source": "ENTITY NAME", "target": "ENTITY NAME",
+      "type": "short lower-case verb phrase, e.g. extends, reduces, measured by, evaluated on",
+      "description": "why they are related. ALWAYS keep exact numbers, percentages and deltas.",
+      "strength": 7}}
+  ]
+}}
+
+Rules:
+- Extract EVERY entity you can find, then find the relationships BETWEEN them.
+- Relationships matter as much as entities. A chunk with 10 entities usually has
+  at least 5 relationships. Look for: what measures what, what improves what,
+  what is part of what, what is evaluated on what, what is an alternative to what.
+- "source" and "target" MUST be names that appear in your own "entities" list.
+- METRIC is a property being measured; BENCHMARK is a dataset or evaluation setting;
+  QUANTITY is an exact figure; TIMEFRAME is a period.
+- "strength" is an integer 1-10.
+- Preserve figures verbatim. Invent nothing.
+
+Input text:
+{input_text}
+"""
+
+# Retained so extractions cached under the old format still parse.
 EXTRACTION_PROMPT = """
 -Goal-
 Given a text document, identify all entities, quantitative metrics, numerical values, and relationships between them.
@@ -176,20 +226,130 @@ Input Text:
 
 
 class EntityRelationshipExtractor:
-    """Extracts entities and relationships from chunks using an OpenAI chat model."""
+    """Extracts entities and relationships from chunks via any configured provider.
 
-    def __init__(self, model_name: str = "gpt-4o-mini", temperature: float = 0.0, api_key: Optional[str] = None):
-        self.llm = ChatOpenAI(
-            model=model_name,
-            temperature=temperature,
-            api_key=api_key or os.getenv("OPENAI_API_KEY")
+    Results are cached by content hash, so a rebuild only pays for chunks whose
+    text, prompt or model actually changed. The cache key includes the provider
+    and model: without that, switching routes would read back another model's
+    extractions and report them as this one's, and a re-index after a switch
+    would yield a graph with two different naming conventions in it.
+    """
+
+    def __init__(
+        self,
+        provider=None,
+        temperature: float = 0.0,
+        model_name: Optional[str] = None,
+        api_key: Optional[str] = None,
+        cache: Optional["ExtractionCache"] = None,
+        usage: Optional["UsageLedger"] = None,
+    ):
+        from core import providers as provider_registry
+
+        if provider is None:
+            provider = provider_registry.get("openai")
+            if model_name:
+                provider = replace(provider, model=model_name)
+        self.provider = provider
+        self.cache = cache
+        self.usage = usage
+        self.llm = provider_registry.build_llm(
+            provider, temperature=temperature, json_mode=True
         )
-        self.prompt = ChatPromptTemplate.from_template(EXTRACTION_PROMPT)
-        self.chain = self.prompt | self.llm | StrOutputParser()
+        self.prompt = ChatPromptTemplate.from_template(EXTRACTION_PROMPT_JSON)
+        self.chain = self.prompt | self.llm
+
+    def cache_key(self, chunk_text: str) -> str:
+        digest = hashlib.sha256(
+            "|".join([chunk_text, PROMPT_VERSION, self.provider.key, self.provider.model])
+            .encode("utf-8")
+        ).hexdigest()
+        return digest
 
     def extract_chunk(self, chunk_text: str, chunk_id: str) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        key = self.cache_key(chunk_text)
+        if self.cache is not None:
+            hit = self.cache.get(key)
+            if hit is not None:
+                if self.usage is not None:
+                    self.usage.record_cache_hit("extraction")
+                return self._retag(hit, chunk_id)
+
         response = self.chain.invoke({"input_text": chunk_text})
-        return self._parse_response(response, chunk_id)
+        raw = getattr(response, "content", response)
+        if self.usage is not None:
+            self.usage.record_call("extraction", self.provider, response)
+
+        entities, relationships = self._parse_json(str(raw), chunk_id)
+        if not entities and not relationships:
+            # Tolerate a model that ignored json_mode and answered in the old
+            # delimiter format rather than losing the chunk entirely.
+            entities, relationships = self._parse_response(str(raw), chunk_id)
+
+        if self.cache is not None:
+            self.cache.put(key, {"entities": entities, "relationships": relationships})
+        return entities, relationships
+
+    @staticmethod
+    def _retag(payload: Dict[str, Any], chunk_id: str):
+        """A cached result was produced for some other chunk id; re-stamp it."""
+        entities = [dict(e, chunk_id=chunk_id) for e in payload.get("entities", [])]
+        relationships = [dict(r, chunk_id=chunk_id) for r in payload.get("relationships", [])]
+        return entities, relationships
+
+    @staticmethod
+    def _parse_json(raw_text: str, chunk_id: str) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        """Parse the schema'd response, tolerating fences and surrounding prose."""
+        text = raw_text.strip()
+        if text.startswith("```"):
+            text = re.sub(r"^```[a-zA-Z]*\s*", "", text)
+            text = re.sub(r"\s*```$", "", text)
+        start, end = text.find("{"), text.rfind("}")
+        if start == -1 or end <= start:
+            return [], []
+        try:
+            data = json.loads(text[start:end + 1])
+        except ValueError:
+            return [], []
+
+        entities: List[Dict[str, Any]] = []
+        seen_titles = set()
+        for item in data.get("entities") or []:
+            if not isinstance(item, dict):
+                continue
+            title = str(item.get("name") or "").strip().upper()
+            if not title:
+                continue
+            entities.append({
+                "title": title,
+                "type": str(item.get("type") or "CONCEPT").strip().upper()[:40],
+                "description": str(item.get("description") or "").strip(),
+                "chunk_id": chunk_id,
+            })
+            seen_titles.add(title)
+
+        relationships: List[Dict[str, Any]] = []
+        for item in data.get("relationships") or []:
+            if not isinstance(item, dict):
+                continue
+            source = str(item.get("source") or "").strip().upper()
+            target = str(item.get("target") or "").strip().upper()
+            if not source or not target or source == target:
+                continue
+            try:
+                weight = float(item.get("strength", 5))
+            except (TypeError, ValueError):
+                weight = 5.0
+            relationships.append({
+                "source": source,
+                "target": target,
+                "type": str(item.get("type") or "related").strip().lower()[:40],
+                "description": str(item.get("description") or "").strip(),
+                "weight": max(1.0, min(10.0, weight)),
+                "chunk_id": chunk_id,
+            })
+
+        return entities, relationships
 
     def _parse_response(self, raw_text: str, chunk_id: str) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         entities = []
@@ -278,13 +438,26 @@ Return only the JSON object.
 class CommunityReportSynthesizer:
     """Generates community reports with an LLM, mirroring GraphRAG's report step."""
 
-    def __init__(self, model_name: str = "gpt-4o-mini", temperature: float = 0.2, api_key: Optional[str] = None):
-        self.llm = ChatOpenAI(
-            model=model_name,
-            temperature=temperature,
-            api_key=api_key or os.getenv("OPENAI_API_KEY")
+    def __init__(
+        self,
+        provider=None,
+        temperature: float = 0.2,
+        model_name: Optional[str] = None,
+        api_key: Optional[str] = None,
+        usage: Optional["UsageLedger"] = None,
+    ):
+        from core import providers as provider_registry
+
+        if provider is None:
+            provider = provider_registry.get("openai")
+            if model_name:
+                provider = replace(provider, model=model_name)
+        self.provider = provider
+        self.usage = usage
+        self.llm = provider_registry.build_llm(
+            provider, temperature=temperature, json_mode=True
         )
-        self.chain = ChatPromptTemplate.from_template(REPORT_PROMPT) | self.llm | StrOutputParser()
+        self.chain = ChatPromptTemplate.from_template(REPORT_PROMPT) | self.llm
 
     def synthesize(
         self,
@@ -302,8 +475,12 @@ class CommunityReportSynthesizer:
             for r in relationship_rows
         ) or "- (no relationships inside this community)"
 
-        raw = self.chain.invoke({"entities": entities_text, "relationships": relationships_text})
-        return self._parse(raw)
+        response = self.chain.invoke(
+            {"entities": entities_text, "relationships": relationships_text}
+        )
+        if self.usage is not None:
+            self.usage.record_call("reports", self.provider, response)
+        return self._parse(str(getattr(response, "content", response)))
 
     @staticmethod
     def _parse(raw: str) -> Dict[str, Any]:
@@ -349,6 +526,35 @@ def _clip(text: Any, limit: int) -> str:
     return cleaned if len(cleaned) <= limit else cleaned[:limit].rstrip() + "…"
 
 
+def _is_trivial_community(member_rows: List[Dict[str, Any]], internal: List[Dict[str, Any]]) -> bool:
+    """Is there anything here worth spending a model call on?
+
+    A community is trivial when it has at most two concepts and no relationship
+    between them: there is no structure to summarize, so a report would be the
+    model restating one entity's description as analysis.
+    """
+    return len(member_rows) <= 2 and not internal
+
+
+def _describe_trivial(member_rows: List[Dict[str, Any]], comm_id: int) -> Tuple[str, str]:
+    """Deterministic title and summary for a community with no internal structure."""
+    if not member_rows:
+        return f"Empty community {comm_id}", "This community has no concepts."
+    names = [r["title"] for r in member_rows]
+    title = " and ".join(names) if len(names) > 1 else names[0]
+    kinds = ", ".join(sorted({str(r.get("type", "CONCEPT")) for r in member_rows}))
+    descriptions = " ".join(
+        _clip(r.get("description", ""), 300) for r in member_rows if r.get("description")
+    )
+    lead = (
+        f"An isolated concept ({kinds}) with no extracted relationships to the rest of "
+        f"the corpus."
+        if len(names) == 1 else
+        f"Two concepts ({kinds}) grouped together with no extracted relationship between them."
+    )
+    return title, f"{lead} {descriptions}".strip()
+
+
 def _fallback_rank(entity_count: int, internal_edges: int, max_entities: int) -> Tuple[float, str]:
     """Derive an importance rank from graph structure when the LLM rating is unusable."""
     if max_entities <= 0:
@@ -360,6 +566,46 @@ def _fallback_rank(entity_count: int, internal_edges: int, max_entities: int) ->
         round(score, 1),
         f"Derived from {entity_count} concepts and {internal_edges} internal relationships.",
     )
+
+
+class ProgressRelay:
+    """Funnels progress from worker threads onto the calling thread.
+
+    Streamlit widgets can only be written from the thread that owns the script
+    run; a call from a pool worker is silently dropped with a "missing
+    ScriptRunContext" warning. Worker messages are queued here and flushed the
+    next time the owning thread reports, so report-stage progress is not lost.
+    """
+
+    def __init__(self, callback: Optional[Callable[[float, str, Dict[str, Any]], None]]):
+        self._callback = callback
+        self._queue: "queue.Queue" = queue.Queue()
+        self._owner = threading.get_ident()
+
+    def __call__(self, progress: float, message: str, stats: Optional[Dict[str, Any]] = None):
+        item = (float(progress), str(message), dict(stats or {}))
+        if threading.get_ident() == self._owner:
+            self.flush()
+            self._emit(item)
+        else:
+            self._queue.put(item)
+
+    def flush(self) -> None:
+        """Drain queued worker messages. Safe to call only from the owner."""
+        while True:
+            try:
+                self._emit(self._queue.get_nowait())
+            except queue.Empty:
+                return
+
+    def _emit(self, item) -> None:
+        if not self._callback:
+            return
+        try:
+            self._callback(*item)
+        except Exception:
+            # Progress reporting must never take the build down.
+            pass
 
 
 # -----------------------------------------------------------------------------
@@ -377,24 +623,48 @@ class GraphRAGEngine:
     7. Parquet and concept-map export
     """
 
+    # Reports are the slowest stage and are written last, so an interrupted run
+    # still leaves a queryable graph, vectors and concept map behind.
     STEPS = ["Chunk documents", "Extract concepts", "Cluster communities",
-             "Write reports", "Sync vectors", "Draw concept map"]
+             "Write graph", "Sync vectors", "Draw concept map", "Write reports"]
 
     def __init__(
         self,
         output_dir: str = "./ragtest/output",
         chroma_dir: str = "./notebook/chromadb",
         notebook_dir: str = "./notebook",
-        model_name: str = "gpt-4o-mini",
+        model_name: Optional[str] = None,
         temperature: float = 0.0,
         max_workers: int = 4,
+        extraction_provider=None,
+        report_provider=None,
+        cache: Optional["ExtractionCache"] = None,
+        usage: Optional["UsageLedger"] = None,
     ):
+        from core import providers as provider_registry
+
         self.output_dir = Path(output_dir)
         self.chroma_dir = Path(chroma_dir)
         self.notebook_dir = Path(notebook_dir)
-        self.model_name = model_name
         self.temperature = temperature
-        self.max_workers = max_workers
+
+        # Extraction and reports can sit on different routes: extraction is bulk
+        # structured work that suits a cheap open-weight model, while reports are
+        # closer to the analyst-facing output.
+        default = provider_registry.get("openai")
+        if model_name:
+            default = replace(default, model=model_name)
+        self.extraction_provider = extraction_provider or default
+        self.report_provider = report_provider or self.extraction_provider
+        self.model_name = self.extraction_provider.model
+
+        # Concurrency is a property of the backend, not a constant. Ollama
+        # serialises, and raising its parallelism multiplies KV cache instead of
+        # throughput; hosted routes rate-limit instead.
+        self.max_workers = max(1, min(max_workers, self.extraction_provider.max_workers))
+
+        self.cache = cache
+        self.usage = usage
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.chroma_dir.mkdir(parents=True, exist_ok=True)
@@ -440,9 +710,7 @@ class GraphRAGEngine:
         """
         start_time = time.perf_counter()
 
-        def notify(progress: float, message: str, stats: Optional[Dict[str, Any]] = None):
-            if progress_callback:
-                progress_callback(progress, message, stats or {})
+        notify = ProgressRelay(progress_callback)
 
         # Step 1: chunking, per document
         notify(0.04, "Splitting documents into token chunks", {"step": "Chunk documents"})
@@ -482,7 +750,12 @@ class GraphRAGEngine:
             raise ValueError("No text could be chunked from the supplied documents.")
 
         # Step 2: extraction, parallel across chunks
-        extractor = EntityRelationshipExtractor(model_name=self.model_name, temperature=self.temperature)
+        extractor = EntityRelationshipExtractor(
+            provider=self.extraction_provider,
+            temperature=self.temperature,
+            cache=self.cache,
+            usage=self.usage,
+        )
         all_entities_raw: List[Dict[str, Any]] = []
         all_relationships_raw: List[Dict[str, Any]] = []
         completed = 0
@@ -490,7 +763,7 @@ class GraphRAGEngine:
         def extract(unit: Dict[str, Any]):
             return extractor.extract_chunk(unit["text"], unit["chunk_id"])
 
-        with ThreadPoolExecutor(max_workers=min(self.max_workers, total_units)) as pool:
+        with ThreadPoolExecutor(max_workers=max(1, min(self.max_workers, total_units))) as pool:
             for entities, relationships in pool.map(extract, units):
                 all_entities_raw.extend(entities)
                 all_relationships_raw.extend(relationships)
@@ -536,36 +809,51 @@ class GraphRAGEngine:
         degrees = dict(graph.degree())
         df_nodes = self._build_nodes(df_entities, community_of, degrees, positions)
 
-        # Step 5: community reports
-        notify(0.70, f"Writing reports for {len(communities)} communities", {"step": "Write reports"})
-        df_reports = self._build_reports(
-            communities, df_entities, df_relationships, graph, notify
-        )
-
-        # attach the report rank back onto the nodes so the map can size by rank
-        rank_by_community = (
-            dict(zip(df_reports["community"], df_reports["rank"])) if not df_reports.empty else {}
-        )
-        df_nodes["community_rank"] = df_nodes["community"].map(rank_by_community).fillna(0.0).astype(float)
-
-        # Step 6: persist parquet
+        # Step 5: persist the graph now, before the slow report stage. Everything
+        # written here survives an interruption during report synthesis.
+        df_nodes["community_rank"] = 0.0
+        notify(0.68, f"Writing {len(df_entities)} concepts to the graph", {"step": "Write graph"})
         self.output_dir.mkdir(parents=True, exist_ok=True)
         df_entities.to_parquet(self.output_dir / "create_final_entities.parquet")
         df_relationships.to_parquet(self.output_dir / "create_final_relationships.parquet")
         df_nodes.to_parquet(self.output_dir / "create_final_nodes.parquet")
-        df_reports.to_parquet(self.output_dir / "create_final_community_reports.parquet")
 
-        # Step 7: vector sync
-        notify(0.90, "Syncing chunks with the vector store", {"step": "Sync vectors"})
+        # Step 6: vector sync
+        notify(0.72, "Syncing chunks with the vector store", {"step": "Sync vectors"})
         self._sync_chroma(units)
 
-        # Step 8: concept map
-        notify(0.96, "Drawing the concept map", {"step": "Draw concept map"})
+        # Step 7: concept map
+        notify(0.76, "Drawing the concept map", {"step": "Draw concept map"})
         self._generate_visualizations(df_nodes, df_relationships)
 
+        # Step 8: community reports, the slowest stage
+        notify(0.80, f"Writing reports for {len(communities)} communities", {"step": "Write reports"})
+        df_reports = self._build_reports(
+            communities, df_entities, df_relationships, graph, notify
+        )
+        df_reports.to_parquet(self.output_dir / "create_final_community_reports.parquet")
+
+        # Report importance feeds the concept map's size-by-rank, so the nodes
+        # are rewritten once the ranks exist.
+        rank_by_community = (
+            dict(zip(df_reports["community"], df_reports["rank"])) if not df_reports.empty else {}
+        )
+        df_nodes["community_rank"] = (
+            df_nodes["community"].map(rank_by_community).fillna(0.0).astype(float)
+        )
+        df_nodes.to_parquet(self.output_dir / "create_final_nodes.parquet")
+        notify.flush()
+
         elapsed = round(time.perf_counter() - start_time, 2)
+        usage_summary = self.usage.summary() if self.usage is not None else {}
+        cache_stats = self.cache.stats() if self.cache is not None else {}
         result = {
             "elapsed_seconds": elapsed,
+            "usage": usage_summary,
+            "cache": cache_stats,
+            "extraction_provider": self.extraction_provider.key,
+            "extraction_model": self.extraction_provider.model,
+            "report_provider": self.report_provider.key,
             "entities_count": len(df_entities),
             "relationships_count": len(df_relationships),
             "nodes_count": len(df_nodes),
@@ -578,7 +866,7 @@ class GraphRAGEngine:
             "community_reports_df": df_reports,
         }
         notify(1.0, f"Indexed {len(df_entities)} concepts in {elapsed}s", {
-            "step": "Draw concept map",
+            "step": "Write reports",
             "elapsed_seconds": elapsed,
             "entities": len(df_entities),
             "relationships": len(df_relationships),
@@ -681,10 +969,13 @@ class GraphRAGEngine:
         if not communities:
             return pd.DataFrame(columns=REPORT_COLUMNS)
 
+        usage = self.usage
         entities_by_title = {row["title"]: row for row in df_entities.to_dict("records")}
         relationship_records = df_relationships.to_dict("records")
         max_size = max(len(c) for c in communities)
-        synthesizer = CommunityReportSynthesizer(model_name=self.model_name, temperature=0.2)
+        synthesizer = CommunityReportSynthesizer(
+            provider=self.report_provider, temperature=0.2, usage=usage
+        )
         period = time.strftime("%Y-%m-%d")
 
         def build_one(indexed: Tuple[int, set]) -> Dict[str, Any]:
@@ -701,11 +992,21 @@ class GraphRAGEngine:
             top_names = [r["title"] for r in member_rows[:4]]
 
             report = None
-            try:
-                report = synthesizer.synthesize(member_rows[:30], internal[:40])
-            except Exception as exc:  # keep indexing resilient to a single bad response
-                notify(0.0, f"Report synthesis fell back for community {comm_id}: {exc}",
-                       {"step": "Write reports", "community": comm_id})
+            if _is_trivial_community(member_rows, internal):
+                # A community of one or two concepts with no relationship between
+                # them has nothing for an analyst to synthesize. Measured on this
+                # corpus, 206 of 228 communities were of this shape — 90% of the
+                # report stage spent inventing narrative about a single node.
+                # The deterministic description below is both cheaper and more
+                # honest than a model's four findings about one entity.
+                if usage is not None:
+                    usage.record_templated("reports")
+            else:
+                try:
+                    report = synthesizer.synthesize(member_rows[:30], internal[:40])
+                except Exception as exc:  # keep indexing resilient to a single bad response
+                    notify(0.0, f"Report synthesis fell back for community {comm_id}: {exc}",
+                           {"step": "Write reports", "community": comm_id})
 
             if report and report.get("title") and report.get("summary"):
                 title = report["title"]
@@ -713,6 +1014,11 @@ class GraphRAGEngine:
                 findings = report["findings"] or [{"summary": title, "explanation": summary}]
                 rank = report["rating"] if report["rating"] is not None else fallback_rank
                 rank_explanation = report["rating_explanation"] or fallback_reason
+            elif _is_trivial_community(member_rows, internal):
+                title, summary = _describe_trivial(member_rows, comm_id)
+                findings = [{"summary": title, "explanation": summary}]
+                rank = fallback_rank
+                rank_explanation = fallback_reason
             else:
                 title = ", ".join(top_names) if top_names else f"Community {comm_id}"
                 summary = (
@@ -770,12 +1076,13 @@ class GraphRAGEngine:
         rows: List[Dict[str, Any]] = []
         indexed = list(enumerate(communities))
         done = 0
-        with ThreadPoolExecutor(max_workers=min(self.max_workers, len(indexed))) as pool:
+        report_workers = min(self.report_provider.max_workers, self.max_workers, len(indexed))
+        with ThreadPoolExecutor(max_workers=max(1, report_workers)) as pool:
             for row in pool.map(build_one, indexed):
                 rows.append(row)
                 done += 1
                 notify(
-                    0.70 + 0.18 * (done / len(indexed)),
+                    0.80 + 0.18 * (done / len(indexed)),
                     f"Wrote report {done} of {len(indexed)}",
                     {"step": "Write reports", "report_current": done, "report_total": len(indexed)},
                 )

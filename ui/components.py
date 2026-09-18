@@ -644,3 +644,45 @@ def node_inspector(
         '<div><div class="k-side-label" style="margin:0 0 8px;padding:0">Relationships</div>'
         f'<div style="display:grid;gap:6px;color:var(--k-muted)">{rows}</div></div>'
     )
+
+
+# -----------------------------------------------------------------------------
+# Provider routing (sidebar)
+# -----------------------------------------------------------------------------
+def provider_rows(rows) -> str:
+    """Engine list with a live readiness dot and the honest trade for each route.
+
+    Cost, speed and privacy are shown together because they move in opposite
+    directions: the free route is the slow one, and the fast cheap route is the
+    one that sends the corpus off the machine.
+    """
+    from ui.tokens import esc
+
+    out = []
+    for row in rows:
+        ok = row["ok"]
+        colour = "#1F8A5B" if ok else "#8A8A83"
+        weight = "600" if row["active"] else "400"
+        border = "1px solid var(--k-accent)" if row["active"] else "1px solid transparent"
+        out.append(
+            f'<div style="display:flex;flex-direction:column;gap:2px;padding:6px 8px;'
+            f'border-radius:6px;border:{border};margin-bottom:2px">'
+            f'<div style="display:flex;align-items:center;gap:6px">'
+            f'<span class="k-dot" style="background:{colour}"></span>'
+            f'<span style="font-size:12px;font-weight:{weight}">{esc(row["label"])}</span>'
+            f'<span class="k-mono k-faint" style="margin-left:auto;font-size:10px">'
+            f'{esc(row["status"])}</span></div>'
+            f'<div class="k-faint" style="font-size:10.5px;padding-left:14px">'
+            f'{esc(row["trade"])}</div></div>'
+        )
+    return "".join(out)
+
+
+def spend_badge(label: str, value: str, tone: str = "") -> str:
+    from ui.tokens import esc
+
+    colour = {"warn": "#B7791F", "ok": "#1F8A5B"}.get(tone, "var(--k-muted)")
+    return (
+        f'<span class="k-mono" style="font-size:10.5px;color:{colour};margin-right:8px">'
+        f'{esc(label)} <b>{esc(value)}</b></span>'
+    )

@@ -20,10 +20,12 @@ class DocumentVault:
         self.vault_dir = Path(vault_dir)
         self.docs_dir = self.vault_dir / "documents"
         self.tables_dir = self.vault_dir / "tables"
+        self.text_dir = self.vault_dir / "text"
         self.catalog_file = self.vault_dir / "catalog.json"
 
         self.docs_dir.mkdir(parents=True, exist_ok=True)
         self.tables_dir.mkdir(parents=True, exist_ok=True)
+        self.text_dir.mkdir(parents=True, exist_ok=True)
         if not self.catalog_file.exists():
             self._save_catalog([])
 
@@ -216,6 +218,9 @@ class DocumentVault:
             decoded = content_bytes.decode("utf-8", errors="ignore")
             raw_text, tables, page_count = self._extract_tables_from_text(doc_id, decoded)
 
+        # Cache the extracted text so a rebuild never re-parses the source file.
+        (self.text_dir / f"{doc_id}.txt").write_text(raw_text, encoding="utf-8")
+
         # Persist extracted tables JSON
         if tables:
             tables_file = self.tables_dir / f"{doc_id}_tables.json"
@@ -256,15 +261,23 @@ class DocumentVault:
     # Index state
     # -------------------------------------------------------------------------
     def get_document_text(self, doc_id: str) -> str:
-        """Re-extract the text of a stored document from disk.
+        """Return the document's extracted text, from cache when available.
 
-        Extracted text is not cached in the catalog, so a cumulative rebuild
-        reads every retained file back through the same extractor that ran at
-        upload time.
+        Re-parsing a large PDF costs tens of seconds and a cumulative rebuild
+        reads every retained document, so the text is cached at upload time and
+        back-filled here for documents stored before the cache existed.
         """
         document = self.get_document(doc_id)
         if not document:
             return ""
+
+        cache = self.text_dir / f"{doc_id}.txt"
+        if cache.exists():
+            try:
+                return cache.read_text(encoding="utf-8")
+            except Exception:
+                pass
+
         path = Path(document["storage_path"])
         if not path.exists():
             return ""
@@ -272,10 +285,25 @@ class DocumentVault:
         if str(document.get("source_type", "")).lower() == "pdf" or path.suffix.lower() == ".pdf":
             try:
                 text, _tables, _pages = self._extract_tables_from_pdf(doc_id, content)
-                return text
             except Exception:
-                return content.decode("utf-8", errors="ignore")
-        return content.decode("utf-8", errors="ignore")
+                text = content.decode("utf-8", errors="ignore")
+        else:
+            text = content.decode("utf-8", errors="ignore")
+
+        try:
+            cache.write_text(text, encoding="utf-8")
+        except Exception:
+            pass
+        return text
+
+    # Status values a catalog entry can carry. "Not indexed" means no run has
+    # ever covered this document; the failure states are distinct from it so the
+    # registry can say why a document is missing from the graph.
+    NOT_INDEXED = "Not indexed"
+    INDEXED = "Indexed"
+    NEEDS_REINDEX = "Needs re-index"
+    INTERRUPTED = "Indexing interrupted"
+    FAILED = "Indexing failed"
 
     def mark_indexed(self, doc_id: str, chunks_indexed: int, chunks_total: int) -> None:
         """Record that a document's chunks are represented in the graph."""
@@ -285,16 +313,48 @@ class DocumentVault:
                 document["chunks_indexed"] = int(chunks_indexed)
                 document["chunks_total"] = int(chunks_total)
                 document["indexed_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
-                document["status"] = "Indexed" if chunks_indexed else "Not indexed"
+                document["status"] = self.INDEXED if chunks_indexed else self.NOT_INDEXED
+                document.pop("status_detail", None)
         self._save_catalog(catalog)
 
     def mark_needs_reindex(self, doc_id: Optional[str] = None) -> None:
-        """Flag one document, or all of them, as out of step with the graph."""
+        """Flag documents as out of step with the graph.
+
+        A document that has never been indexed stays "Not indexed" — it is not
+        stale, it is simply absent — but one that was in the graph becomes
+        "Needs re-index" so the registry shows the graph no longer matches.
+        """
         catalog = self._load_catalog()
         for document in catalog:
-            if doc_id is None or document["id"] == doc_id:
-                if document.get("chunks_indexed"):
-                    document["status"] = "Needs re-index"
+            if doc_id is not None and document["id"] != doc_id:
+                continue
+            if document.get("chunks_indexed"):
+                document["status"] = self.NEEDS_REINDEX
+            elif document.get("status") not in (self.INTERRUPTED, self.FAILED):
+                document["status"] = self.NOT_INDEXED
+        self._save_catalog(catalog)
+
+    def mark_index_outcome(
+        self,
+        doc_ids: List[str],
+        status: str,
+        detail: str = "",
+    ) -> None:
+        """Record that an index run ended badly for these documents.
+
+        Only documents with nothing in the graph take the failure status; a
+        document that was already indexed keeps its rows and is merely stale.
+        """
+        catalog = self._load_catalog()
+        wanted = set(doc_ids)
+        for document in catalog:
+            if document["id"] not in wanted:
+                continue
+            if document.get("chunks_indexed"):
+                document["status"] = self.NEEDS_REINDEX
+            else:
+                document["status"] = status
+                document["status_detail"] = detail[:300]
         self._save_catalog(catalog)
 
     def delete_document(self, doc_id: str, chroma_dir: Optional[str] = None) -> bool:
@@ -311,6 +371,10 @@ class DocumentVault:
         tables_file = self.tables_dir / f"{doc_id}_tables.json"
         if tables_file.exists():
             tables_file.unlink()
+
+        text_cache = self.text_dir / f"{doc_id}.txt"
+        if text_cache.exists():
+            text_cache.unlink()
 
         if chroma_dir:
             self.purge_vectors(doc_id, chroma_dir)

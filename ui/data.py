@@ -11,8 +11,12 @@ from typing import Any, Dict, List, Optional
 import pandas as pd
 import streamlit as st
 
+from core import providers
+from core.cache import ExtractionCache
 from core.change_manager import ChangeManagementAgent
+from core.ledger import UsageLedger
 from core.rag import GraphData, suggested_prompts as build_suggested_prompts
+from core.runlog import IndexRunLog
 from core.vault import DocumentVault
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -22,6 +26,8 @@ CONCEPT_MAP_PATH = ROOT / "notebook" / "interactive_graph.html"
 VAULT_DIR = ROOT / "vault"
 CHANGELOG_PATH = ROOT / "CHANGELOG.md"
 
+# Kept as the display fallback only. The real model for any stage comes from the
+# provider routing, which the user selects and which is persisted to disk.
 MODEL_NAME = "gpt-4o-mini"
 
 PARQUET_FILES = {
@@ -83,19 +89,60 @@ def passage_count() -> int:
         return 0
 
 
+# -----------------------------------------------------------------------------
+# Provider routing
+# -----------------------------------------------------------------------------
+def provider_settings() -> Dict[str, Any]:
+    """Routing config, read from disk so it survives a restart."""
+    return providers.load_settings(str(VAULT_DIR))
+
+
+def save_provider_settings(settings: Dict[str, Any]) -> None:
+    providers.save_settings(settings, str(VAULT_DIR))
+
+
+def provider_for(stage: str):
+    """The provider routed to one stage, falling back if it is unusable."""
+    routing, _warnings = providers.healthy_routing(provider_settings()["routing"])
+    return providers.get(routing[stage])
+
+
+def provider_warnings() -> List[str]:
+    _routing, warnings = providers.healthy_routing(provider_settings()["routing"])
+    return warnings
+
+
 @st.cache_resource(show_spinner=False)
-def get_llm(temperature: float = 0.2, model_name: str = MODEL_NAME):
-    from langchain_openai import ChatOpenAI
-    return ChatOpenAI(
-        model=model_name,
-        temperature=temperature,
-        api_key=os.getenv("OPENAI_API_KEY", ""),
+def _llm_for(provider_key: str, model: str, temperature: float, streaming: bool):
+    return providers.build_llm(
+        providers.get(provider_key), temperature=temperature, streaming=streaming
     )
+
+
+def get_llm(temperature: float = 0.2, model_name: Optional[str] = None, streaming: bool = False):
+    """The chat client for answer synthesis, on whichever route is selected."""
+    provider = provider_for("synthesis")
+    return _llm_for(provider.key, model_name or provider.model, temperature, streaming)
+
+
+@st.cache_resource(show_spinner=False)
+def get_extraction_cache() -> ExtractionCache:
+    return ExtractionCache(vault_dir=str(VAULT_DIR))
+
+
+def new_ledger() -> UsageLedger:
+    """A fresh ledger per run or per query; totals are appended to disk on finish."""
+    return UsageLedger()
 
 
 @st.cache_resource(show_spinner=False)
 def get_vault() -> DocumentVault:
     return DocumentVault(vault_dir=str(VAULT_DIR))
+
+
+@st.cache_resource(show_spinner=False)
+def get_run_log() -> IndexRunLog:
+    return IndexRunLog(vault_dir=str(VAULT_DIR))
 
 
 @st.cache_resource(show_spinner=False)

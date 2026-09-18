@@ -22,6 +22,8 @@ truststore.inject_into_ssl()
 
 from dotenv import load_dotenv
 
+from core import ledger as ledger_mod
+from core import providers
 from core import rag
 from screens import catalog as screen_catalog
 from screens import concept_map as screen_concept_map
@@ -49,16 +51,35 @@ st.session_state.setdefault("messages", [])
 st.session_state.setdefault("running", None)
 st.session_state.setdefault("temperature", 0.20)
 st.session_state.setdefault("citations_k", 4)
-st.session_state.setdefault("chunk_limit", 8)
+st.session_state.setdefault("chunk_limit", 4)
 
 # -----------------------------------------------------------------------------
 # Shared data
 # -----------------------------------------------------------------------------
 graph = data.graph_data()
 vault = data.get_vault()
+
+# A build runs inside one script run, so a restart can leave a run stranded.
+# Condemn those once per session and flag the documents they were covering.
+if not st.session_state.get("reaped_stale_runs"):
+    st.session_state.reaped_stale_runs = True
+    for stranded in data.get_run_log().reap_stale():
+        vault.mark_index_outcome(
+            [d["id"] for d in stranded.get("documents", []) if d.get("id")],
+            vault.INTERRUPTED,
+            stranded.get("error", ""),
+        )
+
 vault_documents = vault.get_catalog()
 qa = data.current_qa_report()
 version = data.app_version()
+
+# Provider routing, read from disk. healthy_routing falls back to a working
+# route for any stage whose provider has no key or no endpoint, so a missing
+# key degrades the app instead of breaking it mid-run.
+provider_settings = data.provider_settings()
+active_routing, routing_warnings = providers.healthy_routing(provider_settings["routing"])
+lifetime = ledger_mod.lifetime_totals(str(data.VAULT_DIR))
 
 screen = st.query_params.get("screen", "search")
 if screen not in SCREENS:
@@ -94,6 +115,64 @@ with st.sidebar:
             st.session_state.citations_k = st.slider(
                 "Citations", min_value=2, max_value=8,
                 value=int(st.session_state.citations_k),
+            )
+
+    # -- Engine ---------------------------------------------------------------
+    # Routing is a workspace setting, not a chat setting, so it is persisted to
+    # disk rather than session state: a restart must not silently move the app
+    # back onto a different (and differently priced) model.
+    with st.container(key="engine"):
+        st.markdown('<div class="k-rail__head">Engine</div>', unsafe_allow_html=True)
+        preset_names = list(providers.PRESETS) + ["custom"]
+        current_preset = provider_settings.get("preset", "balanced")
+        chosen_preset = st.selectbox(
+            "Preset", preset_names,
+            index=preset_names.index(current_preset) if current_preset in preset_names else 1,
+            key="engine_preset", label_visibility="collapsed",
+            format_func=lambda k: {
+                "frugal": "Frugal · all local, free",
+                "balanced": "Balanced · cheap index, best answers",
+                "best": "Best · highest quality",
+                "custom": "Custom",
+            }.get(k, k),
+        )
+        if chosen_preset != current_preset:
+            new_settings = dict(provider_settings, preset=chosen_preset)
+            if chosen_preset in providers.PRESETS:
+                new_settings["routing"] = dict(providers.PRESETS[chosen_preset])
+            data.save_provider_settings(new_settings)
+            data.clear_caches()
+            st.rerun()
+
+        rows = []
+        for provider in providers.available():
+            ok, status = providers.health(provider)
+            stages = [s for s, k in active_routing.items() if k == provider.key]
+            if provider.cost_per_mtok:
+                estimate = provider.cost_of(122_150, 57_763)
+                trade = f"~${estimate:.3f}/index · fast · sends data"
+            else:
+                trade = "free · slow · fully offline"
+            rows.append({
+                "label": provider.label,
+                "ok": ok,
+                "status": ", ".join(stages) if stages else status if not ok else "idle",
+                "trade": trade,
+                "active": bool(stages),
+            })
+        st.markdown(c.provider_rows(rows), unsafe_allow_html=True)
+
+        for warning in routing_warnings:
+            st.markdown(
+                f'<div class="k-faint" style="font-size:10.5px;color:#B7791F">{warning}</div>',
+                unsafe_allow_html=True,
+            )
+
+        if lifetime.get("runs"):
+            st.markdown(
+                c.spend_badge("spent", f"${lifetime['cost']:.3f}")
+                + c.spend_badge("avoided", f"{lifetime['calls_avoided']} calls", "ok"),
+                unsafe_allow_html=True,
             )
 
     if screen == "concepts" and not graph.nodes.empty and "community" in graph.nodes.columns:
@@ -145,6 +224,9 @@ state = {
     "temperature": float(st.session_state.temperature),
     "citations_k": int(st.session_state.citations_k),
     "chunk_limit": int(st.session_state.chunk_limit),
+    "routing": active_routing,
+    "provider_settings": provider_settings,
+    "lifetime": lifetime,
 }
 
 SCREENS[screen](state)

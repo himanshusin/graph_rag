@@ -7,3 +7,6 @@ ragtest/output/
 
 # Transient per-filter concept map renders
 notebook/concept_map_*.html
+
+# Derived text cache, regenerable from vault/documents
+vault/text/

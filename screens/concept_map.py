@@ -18,6 +18,20 @@ GRAPH_HEIGHT = 620
 MAX_DRAWN_NODES = 220
 
 
+def cell_length(value: Any) -> int:
+    """Length of a parquet list cell.
+
+    Arrow list columns come back as numpy arrays, so ``value or []`` raises
+    "truth value of an array is ambiguous" rather than falling back.
+    """
+    if value is None:
+        return 0
+    try:
+        return len(value)
+    except TypeError:
+        return 0
+
+
 def render(state: Dict[str, Any]) -> None:
     graph = state["graph"]
     size_by = st.query_params.get("size", "degree")
@@ -201,7 +215,7 @@ def _render_inspector(graph, title: Optional[str], state: Dict[str, Any]) -> Non
     entity = matches.iloc[0]
     community = graph.community_of(title)
     degree = graph.degree_of(title)
-    passages = len(entity.get("text_unit_ids") or [])
+    passages = cell_length(entity.get("text_unit_ids"))
 
     relationships = []
     if not graph.relationships.empty:
